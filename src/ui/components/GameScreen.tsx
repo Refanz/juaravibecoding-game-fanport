@@ -25,18 +25,18 @@ export default function GameScreen({ sprites, onReturnToWelcome }: Props) {
 
   // Domain singletons (stable refs)
   const player = useMemo(() => new Player(3, 3), []);
-  const floor  = useMemo(() => { const f = new FloorManager(); f.init(); return f; }, []);
-  const gs     = useMemo(() => { const g = new GameState(); g.startPlaying(); return g; }, []);
+  const floor = useMemo(() => { const f = new FloorManager(); f.init(); return f; }, []);
+  const gs = useMemo(() => { const g = new GameState(); g.startPlaying(); return g; }, []);
 
   // UI state (React)
-  const [currentFloor, setCurrentFloor]   = useState<1 | 2>(1);
-  const [solvedCount,  setSolvedCount]     = useState(0);
-  const [nearObject,   setNearObject]      = useState<number | null>(null);
-  const [nearElevator, setNearElevator]    = useState(false);
-  const [quizKey,      setQuizKey]         = useState<number | null>(null);
+  const [currentFloor, setCurrentFloor] = useState<1 | 2>(1);
+  const [solvedCount, setSolvedCount] = useState(0);
+  const [nearObject, setNearObject] = useState<number | null>(null);
+  const [nearElevator, setNearElevator] = useState(false);
+  const [quizKey, setQuizKey] = useState<number | null>(null);
   const [showTransition, setShowTransition] = useState(false);
-  const [transFloor,   setTransFloor]      = useState<1 | 2>(1);
-  const [won,          setWon]             = useState(false);
+  const [transFloor, setTransFloor] = useState<1 | 2>(1);
+  const [won, setWon] = useState(false);
 
   const { keys, consumeKey } = useInput();
 
@@ -46,7 +46,7 @@ export default function GameScreen({ sprites, onReturnToWelcome }: Props) {
       if (!canvasRef.current) return;
       const hud = document.getElementById('hud');
       const hudH = hud?.offsetHeight ?? 40;
-      canvasRef.current.width  = window.innerWidth;
+      canvasRef.current.width = window.innerWidth;
       canvasRef.current.height = window.innerHeight - hudH;
     };
     resize();
@@ -71,12 +71,9 @@ export default function GameScreen({ sprites, onReturnToWelcome }: Props) {
     AudioManager.complete();
   }, [gs, won]);
 
-  // Open quiz when gs.quizActive is set by game loop
-  useEffect(() => {
-    if (gs.quizActive && gs.quizObjectIndex !== null) {
-      setQuizKey(gs.quizObjectIndex);
-    }
-  });
+  const handleOpenQuiz = useCallback((idx: number) => {
+    setQuizKey(idx);
+  }, []);
 
   const handleCorrect = useCallback(() => {
     if (gs.quizObjectIndex !== null) {
@@ -101,6 +98,7 @@ export default function GameScreen({ sprites, onReturnToWelcome }: Props) {
     onNearElevator: handleNearElevator,
     onFloorChange: handleFloorChange,
     onWin: handleWin,
+    onOpenQuiz: handleOpenQuiz,
   });
 
   const activeQuiz = quizKey !== null

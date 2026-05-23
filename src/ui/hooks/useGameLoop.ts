@@ -30,6 +30,7 @@ interface UseGameLoopParams {
   onNearElevator: (near: boolean) => void;
   onWin: () => void;
   onFloorChange: (f: 1 | 2) => void;
+  onOpenQuiz: (idx: number) => void;
   consumeKey: (k: string) => void;
   keys: Record<string, boolean>;
 }
@@ -38,7 +39,7 @@ export function useGameLoop(params: UseGameLoopParams) {
   const {
     canvasRef, sprites, player, floor, gs,
     onNearObject, onNearElevator, onWin,
-    onFloorChange, consumeKey, keys,
+    onFloorChange, onOpenQuiz, consumeKey, keys,
   } = params;
 
   const lastTime = useRef(0);
@@ -177,6 +178,7 @@ export function useGameLoop(params: UseGameLoopParams) {
         const idx = floor.allObjects.indexOf(near);
         gs.quizObjectIndex = idx;
         gs.quizActive = true;
+        onOpenQuiz(idx);
       } else if (nearElev) {
         const target = floor.oppositeFloor();
         floor.loadFloor(target);
@@ -195,7 +197,7 @@ export function useGameLoop(params: UseGameLoopParams) {
     render(ctx, time);
 
     rafId.current = requestAnimationFrame(tick);
-  }, [canvasRef, consumeKey, floor, gs, keys, onFloorChange, onNearElevator, onNearObject, onWin, player, render]);
+  }, [canvasRef, consumeKey, floor, gs, keys, onFloorChange, onNearElevator, onNearObject, onOpenQuiz, onWin, player, render]);
 
   useEffect(() => {
     if (gs.screen !== 'playing') return;
