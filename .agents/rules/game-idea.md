@@ -2,47 +2,40 @@
 trigger: always_on
 ---
 
-# Instruksi Pembuatan Game: IT Support Vibe (Proyek #JuaraVibeCoding)
+# Instruksi Pembuatan Game: IT Support Hospital Vibe (Proyek #JuaraVibeCoding)
 
 ## Konteks Proyek
-Kamu adalah seorang ahli pengembangan game web-based. Buatkan saya sebuah purwarupa (prototype) game web sederhana dengan tema "IT Support" menggunakan gaya visual 2D top-down retro (mirip game RPG/Pokémon jadul). Game ini merupakan bagian dari submission kompetisi #JuaraVibeCoding, sehingga kodenya harus siap untuk di-deploy ke **Google Cloud Run**.
+Kamu adalah seorang ahli pengembangan game web-based. Buatkan saya purwarupa (prototype) game web dengan tema "IT Support di Rumah Sakit 2 Lantai" menggunakan gaya visual 2D top-down retro. Game ini adalah submission untuk kompetisi #JuaraVibeCoding, dan kodenya harus siap di-deploy ke **Google Cloud Run** [1].
 
-## Tech Stack & Infrastruktur
-- **Frontend**: HTML5, CSS3, dan JavaScript murni (disarankan menggunakan library **Kaboom.js** atau **Phaser.js** via CDN agar ringan dan cocok untuk vibe coding).
-- **Deployment**: Buatkan file `Dockerfile` sederhana (menggunakan image `nginx:alpine` atau `node`) untuk melayani (serve) file statis HTML/JS/CSS ini agar siap di-deploy langsung ke Google Cloud Run.
+## Tech Stack, Infrastruktur & Arsitektur
+- **Frontend**: **React** dipadukan dengan bundler **Vite** dan menggunakan bahasa **TypeScript**.
+- **Paradigma (Wajib)**: 
+  - Terapkan **Object-Oriented Programming (OOP)** untuk logika inti game (gunakan *class*, enkapsulasi, pewarisan, polimorfisme untuk entitas seperti `Player`, `NPC`, `InteractableObject`).
+  - Implementasikan **Clean Architecture** dan **Separation of Concerns (SoC)**. Pisahkan dengan jelas antara lapisan Presentasi (React Components/Hooks), lapisan Domain (Logika OOP Game murni), dan lapisan Infrastruktur (Data/Asset).
+- **Deployment**: Buatkan `Dockerfile` multi-stage (Node.js untuk *build* project Vite, lalu `nginx:alpine` untuk *serve* folder `dist` di port 8080) [1].
 
 ## Spesifikasi & Flow Game
-Game harus fungsional, responsif, dan memiliki 3 layar/state utama:
+Game memiliki 2 state utama:
+1. **Welcome Page**: Judul "IT Support: Hospital Vibe", tombol "Start Game", dan UI bernuansa rumah sakit.
+2. **Main Game (Peta 2 Lantai)**: 
+   - Pemain bergerak menggunakan panah/WASD.
+   - Bisa berpindah lantai dengan mendekati objek **Lift** (tekan Spasi).
+   - **Interaksi Kasus**: Terdapat PC/Alat rusak berkedip merah. Jika didekati (tekan Spasi), muncul popup kuis troubleshooting IT.
 
-1. **Welcome Page**: 
-   - Menampilkan judul game (contoh: "IT Support: The Vibe Coder").
-   - Tombol "Start Game".
-   - Teks instruksi singkat cara bermain. 
-   - Desain UI harus bernuansa retro/pixel-art, rapi, dan ramah untuk orang awam.
+## Layout & Tata Ruang
+Buatkan tata letak grid/ruangan yang luas:
+- **Lantai 1:** Front Office (spawn), IGD, Farmasi, ICU, Rawat Inap (Kelas 1, 2, 3), dan Rawat Jalan (10 meja Poli: Anak, Penyakit Dalam, ObGyn, Bedah, Mata, THT, Gigi, Saraf, Kulit & Kelamin, Jantung).
+- **Lantai 2:** Rawat Inap VIP, Ruang Operasi, Hemodialisa, Radiologi.
 
-2. **Level Selection**: 
-   - Menampilkan minimal 3 level. 
-   - Level 2 dan 3 awalnya terkunci (locked) dan baru bisa diakses setelah level sebelumnya diselesaikan.
-
-3. **Main Game (Mekanik Top-Down 2D)**:
-   - Karakter utama bisa bergerak (Atas, Bawah, Kiri, Kanan) menggunakan tombol panah atau WASD di dalam ruangan kantor/server.
-   - Terdapat objek berkedip atau "NPC" (seperti komputer mati, router rusak) yang harus dihampiri.
-   - **Interaksi**: Saat pemain berada di dekat objek dan menekan tombol aksi (misal: Spasi), muncul popup dialog/kuis troubleshooting IT sederhana.
-   - Pemain menang jika berhasil menjawab/menyelesaikan task IT tersebut.
-
-## Rincian Level (Sederhana)
-- **Level 1 (The Power Issue)**: Pemain harus berjalan mencari 1 komputer yang mati dan menyalakannya (Kuis: "Layar blank, apa yang dicek pertama kali? A. Kabel Power, B. Beli baru").
-- **Level 2 (The Router Down)**: Pemain mencari router di ruang server yang ruwet untuk merestart jaringan internet.
-- **Level 3 (The Virus Outbreak)**: Pemain harus mengkarantina 3 komputer yang terinfeksi virus dengan batas waktu (timer).
-
-## Manajemen Asset (Vibe Coding)
-Karena ini "vibe coding", **jangan gunakan local asset gambar**. Gunakan bentuk geometri dengan warna-warni yang merepresentasikan objek, atau gunakan **Emoji** (misal: 💻 untuk PC, 👨‍💻 untuk player, 📡 untuk router) yang di-render di atas kanvas agar kode bisa langsung berjalan (run) tanpa pesan error "image not found".
+## Manajemen Asset & Optimasi Performa
+Jangan gunakan local asset gambar. **Generate seluruh aset menggunakan kode SVG (Scalable Vector Graphics)** dengan aturan:
+1. **Rasterisasi di Awal**: Render kode SVG menjadi format Data URI (PNG/Base64) **hanya satu kali saat preload**. Jangan render ulang vektor di setiap frame.
+2. **Bentuk Dasar & Flat Design**: Gunakan `<rect>`, `<circle>`, `<polygon>`. Dilarang menggunakan filter berat (drop shadow, blur) atau `<path>` kompleks. Gunakan warna solid retro.
+3. **Daftar Aset**: Pemain (IT dengan laptop), Tenaga Medis, Meja PC, PC Rusak, Pintu Lift, Kasur, Obat, Simbol Radiasi.
 
 ## Output yang Dibutuhkan
-Tolong hasilkan baris kode lengkap untuk file-file berikut:
-1. `index.html` (Struktur dasar & impor library via CDN)
-2. `style.css` (Gaya retro, font pixel jika memungkinkan via Google Fonts)
-3. `game.js` (Logika game, state Welcome, Level Select, pergerakan, dan deteksi tabrakan/interaksi)
-4. `Dockerfile` (Konfigurasi Nginx untuk melayani direktori statis pada port 8080 sesuai standar Cloud Run)
-
-Pastikan kodenya fungsional, bersih, dan menghasilkan user experience yang menyenangkan!
+Hasilkan struktur proyek Vite yang modular dan baris kode lengkap untuk:
+1. Konfigurasi proyek (`package.json`, `vite.config.ts`, `tsconfig.json`).
+2. `index.html` dan file entry `src/main.tsx`.
+3. Direktori `src/` yang terstruktur (contoh: `src/domain/`, `src/ui/components/`, `src/infrastructure/`) yang memadukan UI komponen React dengan logika class OOP.
+4. `Dockerfile` yang siap mem-build Vite app dan men-deploy hasilnya ke Cloud Run.

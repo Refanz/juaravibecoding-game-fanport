@@ -1,16 +1,26 @@
-FROM nginx:alpine
+# ==========================================
+# Dockerfile — Multi-stage build
+# Stage 1: Build Vite + React + TypeScript
+# Stage 2: Serve dengan nginx:alpine port 8080
+# ==========================================
 
-# Remove default nginx config
+# Stage 1: Build
+FROM node:20-alpine AS builder
+
+WORKDIR /app
+
+COPY package*.json ./
+RUN npm install
+
+COPY . .
+RUN npm run build
+
+# Stage 2: Serve
+FROM nginx:alpine AS runner
+
 RUN rm /etc/nginx/conf.d/default.conf
-
-# Copy custom config
 COPY nginx.conf /etc/nginx/conf.d/default.conf
-
-# Copy game files
-COPY index.html /usr/share/nginx/html/
-COPY style.css /usr/share/nginx/html/
-COPY levels.js /usr/share/nginx/html/
-COPY game.js /usr/share/nginx/html/
+COPY --from=builder /app/dist /usr/share/nginx/html
 
 EXPOSE 8080
 
