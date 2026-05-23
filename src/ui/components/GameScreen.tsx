@@ -108,30 +108,36 @@ export default function GameScreen({ sprites, onReturnToWelcome }: Props) {
     : null;
 
   return (
-    <div className="screen game-screen">
+    <div className="w-screen h-screen flex flex-col bg-surface">
       {/* HUD */}
-      <div id="hud" className="hud">
-        <span className="hud-floor">🏥 Lantai {currentFloor}</span>
-        <span className="hud-obj">🔎 Temukan &amp; perbaiki perangkat IT rusak!</span>
-        <span className="hud-prog">📊 {solvedCount}/{floor.totalObjects}</span>
+      <div id="hud" className="flex items-center gap-4 py-1.5 px-4 bg-dark/90 border-b border-hospital-blue/30 text-[clamp(0.35rem,1vw,0.55rem)] flex-wrap">
+        <span className="text-hospital-sky">🏥 Lantai {currentFloor}</span>
+        <span className="text-text-dim flex-1">🔎 Temukan &amp; perbaiki perangkat IT rusak!</span>
+        <span className="text-medical-green">📊 {solvedCount}/{floor.totalObjects}</span>
       </div>
 
       {/* Canvas */}
       <canvas ref={canvasRef} id="gameCanvas" />
 
       {/* Interaction hints */}
-      <div id="interaction-hint" className={`hint ${nearObject !== null && !activeQuiz ? '' : 'hidden'}`}>
-        ⌨️ Tekan <span className="key">[SPASI]</span> untuk interaksi
-      </div>
-      <div id="elevator-hint" className={`hint ${nearElevator && nearObject === null && !activeQuiz ? '' : 'hidden'}`}>
-        🛗 Tekan <span className="key">[SPASI]</span> naik/turun lantai
-      </div>
+      {nearObject !== null && !activeQuiz && (
+        <div className="fixed bottom-4 left-1/2 -translate-x-1/2 bg-dark/90 border border-hospital-sky py-1.5 px-4 text-[0.5rem] text-hospital-sky rounded pointer-events-none whitespace-nowrap">
+          ⌨️ Tekan <span className="bg-hospital-blue py-0.5 px-1.5 rounded-sm mx-0.5">[SPASI]</span> untuk interaksi
+        </div>
+      )}
+      {nearElevator && nearObject === null && !activeQuiz && (
+        <div className="fixed bottom-4 left-1/2 -translate-x-1/2 bg-dark/90 border border-hospital-sky py-1.5 px-4 text-[0.5rem] text-hospital-sky rounded pointer-events-none whitespace-nowrap">
+          🛗 Tekan <span className="bg-hospital-blue py-0.5 px-1.5 rounded-sm mx-0.5">[SPASI]</span> naik/turun lantai
+        </div>
+      )}
 
       {/* Floor Transition */}
-      <div className={`transition-overlay ${showTransition ? '' : 'hidden'}`} id="floor-transition">
-        <div className="transition-icon">🛗</div>
-        <div className="transition-text" id="transition-text">Menuju Lantai {transFloor}...</div>
-      </div>
+      {showTransition && (
+        <div className="fixed inset-0 bg-black/85 flex flex-col items-center justify-center gap-4 z-200 animate-fade-in">
+          <div className="text-5xl animate-bounce-icon">🛗</div>
+          <div className="text-[clamp(0.7rem,2vw,1.1rem)] text-hospital-sky">Menuju Lantai {transFloor}...</div>
+        </div>
+      )}
 
       {/* Quiz Modal */}
       {activeQuiz && (
@@ -143,20 +149,26 @@ export default function GameScreen({ sprites, onReturnToWelcome }: Props) {
       )}
 
       {/* Win Modal */}
-      <div className={`win-overlay ${won ? '' : 'hidden'}`} id="win-modal">
-        <div className="win-card">
-          <div style={{ fontSize: '2.5rem' }}>🏆</div>
-          <div className="win-title">MISI SELESAI!</div>
-          <div className="win-sub">
-            Semua perangkat IT di Rumah Sakit<br />
-            telah berhasil diperbaiki!<br />
-            Pasien aman, sistem berjalan normal. ✅
+      {won && (
+        <div className="fixed inset-0 bg-black/88 flex items-center justify-center z-300 animate-fade-in">
+          <div className="bg-dark border-2 border-medical-green rounded-lg p-8 text-center flex flex-col gap-5 max-w-[400px]">
+            <div className="text-[2.5rem]">🏆</div>
+            <div className="text-[clamp(0.8rem,2vw,1.2rem)] text-medical-light">MISI SELESAI!</div>
+            <div className="text-[0.5rem] text-text-dim leading-[2]">
+              Semua perangkat IT di Rumah Sakit<br />
+              telah berhasil diperbaiki!<br />
+              Pasien aman, sistem berjalan normal. ✅
+            </div>
+            <button
+              id="btn-play-again"
+              onClick={() => onReturnToWelcome()}
+              className="bg-medical-green border-2 border-medical-light text-white font-[var(--font-pixel)] text-[0.55rem] py-3 px-6 cursor-pointer rounded transition-all duration-200 hover:scale-105 hover:shadow-[0_0_16px_#66bb6a]"
+            >
+              🔄 MAIN LAGI
+            </button>
           </div>
-          <button id="btn-play-again" className="btn-again" onClick={() => { onReturnToWelcome(); }}>
-            🔄 MAIN LAGI
-          </button>
         </div>
-      </div>
+      )}
     </div>
   );
 }

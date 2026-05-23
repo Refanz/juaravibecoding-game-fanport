@@ -26,8 +26,7 @@ export default function App() {
 
   if (!sprites) {
     return (
-      <div style={{ display:'flex', alignItems:'center', justifyContent:'center',
-        height:'100vh', fontFamily:'monospace', color:'#4fc3f7', fontSize:'1rem' }}>
+      <div className="flex items-center justify-center h-screen font-mono text-hospital-sky text-base">
         🏥 Loading assets...
       </div>
     );
