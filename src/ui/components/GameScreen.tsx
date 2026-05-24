@@ -16,12 +16,14 @@ import InfoModal from './InfoModal';
 import PauseModal from './PauseModal';
 import CCTVMonitorModal from './CCTVMonitorModal';
 import VirtualGamepad from './VirtualGamepad';
+import MapModal from './MapModal';
 
 interface Props {
   onReturnToWelcome: () => void;
+  isWelcome?: boolean;
 }
 
-export default function GameScreen({ onReturnToWelcome }: Props) {
+export default function GameScreen({ onReturnToWelcome, isWelcome = false }: Props) {
   // Domain singletons (stable refs)
   const floor = useMemo(() => { const f = new FloorManager(); f.init(); return f; }, []);
   const gs = useMemo(() => { const g = new GameState(); g.startPlaying(); return g; }, []);
@@ -37,6 +39,7 @@ export default function GameScreen({ onReturnToWelcome }: Props) {
   const [transFloor, setTransFloor] = useState<1 | 2>(1);
   const [won, setWon] = useState(false);
   const [showInfo, setShowInfo] = useState(false);
+  const [showMap, setShowMap] = useState(false);
   const [showPause, setShowPause] = useState(false);
   const [showCCTV, setShowCCTV] = useState(false);
 
@@ -110,43 +113,61 @@ export default function GameScreen({ onReturnToWelcome }: Props) {
   return (
     <div className="w-screen h-screen flex flex-col bg-surface">
       {/* HUD */}
-      <div id="hud" className="flex items-center gap-4 py-1.5 px-4 bg-dark/90 border-b border-hospital-blue/30 text-[clamp(0.35rem,1vw,0.55rem)] flex-wrap">
-        <span className="text-hospital-sky">🏥 Lantai {currentFloor}</span>
-        <span className="text-text-dim flex-1">🔎 Temukan &amp; perbaiki perangkat IT rusak!</span>
-        <span className="text-medical-green">📊 {solvedCount}/{floor.totalObjects}</span>
-        <button 
-          onClick={() => setShowInfo(true)}
-          className="text-hospital-sky hover:text-white bg-hospital-blue/20 hover:bg-hospital-blue/40 border border-hospital-blue px-2 py-1 rounded cursor-pointer transition-colors text-[0.6rem] ml-2 flex items-center gap-1"
-          title="Informasi Ikon"
-        >
-          <span>ℹ️</span> Info
-        </button>
-        <button 
-          onClick={handlePause}
-          className="text-hospital-sky hover:text-white bg-hospital-blue/20 hover:bg-hospital-blue/40 border border-hospital-blue px-2 py-1.5 rounded cursor-pointer transition-colors ml-1 flex items-center justify-center"
-          title="Pause Game"
-        >
-          <span className="text-sm sm:text-base leading-none">⏸️</span>
-        </button>
-      </div>
+      {!isWelcome && (
+        <div id="hud" className="flex items-center gap-4 py-1.5 px-4 bg-dark/90 border-b border-hospital-blue/30 text-[clamp(0.35rem,1vw,0.55rem)] flex-wrap z-10 relative">
+          <span className="text-hospital-sky">🏥 Lantai {currentFloor}</span>
+          <span className="text-text-dim flex-1">🔎 Temukan &amp; perbaiki perangkat IT rusak!</span>
+          <span className="text-medical-green">📊 {solvedCount}/{floor.totalObjects}</span>
+        </div>
+      )}
 
       {/* Phaser Game Container */}
       <div className="flex-1 overflow-hidden relative">
+        {/* Floating Action Buttons */}
+        {!isWelcome && (
+          <div className="absolute top-4 left-4 flex flex-col gap-3 z-50 pointer-events-auto">
+            <button 
+              onClick={handlePause}
+              className="text-hospital-sky hover:text-white bg-dark/50 hover:bg-dark border border-hospital-blue/40 hover:border-hospital-blue w-10 h-10 sm:w-auto sm:h-auto sm:px-4 sm:py-2 rounded-full cursor-pointer transition-all duration-300 opacity-60 hover:opacity-100 shadow-[0_0_10px_rgba(0,0,0,0.5)] backdrop-blur-sm flex items-center justify-center gap-2 group"
+              title="Pause Game"
+            >
+              <span className="text-lg leading-none group-hover:scale-110 transition-transform">⏸️</span>
+              <span className="text-[0.65rem] font-bold tracking-wider hidden sm:block">PAUSE</span>
+            </button>
+            <button 
+              onClick={() => setShowMap(true)}
+              className="text-hospital-sky hover:text-white bg-dark/50 hover:bg-dark border border-hospital-blue/40 hover:border-hospital-blue w-10 h-10 sm:w-auto sm:h-auto sm:px-4 sm:py-2 rounded-full cursor-pointer transition-all duration-300 opacity-60 hover:opacity-100 shadow-[0_0_10px_rgba(0,0,0,0.5)] backdrop-blur-sm flex items-center justify-center gap-2 group"
+              title="Buka Map"
+            >
+              <span className="text-lg leading-none group-hover:scale-110 transition-transform">🗺️</span>
+              <span className="text-[0.65rem] font-bold tracking-wider hidden sm:block">MAP</span>
+            </button>
+            <button 
+              onClick={() => setShowInfo(true)}
+              className="text-hospital-sky hover:text-white bg-dark/50 hover:bg-dark border border-hospital-blue/40 hover:border-hospital-blue w-10 h-10 sm:w-auto sm:h-auto sm:px-4 sm:py-2 rounded-full cursor-pointer transition-all duration-300 opacity-60 hover:opacity-100 shadow-[0_0_10px_rgba(0,0,0,0.5)] backdrop-blur-sm flex items-center justify-center gap-2 group"
+              title="Informasi Ikon"
+            >
+              <span className="text-lg leading-none group-hover:scale-110 transition-transform">ℹ️</span>
+              <span className="text-[0.65rem] font-bold tracking-wider hidden sm:block">INFO</span>
+            </button>
+          </div>
+        )}
+
         <PhaserGame floorManager={floor} gameState={gs} />
-        <VirtualGamepad />
+        {!isWelcome && <VirtualGamepad />}
 
         {/* Interaction hints */}
-        {nearObject !== null && !activeQuiz && (
+        {!isWelcome && nearObject !== null && !activeQuiz && (
           <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-dark/90 border border-hospital-sky py-1.5 px-4 text-[0.5rem] text-hospital-sky rounded pointer-events-none whitespace-nowrap">
             ⌨️ Tekan <span className="bg-hospital-blue py-0.5 px-1.5 rounded-sm mx-0.5">[SPASI]</span> untuk interaksi
           </div>
         )}
-        {nearElevator && nearObject === null && !activeQuiz && (
+        {!isWelcome && nearElevator && nearObject === null && !activeQuiz && (
           <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-dark/90 border border-hospital-sky py-1.5 px-4 text-[0.5rem] text-hospital-sky rounded pointer-events-none whitespace-nowrap">
             🛗 Tekan <span className="bg-hospital-blue py-0.5 px-1.5 rounded-sm mx-0.5">[SPASI]</span> naik/turun lantai
           </div>
         )}
-        {nearCCTV && nearObject === null && !activeQuiz && !nearElevator && (
+        {!isWelcome && nearCCTV && nearObject === null && !activeQuiz && !nearElevator && (
           <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-dark/90 border border-[#4fc3f7] py-1.5 px-4 text-[0.5rem] text-[#4fc3f7] rounded pointer-events-none whitespace-nowrap">
             📹 Tekan <span className="bg-[#1b4f72] py-0.5 px-1.5 rounded-sm mx-0.5">[SPASI]</span> Monitor CCTV
           </div>
@@ -188,6 +209,11 @@ export default function GameScreen({ onReturnToWelcome }: Props) {
       {/* CCTV Monitor Modal */}
       {showCCTV && (
         <CCTVMonitorModal onClose={() => setShowCCTV(false)} />
+      )}
+
+      {/* Map Modal */}
+      {showMap && (
+        <MapModal onClose={() => setShowMap(false)} initialFloor={currentFloor} />
       )}
 
       {/* Win Modal */}
