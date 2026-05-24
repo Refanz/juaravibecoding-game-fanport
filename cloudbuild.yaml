@@ -1,0 +1,35 @@
+steps:
+  # 1. Build the Docker image
+  - name: 'gcr.io/cloud-builders/docker'
+    args: 
+      - 'build'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/hospital-it-support'
+      - '.'
+
+  # 2. Push the Docker image to Google Container Registry (GCR)
+  - name: 'gcr.io/cloud-builders/docker'
+    args: 
+      - 'push'
+      - 'gcr.io/$PROJECT_ID/hospital-it-support'
+
+  # 3. Deploy the image to Google Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: 'gcloud'
+    args:
+      - 'run'
+      - 'deploy'
+      - 'hospital-it-support'
+      - '--image'
+      - 'gcr.io/$PROJECT_ID/hospital-it-support'
+      - '--region'
+      - 'asia-southeast2' # Region Jakarta (bisa disesuaikan)
+      - '--platform'
+      - 'managed'
+      - '--port'
+      - '8080'
+      - '--allow-unauthenticated'
+
+# Menyimpan image di GCR
+images:
+  - 'gcr.io/$PROJECT_ID/hospital-it-support'
