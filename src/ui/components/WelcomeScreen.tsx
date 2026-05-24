@@ -2,11 +2,15 @@
 // ui/components/WelcomeScreen.tsx
 // ==========================================
 
+import { useState } from 'react';
 import { AudioManager } from '../../infrastructure/assets/AudioManager';
+import SettingsModal from './SettingsModal';
 
 interface Props { onStart: () => void; }
 
 export default function WelcomeScreen({ onStart }: Props) {
+  const [showSettings, setShowSettings] = useState(false);
+
   const handleStart = () => { AudioManager.click(); onStart(); };
   return (
     <div className="w-screen h-screen flex flex-col items-center justify-center gap-8 text-center p-8 bg-[radial-gradient(ellipse_at_center,_#0a2a4a_0%,_#041020_100%)] animate-fade-in">
@@ -17,13 +21,22 @@ export default function WelcomeScreen({ onStart }: Props) {
       <p className="text-[clamp(0.55rem,1.5vw,0.85rem)] text-text-dim">
         #JuaraVibeCoding — Google Cloud Run
       </p>
-      <button
-        id="btn-start"
-        onClick={handleStart}
-        className="bg-linear-to-br from-hospital-blue to-[#0d47a1] border-2 border-hospital-sky text-white font-[var(--font-pixel)] text-[clamp(0.5rem,1.5vw,0.8rem)] py-3.5 px-8 cursor-pointer rounded uppercase tracking-widest transition-all duration-200 hover:bg-hospital-sky hover:text-dark-deep hover:scale-105 hover:shadow-[0_0_20px_#4fc3f7]"
-      >
-        ▶ START GAME
-      </button>
+      <div className="flex gap-4">
+        <button
+          id="btn-start"
+          onClick={handleStart}
+          className="bg-linear-to-br from-hospital-blue to-[#0d47a1] border-2 border-hospital-sky text-white font-[var(--font-pixel)] text-[clamp(0.5rem,1.5vw,0.8rem)] py-3.5 px-8 cursor-pointer rounded uppercase tracking-widest transition-all duration-200 hover:bg-hospital-sky hover:text-dark-deep hover:scale-105 hover:shadow-[0_0_20px_#4fc3f7]"
+        >
+          ▶ START GAME
+        </button>
+        <button
+          onClick={() => { AudioManager.click(); setShowSettings(true); }}
+          className="bg-dark/50 border-2 border-[#607d8b] text-text-light font-[var(--font-pixel)] text-[clamp(0.5rem,1.5vw,0.8rem)] py-3.5 px-4 cursor-pointer rounded transition-all duration-200 hover:bg-[#607d8b] hover:text-white hover:scale-105"
+          title="Pengaturan"
+        >
+          ⚙️
+        </button>
+      </div>
       <div className="text-[0.5rem] text-[#607d8b] leading-[2.2]">
         🕹️ WASD / Arrow Keys — Gerak<br />
         ⌨️ SPASI — Interaksi / Lift<br />
@@ -32,6 +45,8 @@ export default function WelcomeScreen({ onStart }: Props) {
       <div className="text-[0.45rem] text-hospital-sky border border-hospital-sky/30 py-1 px-3 rounded-full">
         🏆 Submission #JuaraVibeCoding 2026
       </div>
+
+      {showSettings && <SettingsModal onClose={() => setShowSettings(false)} />}
     </div>
   );
 }

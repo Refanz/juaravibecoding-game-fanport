@@ -5,8 +5,10 @@
 
 const AudioCtxCtor = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
 let audioCtx: AudioContext | null = null;
+let isMuted = localStorage.getItem('jvc_sound') === 'off';
 
 function beep(freq: number, dur: number, type: OscillatorType = 'square'): void {
+  if (isMuted) return;
   if (!audioCtx) audioCtx = new AudioCtxCtor();
   const o = audioCtx.createOscillator();
   const g = audioCtx.createGain();
@@ -21,6 +23,11 @@ function beep(freq: number, dur: number, type: OscillatorType = 'square'): void 
 }
 
 export const AudioManager = {
+  setMuted: (muted: boolean) => {
+    isMuted = muted;
+    localStorage.setItem('jvc_sound', muted ? 'off' : 'on');
+  },
+  isMuted: () => isMuted,
   click:    () => beep(440, 0.1),
   correct:  () => { beep(523,0.1); setTimeout(()=>beep(659,0.1),100); setTimeout(()=>beep(784,0.15),200); },
   wrong:    () => { beep(200,0.2,'sawtooth'); setTimeout(()=>beep(150,0.3,'sawtooth'),200); },
