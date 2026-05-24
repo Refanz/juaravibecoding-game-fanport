@@ -230,9 +230,21 @@ export class GameScene extends Phaser.Scene {
         if (SOLID_TILES.includes(type)) {
           // If it's a wall, we handle visual and physics differently
           if (type === 1) {
-             const wallSprite = this.wallsGroup.create(x + TILE/2, y, 'wall') as Phaser.Physics.Arcade.Sprite;
-             wallSprite.setSize(TILE, TILE);
-             wallSprite.setOffset(0, TILE); // The SVG is 96px high, collision is the bottom 48px
+             const leftType = c > 0 ? map[r][c-1] : 0;
+             const rightType = c < map[r].length - 1 ? map[r][c+1] : 0;
+             const isVertical = leftType !== 1 && rightType !== 1;
+             
+             const wallSpriteKey = isVertical ? 'wallVertical' : 'wall';
+             const wallSprite = this.wallsGroup.create(x + TILE/2, y, wallSpriteKey) as Phaser.Physics.Arcade.Sprite;
+             
+             if (isVertical) {
+                 wallSprite.setSize(12, TILE); // 12px wide collision box
+                 wallSprite.setOffset(18, TILE); // Centered (18px from left), 48px from top
+             } else {
+                 wallSprite.setSize(TILE, TILE);
+                 wallSprite.setOffset(0, TILE); // The SVG is 96px high, collision is the bottom 48px
+             }
+             
              wallSprite.setDepth(y + TILE); // Y-sort based on the bottom of the tile
           } else {
              const collisionBox = this.add.rectangle(x + TILE/2, y + TILE/2, TILE, TILE, 0x000000, 0);
@@ -248,6 +260,15 @@ export class GameScene extends Phaser.Scene {
                 bed.setDepth(y + TILE);
              }
           }
+        } else if (type === 7) { // Door
+           // Draw a floor underneath
+           const rect = this.add.rectangle(x + TILE/2, y + TILE/2, TILE, TILE, 0xe8f0f8);
+           rect.setDepth(0);
+           rect.setStrokeStyle(1, 0xd6e4f0);
+           
+           // Draw door sprite
+           const doorSprite = this.add.image(x + TILE/2, y + TILE/2, 'door');
+           doorSprite.setDepth(0); // Flat on the floor
         }
       }
     }
