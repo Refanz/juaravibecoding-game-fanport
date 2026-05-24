@@ -15,6 +15,7 @@ import QuizModal from './QuizModal';
 import InfoModal from './InfoModal';
 import PauseModal from './PauseModal';
 import CCTVMonitorModal from './CCTVMonitorModal';
+import VirtualGamepad from './VirtualGamepad';
 
 interface Props {
   onReturnToWelcome: () => void;
@@ -132,6 +133,7 @@ export default function GameScreen({ onReturnToWelcome }: Props) {
       {/* Phaser Game Container */}
       <div className="flex-1 overflow-hidden relative">
         <PhaserGame floorManager={floor} gameState={gs} />
+        <VirtualGamepad />
 
         {/* Interaction hints */}
         {nearObject !== null && !activeQuiz && (
