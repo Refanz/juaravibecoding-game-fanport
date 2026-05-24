@@ -9,9 +9,9 @@ export interface NPCData { x: number; y: number; role: 'doctor' | 'nurse' | 'gue
 export interface DecorData { x: number; y: number; type: 'bed' | 'medicine' | 'radiation' | 'accessPoint' | 'car' | 'motorcycle' | 'gate' | 'securityPost' | 'cctvCamera' | 'cctvMonitor'; }
 export interface BrokenObjectData {
   x: number; y: number;
-  type: 'computer' | 'monitor';
+  type: 'computer' | 'monitor' | 'serverRack' | 'ups' | 'firewall' | 'switchCore' | 'switchAccess' | 'ac' | 'accessDoor' | 'modemSenang' | 'modemCepat' | 'modemGatotkaca';
   label: string;
-  floor: 1 | 2;
+  floor: 1 | 2 | 3;
 }
 
 // ---- Lantai 1 ----
@@ -31,6 +31,7 @@ export const ROOM_LABELS_F1: RoomLabel[] = [
   { x: 7, y: 18, text: 'Gigi' }, { x: 11, y: 18, text: 'Saraf' },
   { x: 15, y: 18, text: 'Kulit' }, { x: 19, y: 18, text: 'Jantung' },
   { x: 26, y: 10, text: 'LIFT' },
+  { x: 24, y: 14, text: 'IT HUB' },
   { x: 24, y: 16, text: 'RUANG CCTV' },
 ];
 
@@ -128,6 +129,7 @@ export const FLOOR1_OBJECTS: BrokenObjectData[] = [
   { x: 2, y: 15, type: 'computer', label: 'PC Poli Anak', floor: 1 },
   { x: 10, y: 15, type: 'computer', label: 'PC Poli Kandung', floor: 1 },
   { x: 18, y: 18, type: 'computer', label: 'PC Poli Kulit', floor: 1 },
+  { x: 24, y: 15, type: 'switchAccess', label: 'Switch Distribusi Lt.1', floor: 1 },
 ];
 
 // ---- Lantai 2 ----
@@ -136,6 +138,7 @@ export const ROOM_LABELS_F2: RoomLabel[] = [
   { x: 14, y: 1, text: 'RADIOLOGI' },
   { x: 3, y: 7, text: 'HEMODIALISA' },
   { x: 14, y: 7, text: 'RAWAT INAP VIP' },
+  { x: 24, y: 9, text: 'IT HUB' },
   { x: 26, y: 10, text: 'LIFT' },
 ];
 
@@ -173,6 +176,40 @@ export const FLOOR2_OBJECTS: BrokenObjectData[] = [
   { x: 14, y: 2, type: 'monitor', label: 'Alat Radiologi', floor: 2 },
   { x: 5, y: 8, type: 'computer', label: 'PC Hemodialisa', floor: 2 },
   { x: 15, y: 8, type: 'monitor', label: 'Alat VIP', floor: 2 },
+  { x: 24, y: 10, type: 'switchAccess', label: 'Switch Distribusi Lt.2', floor: 2 },
+];
+
+// ---- Lantai 3 ----
+export const ROOM_LABELS_F3: RoomLabel[] = [
+  { x: 10, y: 14, text: 'SERVER ROOM' },
+  { x: 23, y: 11, text: 'LORONG LIFT' },
+  { x: 26, y: 10, text: 'LIFT' },
+];
+export const FLOOR3_NPCS: NPCData[] = [];
+export const FLOOR3_DECORATIONS: DecorData[] = [
+  { x: 4, y: 4, type: 'cctvCamera' },
+  { x: 17, y: 25, type: 'cctvCamera' },
+];
+export const FLOOR3_OBJECTS: BrokenObjectData[] = [
+  { x: 20, y: 11, type: 'accessDoor', label: 'Access Door Server', floor: 3 },
+  { x: 3, y: 3, type: 'ac', label: 'AC Server Room', floor: 3 },
+  { x: 16, y: 4, type: 'modemSenang', label: 'Modem SenangNet', floor: 3 },
+  { x: 16, y: 5, type: 'modemCepat', label: 'Modem CepatNet', floor: 3 },
+  { x: 16, y: 6, type: 'modemGatotkaca', label: 'Modem GatotkacaNet', floor: 3 },
+  { x: 16, y: 7, type: 'firewall', label: 'Fortigate Firewall', floor: 3 },
+  { x: 16, y: 8, type: 'switchCore', label: 'Switch Core', floor: 3 },
+  { x: 16, y: 9, type: 'ups', label: 'UPS Utama', floor: 3 },
+  { x: 6, y: 10, type: 'serverRack', label: 'Rak Server A1', floor: 3 },
+  { x: 6, y: 12, type: 'serverRack', label: 'Rak Server A2', floor: 3 },
+  { x: 6, y: 14, type: 'serverRack', label: 'Rak Server A3', floor: 3 },
+  { x: 6, y: 16, type: 'serverRack', label: 'Rak Server A4', floor: 3 },
+  { x: 6, y: 18, type: 'serverRack', label: 'Rak Server A5', floor: 3 },
+  { x: 10, y: 10, type: 'serverRack', label: 'Rak Server B1', floor: 3 },
+  { x: 10, y: 12, type: 'serverRack', label: 'Rak Server B2', floor: 3 },
+  { x: 10, y: 14, type: 'serverRack', label: 'Rak Server B3', floor: 3 },
+  { x: 10, y: 16, type: 'serverRack', label: 'Rak Server B4', floor: 3 },
+  { x: 10, y: 18, type: 'serverRack', label: 'Rak Server B5', floor: 3 },
+  { x: 16, y: 24, type: 'computer', label: 'PC Monitoring', floor: 3 },
 ];
 
 export interface AreaBounds {
@@ -200,4 +237,8 @@ export const FLOOR2_AREA_BOUNDS: AreaBounds[] = [
   { id: 'radiologi', startX: 12, startY: 1, endX: 26, endY: 5 },
   { id: 'hemodialisa', startX: 1, startY: 7, endX: 10, endY: 12 },
   { id: 'vip', startX: 12, startY: 7, endX: 26, endY: 12 },
+];
+
+export const FLOOR3_AREA_BOUNDS: AreaBounds[] = [
+  { id: 'server_room', startX: 1, startY: 1, endX: 26, endY: 28 },
 ];

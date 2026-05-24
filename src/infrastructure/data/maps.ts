@@ -8,8 +8,9 @@ export type TileMap = number[][];
 
 import { MAP_FLOOR1 } from './maps/floor1';
 import { MAP_FLOOR2 } from './maps/floor2';
+import { MAP_FLOOR3 } from './maps/floor3';
 
-export { MAP_FLOOR1, MAP_FLOOR2 };
+export { MAP_FLOOR1, MAP_FLOOR2, MAP_FLOOR3 };
 
 export const SOLID_TILES = [1, 2, 3, 4];
 export const ELEVATOR_POS = { x: 26, y: 11 };

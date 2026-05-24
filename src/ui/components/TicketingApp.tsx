@@ -39,7 +39,7 @@ export default function TicketingApp({ objects, onGoToLocation, onFixTicket }: P
   return (
     <div className="flex w-full h-full bg-[#f0f0f0] rounded-sm overflow-hidden border-2 border-slate-400">
       {/* Left List */}
-      <div className="w-1/2 md:w-1/3 border-r-2 border-slate-400 flex flex-col bg-white">
+      <div className={`w-full md:w-1/3 border-r-2 border-slate-400 flex-col bg-white ${selectedTicket !== null ? 'hidden md:flex' : 'flex'}`}>
         {/* Filter bar */}
         <div className="p-2 border-b border-slate-300 bg-[#e0e0e0] flex flex-col gap-2">
           <div className="flex gap-2">
@@ -95,9 +95,19 @@ export default function TicketingApp({ objects, onGoToLocation, onFixTicket }: P
       </div>
 
       {/* Right Detail */}
-      <div className="flex-1 bg-[#fafafa] p-4 flex flex-col">
+      <div className={`flex-1 bg-[#fafafa] p-4 flex-col ${selectedTicket === null ? 'hidden md:flex' : 'flex'}`}>
         {selectedTicket !== null && activeObj && activeQuiz ? (
           <>
+            {/* Mobile Back Button */}
+            <div className="md:hidden mb-4">
+              <button 
+                onClick={() => setSelectedTicket(null)} 
+                className="text-blue-600 bg-blue-50 px-3 py-1.5 rounded-md font-bold text-[0.65rem] border border-blue-200 flex items-center gap-2"
+              >
+                <span>⬅</span> Kembali ke Daftar Tiket
+              </button>
+            </div>
+
             <div className="flex items-center gap-4 border-b-2 border-slate-200 pb-4 mb-4">
               <div className="text-4xl bg-slate-200 p-3 rounded-lg shadow-inner">{activeQuiz.icon}</div>
               <div>

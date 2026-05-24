@@ -177,6 +177,87 @@ const SVG_DEFS: Record<string, string> = {
     <rect x="10" y="40" width="28" height="4" rx="1" fill="#7F8C8D"/>
     <circle cx="5" cy="37" r="2" fill="#2ECC71"/>
   </svg>`,
+  serverRack: `<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48">
+    <rect x="10" y="4" width="28" height="40" rx="2" fill="#2C3E50"/>
+    <rect x="14" y="8" width="20" height="6" fill="#34495E"/>
+    <rect x="14" y="16" width="20" height="6" fill="#34495E"/>
+    <rect x="14" y="24" width="20" height="6" fill="#34495E"/>
+    <rect x="14" y="32" width="20" height="6" fill="#34495E"/>
+    <circle cx="18" cy="11" r="1.5" fill="#2ECC71"/>
+    <circle cx="18" cy="19" r="1.5" fill="#2ECC71"/>
+    <circle cx="18" cy="27" r="1.5" fill="#2ECC71"/>
+    <circle cx="18" cy="35" r="1.5" fill="#2ECC71"/>
+  </svg>`,
+  ups: `<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48">
+    <rect x="8" y="14" width="32" height="26" rx="3" fill="#1C2833"/>
+    <rect x="14" y="18" width="20" height="10" rx="1" fill="#7F8C8D"/>
+    <rect x="16" y="20" width="16" height="6" fill="#95A5A6"/>
+    <circle cx="14" cy="34" r="2" fill="#2ECC71"/>
+    <circle cx="20" cy="34" r="2" fill="#E74C3C"/>
+  </svg>`,
+  firewall: `<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48">
+    <rect x="6" y="20" width="36" height="12" rx="1" fill="#C0392B"/>
+    <rect x="8" y="22" width="4" height="8" fill="#FDFEFE"/>
+    <rect x="14" y="22" width="20" height="8" fill="#E74C3C"/>
+    <circle cx="38" cy="26" r="2" fill="#2ECC71"/>
+    <circle cx="10" cy="26" r="1" fill="#2ECC71"/>
+  </svg>`,
+  switchCore: `<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48">
+    <rect x="4" y="16" width="40" height="16" rx="2" fill="#2980B9"/>
+    <rect x="8" y="20" width="32" height="8" fill="#1F618D"/>
+    <rect x="10" y="22" width="2" height="4" fill="#F1C40F"/>
+    <rect x="14" y="22" width="2" height="4" fill="#F1C40F"/>
+    <rect x="18" y="22" width="2" height="4" fill="#F1C40F"/>
+    <rect x="22" y="22" width="2" height="4" fill="#F1C40F"/>
+    <rect x="26" y="22" width="2" height="4" fill="#F1C40F"/>
+    <rect x="30" y="22" width="2" height="4" fill="#F1C40F"/>
+    <rect x="34" y="22" width="2" height="4" fill="#F1C40F"/>
+  </svg>`,
+  switchAccess: `<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48">
+    <rect x="6" y="20" width="36" height="10" rx="1" fill="#7F8C8D"/>
+    <rect x="10" y="23" width="28" height="4" fill="#5D6D7E"/>
+    <circle cx="12" cy="25" r="1" fill="#2ECC71"/>
+    <circle cx="16" cy="25" r="1" fill="#2ECC71"/>
+    <circle cx="20" cy="25" r="1" fill="#2ECC71"/>
+  </svg>`,
+  ac: `<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48">
+    <rect x="8" y="6" width="32" height="12" rx="2" fill="#ECF0F1"/>
+    <rect x="12" y="10" width="24" height="2" fill="#BDC3C7"/>
+    <rect x="12" y="14" width="24" height="2" fill="#BDC3C7"/>
+    <circle cx="36" cy="12" r="1.5" fill="#2ECC71"/>
+    <polygon points="16,20 32,20 28,26 20,26" fill="#85C1E9" opacity="0.5"/>
+  </svg>`,
+  accessDoor: `<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48">
+    <rect x="12" y="8" width="24" height="40" fill="#95A5A6"/>
+    <rect x="14" y="10" width="20" height="38" fill="#7F8C8D"/>
+    <rect x="30" y="24" width="6" height="8" rx="1" fill="#2C3E50"/>
+    <circle cx="32" cy="26" r="0.5" fill="#ECF0F1"/>
+    <circle cx="34" cy="26" r="0.5" fill="#ECF0F1"/>
+    <circle cx="32" cy="28" r="0.5" fill="#ECF0F1"/>
+    <circle cx="34" cy="28" r="0.5" fill="#ECF0F1"/>
+    <rect x="30" y="20" width="6" height="2" fill="#E74C3C"/>
+  </svg>`,
+  modemSenang: `<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48">
+    <rect x="14" y="16" width="20" height="24" rx="2" fill="#F1C40F"/>
+    <rect x="16" y="8" width="2" height="8" fill="#F1C40F"/>
+    <rect x="30" y="8" width="2" height="8" fill="#F1C40F"/>
+    <rect x="18" y="22" width="12" height="4" fill="#2C3E50"/>
+    <circle cx="24" cy="32" r="3" fill="#2ECC71"/>
+  </svg>`,
+  modemCepat: `<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48">
+    <rect x="14" y="16" width="20" height="24" rx="2" fill="#E74C3C"/>
+    <rect x="16" y="8" width="2" height="8" fill="#E74C3C"/>
+    <rect x="30" y="8" width="2" height="8" fill="#E74C3C"/>
+    <rect x="18" y="22" width="12" height="4" fill="#2C3E50"/>
+    <circle cx="24" cy="32" r="3" fill="#3498DB"/>
+  </svg>`,
+  modemGatotkaca: `<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48">
+    <rect x="14" y="16" width="20" height="24" rx="2" fill="#9B59B6"/>
+    <rect x="16" y="8" width="2" height="8" fill="#9B59B6"/>
+    <rect x="30" y="8" width="2" height="8" fill="#9B59B6"/>
+    <rect x="18" y="22" width="12" height="4" fill="#2C3E50"/>
+    <circle cx="24" cy="32" r="3" fill="#F1C40F"/>
+  </svg>`,
 };
 
 export type SpriteKey = keyof typeof SVG_DEFS;
@@ -195,10 +276,31 @@ export function getAllSpriteUris(): Record<string, string> {
   return uris;
 }
 
-export function npcSpriteKey(role: 'doctor' | 'nurse' | 'guest' | 'nurseWheelchair' | 'nurseBed' | 'walkingNurse' | 'security'): string {
+export function npcSpriteKey(
+  role:
+    | "doctor"
+    | "nurse"
+    | "guest"
+    | "nurseWheelchair"
+    | "nurseBed"
+    | "walkingNurse"
+    | "security",
+): string {
   return role;
 }
 
-export function decorSpriteKey(type: 'bed' | 'medicine' | 'radiation' | 'accessPoint' | 'car' | 'motorcycle' | 'gate' | 'securityPost' | 'cctvCamera' | 'cctvMonitor'): string {
+export function decorSpriteKey(
+  type:
+    | "bed"
+    | "medicine"
+    | "radiation"
+    | "accessPoint"
+    | "car"
+    | "motorcycle"
+    | "gate"
+    | "securityPost"
+    | "cctvCamera"
+    | "cctvMonitor",
+): string {
   return type;
 }
