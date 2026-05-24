@@ -10,10 +10,10 @@ const TILE = 48;
 export class NPC {
   readonly x: number;
   readonly y: number;
-  readonly role: 'doctor' | 'nurse';
+  readonly role: 'doctor' | 'nurse' | 'guest' | 'nurseWheelchair' | 'nurseBed' | 'walkingNurse' | 'security';
   readonly label: string;
 
-  constructor(x: number, y: number, role: 'doctor' | 'nurse', label: string) {
+  constructor(x: number, y: number, role: 'doctor' | 'nurse' | 'guest' | 'nurseWheelchair' | 'nurseBed' | 'walkingNurse' | 'security', label: string) {
     this.x = x;
     this.y = y;
     this.role = role;

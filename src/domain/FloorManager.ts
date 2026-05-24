@@ -69,6 +69,17 @@ export class FloorManager {
     return Math.hypot(px - this.elevatorCenterX, py - this.elevatorCenterY) < INTERACT_RANGE;
   }
 
+  // CCTV Monitor at tile (24, 17) — Ruang CCTV khusus di Lantai 1
+  readonly cctvMonitorPos = { x: 24, y: 17 };
+
+  get cctvMonitorCenterX() { return this.cctvMonitorPos.x * TILE + TILE / 2; }
+  get cctvMonitorCenterY() { return this.cctvMonitorPos.y * TILE + TILE / 2; }
+
+  isNearCCTVMonitor(px: number, py: number): boolean {
+    if (this.currentFloor !== 1) return false;
+    return Math.hypot(px - this.cctvMonitorCenterX, py - this.cctvMonitorCenterY) < INTERACT_RANGE;
+  }
+
   nearestObject(px: number, py: number): InteractableObject | null {
     for (const obj of this.floorObjects) {
       if (!obj.solved && obj.isNear(px, py)) return obj;

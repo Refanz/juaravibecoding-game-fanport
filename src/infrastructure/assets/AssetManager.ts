@@ -83,33 +83,129 @@ const SVG_DEFS: Record<string, string> = {
     <polygon points="44,24 30,26 30,22" fill="#2C3E50"/>
     <circle cx="24" cy="24" r="3" fill="#F39C12"/>
   </svg>`,
+  accessPoint: `<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48">
+    <rect x="12" y="16" width="24" height="16" rx="4" fill="#FDFEFE"/>
+    <rect x="12" y="28" width="24" height="4" rx="2" fill="#BDC3C7"/>
+    <rect x="16" y="6" width="2" height="12" rx="1" fill="#7F8C8D"/>
+    <rect x="30" y="6" width="2" height="12" rx="1" fill="#7F8C8D"/>
+    <circle cx="17" cy="6" r="1.5" fill="#E74C3C"/>
+    <circle cx="31" cy="6" r="1.5" fill="#E74C3C"/>
+    <circle cx="16" cy="24" r="2" fill="#2ECC71"/>
+    <circle cx="20" cy="24" r="2" fill="#2ECC71"/>
+    <circle cx="24" cy="24" r="2" fill="#2ECC71"/>
+    <circle cx="28" cy="24" r="2" fill="#F1C40F"/>
+    <circle cx="32" cy="24" r="2" fill="#3498DB"/>
+    <rect x="12" y="20" width="24" height="2" fill="#34495E"/>
+  </svg>`,
+  guest: `<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48">
+    <circle cx="24" cy="12" r="9" fill="#F5CBA7"/>
+    <rect x="14" y="20" width="20" height="18" rx="2" fill="#E67E22"/>
+    <rect x="10" y="38" width="28" height="6" rx="2" fill="#95A5A6"/>
+  </svg>`,
+  nurseWheelchair: `<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48">
+    <rect x="24" y="16" width="16" height="16" rx="2" fill="#9B59B6"/>
+    <circle cx="32" cy="10" r="7" fill="#F5CBA7"/>
+    <circle cx="32" cy="34" r="8" fill="none" stroke="#2C3E50" stroke-width="3"/>
+    <circle cx="14" cy="10" r="7" fill="#F5CBA7"/>
+    <rect x="8" y="18" width="12" height="18" rx="2" fill="#5DADE2"/>
+  </svg>`,
+  nurseBed: `<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48">
+    <rect x="12" y="14" width="32" height="20" rx="2" fill="#AED6F1"/>
+    <rect x="12" y="12" width="32" height="4" rx="2" fill="#5DADE2"/>
+    <rect x="12" y="12" width="10" height="24" rx="2" fill="#FDFEFE"/>
+    <circle cx="16" cy="24" r="5" fill="#F5CBA7"/>
+    <rect x="14" y="32" width="4" height="4" rx="1" fill="#7F8C8D"/>
+    <rect x="38" y="32" width="4" height="4" rx="1" fill="#7F8C8D"/>
+    <circle cx="6" cy="16" r="7" fill="#F5CBA7"/>
+    <rect x="2" y="24" width="10" height="16" rx="2" fill="#5DADE2"/>
+  </svg>`,
+  walkingNurse: `<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48">
+    <circle cx="24" cy="12" r="9" fill="#F5CBA7"/>
+    <rect x="14" y="20" width="20" height="18" rx="2" fill="#5DADE2"/>
+    <rect x="10" y="38" width="28" height="6" rx="2" fill="#2E86C1"/>
+    <rect x="21" y="22" width="6" height="1" fill="#FDFEFE"/>
+    <rect x="23" y="20" width="2" height="5" fill="#FDFEFE"/>
+    <polygon points="16,8 32,8 29,4 19,4" fill="#FDFEFE"/>
+  </svg>`,
+  security: `<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48">
+    <circle cx="24" cy="12" r="9" fill="#F5CBA7"/>
+    <rect x="14" y="20" width="20" height="18" rx="2" fill="#1A5276"/>
+    <rect x="10" y="38" width="28" height="6" rx="2" fill="#1A3B5C"/>
+    <rect x="20" y="20" width="8" height="4" fill="#F1C40F"/>
+    <polygon points="24,4 22,8 26,8" fill="#1A5276"/>
+    <rect x="18" y="2" width="12" height="4" rx="1" fill="#2980B9"/>
+  </svg>`,
+  car: `<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48">
+    <rect x="4" y="12" width="40" height="24" rx="4" fill="#E74C3C"/>
+    <rect x="10" y="16" width="28" height="16" rx="2" fill="#2C3E50"/>
+    <rect x="14" y="18" width="20" height="12" fill="#34495E"/>
+    <rect x="2" y="18" width="4" height="4" fill="#F1C40F"/>
+    <rect x="42" y="18" width="4" height="4" fill="#C0392B"/>
+  </svg>`,
+  motorcycle: `<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48">
+    <rect x="14" y="10" width="20" height="28" rx="4" fill="#34495E"/>
+    <rect x="18" y="14" width="12" height="14" rx="2" fill="#2980B9"/>
+    <circle cx="24" cy="34" r="6" fill="#17202A"/>
+    <rect x="16" y="8" width="16" height="4" rx="1" fill="#7F8C8D"/>
+  </svg>`,
+  gate: `<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48">
+    <rect x="4" y="20" width="40" height="4" fill="#F1C40F"/>
+    <rect x="8" y="20" width="4" height="4" fill="#E74C3C"/>
+    <rect x="16" y="20" width="4" height="4" fill="#E74C3C"/>
+    <rect x="24" y="20" width="4" height="4" fill="#E74C3C"/>
+    <rect x="32" y="20" width="4" height="4" fill="#E74C3C"/>
+    <rect x="4" y="16" width="6" height="16" rx="1" fill="#7F8C8D"/>
+  </svg>`,
+  securityPost: `<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48">
+    <rect x="4" y="4" width="40" height="40" rx="2" fill="#ECF0F1"/>
+    <rect x="2" y="2" width="44" height="8" rx="1" fill="#2980B9"/>
+    <rect x="8" y="16" width="32" height="16" fill="#34495E"/>
+    <rect x="12" y="18" width="24" height="12" fill="#AED6F1"/>
+  </svg>`,
+  cctvCamera: `<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48">
+    <rect x="10" y="18" width="20" height="12" rx="2" fill="#2C3E50"/>
+    <rect x="30" y="20" width="10" height="8" rx="1" fill="#34495E"/>
+    <circle cx="20" cy="24" r="5" fill="#1A252F"/>
+    <circle cx="20" cy="24" r="3" fill="#4FC3F7"/>
+    <rect x="14" y="10" width="4" height="10" rx="1" fill="#7F8C8D"/>
+    <rect x="10" y="8" width="12" height="4" rx="1" fill="#95A5A6"/>
+    <circle cx="38" cy="14" r="3" fill="#E74C3C"/>
+  </svg>`,
+  cctvMonitor: `<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48">
+    <rect x="2" y="4" width="44" height="32" rx="3" fill="#1A252F"/>
+    <rect x="5" y="7" width="38" height="26" fill="#0D1B2A"/>
+    <rect x="7" y="9" width="17" height="11" rx="1" fill="#1B4F72"/>
+    <rect x="26" y="9" width="17" height="11" rx="1" fill="#1B4F72"/>
+    <rect x="7" y="22" width="17" height="9" rx="1" fill="#154360"/>
+    <rect x="26" y="22" width="17" height="9" rx="1" fill="#154360"/>
+    <circle cx="15" cy="14" r="3" fill="#4FC3F7"/>
+    <circle cx="34" cy="14" r="3" fill="#4FC3F7"/>
+    <rect x="18" y="36" width="12" height="4" fill="#2C3E50"/>
+    <rect x="10" y="40" width="28" height="4" rx="1" fill="#7F8C8D"/>
+    <circle cx="5" cy="37" r="2" fill="#2ECC71"/>
+  </svg>`,
 };
 
 export type SpriteKey = keyof typeof SVG_DEFS;
-export type SpriteMap = Record<string, HTMLImageElement>;
 
-function svgToImage(svgStr: string): Promise<HTMLImageElement> {
-  return new Promise(resolve => {
-    const blob = new Blob([svgStr], { type: 'image/svg+xml' });
-    const url = URL.createObjectURL(blob);
-    const img = new Image();
-    img.onload = () => { URL.revokeObjectURL(url); resolve(img); };
-    img.src = url;
-  });
+export function svgToDataUri(svgStr: string): string {
+  const base64 = btoa(unescape(encodeURIComponent(svgStr)));
+  return `data:image/svg+xml;base64,${base64}`;
 }
 
-/** Rasterisasi semua SVG ke Image — dipanggil SEKALI saat init. */
-export async function preloadSprites(): Promise<SpriteMap> {
-  const entries = await Promise.all(
-    Object.entries(SVG_DEFS).map(async ([key, svg]) => [key, await svgToImage(svg)] as [string, HTMLImageElement])
-  );
-  return Object.fromEntries(entries);
+/** Mengembalikan Record berisi Data URI untuk dipreload oleh Phaser */
+export function getAllSpriteUris(): Record<string, string> {
+  const uris: Record<string, string> = {};
+  for (const [key, svg] of Object.entries(SVG_DEFS)) {
+    uris[key] = svgToDataUri(svg);
+  }
+  return uris;
 }
 
-export function npcSpriteKey(role: 'doctor' | 'nurse'): string {
-  return role === 'nurse' ? 'nurse' : 'doctor';
+export function npcSpriteKey(role: 'doctor' | 'nurse' | 'guest' | 'nurseWheelchair' | 'nurseBed' | 'walkingNurse' | 'security'): string {
+  return role;
 }
 
-export function decorSpriteKey(type: 'bed' | 'medicine' | 'radiation'): string {
+export function decorSpriteKey(type: 'bed' | 'medicine' | 'radiation' | 'accessPoint' | 'car' | 'motorcycle' | 'gate' | 'securityPost' | 'cctvCamera' | 'cctvMonitor'): string {
   return type;
 }

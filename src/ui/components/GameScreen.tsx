@@ -4,104 +4,103 @@
 // + modal quiz, transisi, win
 // ==========================================
 
-import { useRef, useEffect, useState, useCallback, useMemo } from 'react';
-import { SpriteMap } from '../../infrastructure/assets/AssetManager';
-import { Player } from '../../domain/entities/Player';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import { FloorManager } from '../../domain/FloorManager';
 import { GameState } from '../../domain/GameState';
 import { HOSPITAL_QUIZZES } from '../../infrastructure/data/quizzes';
 import { AudioManager } from '../../infrastructure/assets/AudioManager';
-import { useGameLoop } from '../hooks/useGameLoop';
-import { useInput } from '../hooks/useInput';
+import { EventBus } from '../../infrastructure/events/EventBus';
+import { PhaserGame } from '../../domain/phaser/PhaserGame';
 import QuizModal from './QuizModal';
+import InfoModal from './InfoModal';
+import PauseModal from './PauseModal';
+import CCTVMonitorModal from './CCTVMonitorModal';
 
 interface Props {
-  sprites: SpriteMap;
   onReturnToWelcome: () => void;
 }
 
-export default function GameScreen({ sprites, onReturnToWelcome }: Props) {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-
+export default function GameScreen({ onReturnToWelcome }: Props) {
   // Domain singletons (stable refs)
-  const player = useMemo(() => new Player(3, 3), []);
-  const floor  = useMemo(() => { const f = new FloorManager(); f.init(); return f; }, []);
-  const gs     = useMemo(() => { const g = new GameState(); g.startPlaying(); return g; }, []);
+  const floor = useMemo(() => { const f = new FloorManager(); f.init(); return f; }, []);
+  const gs = useMemo(() => { const g = new GameState(); g.startPlaying(); return g; }, []);
 
   // UI state (React)
-  const [currentFloor, setCurrentFloor]   = useState<1 | 2>(1);
-  const [solvedCount,  setSolvedCount]     = useState(0);
-  const [nearObject,   setNearObject]      = useState<number | null>(null);
-  const [nearElevator, setNearElevator]    = useState(false);
-  const [quizKey,      setQuizKey]         = useState<number | null>(null);
+  const [currentFloor, setCurrentFloor] = useState<1 | 2>(1);
+  const [solvedCount, setSolvedCount] = useState(0);
+  const [nearObject, setNearObject] = useState<number | null>(null);
+  const [nearElevator, setNearElevator] = useState(false);
+  const [nearCCTV, setNearCCTV] = useState(false);
+  const [quizKey, setQuizKey] = useState<number | null>(null);
   const [showTransition, setShowTransition] = useState(false);
-  const [transFloor,   setTransFloor]      = useState<1 | 2>(1);
-  const [won,          setWon]             = useState(false);
+  const [transFloor, setTransFloor] = useState<1 | 2>(1);
+  const [won, setWon] = useState(false);
+  const [showInfo, setShowInfo] = useState(false);
+  const [showPause, setShowPause] = useState(false);
+  const [showCCTV, setShowCCTV] = useState(false);
 
-  const { keys, consumeKey } = useInput();
+  const handlePause = () => {
+    gs.isPaused = true;
+    setShowPause(true);
+  };
 
-  // Resize canvas to fill viewport
+  const handleResume = () => {
+    gs.isPaused = false;
+    setShowPause(false);
+  };
+
+  const handleReturnToWelcomeFromPause = () => {
+    gs.isPaused = false;
+    onReturnToWelcome();
+  };
+
   useEffect(() => {
-    const resize = () => {
-      if (!canvasRef.current) return;
-      const hud = document.getElementById('hud');
-      const hudH = hud?.offsetHeight ?? 40;
-      canvasRef.current.width  = window.innerWidth;
-      canvasRef.current.height = window.innerHeight - hudH;
+    const onNearObject = (idx: number | null) => setNearObject(idx);
+    const onNearElevator = (near: boolean) => setNearElevator(near);
+    const onNearCCTV = (near: boolean) => setNearCCTV(near);
+    const onOpenQuiz = (idx: number) => setQuizKey(idx);
+    const onOpenCCTV = () => setShowCCTV(true);
+    const onFloorChanged = (f: 1 | 2) => {
+      setCurrentFloor(f);
+      setTransFloor(f);
+      setShowTransition(true);
+      setTimeout(() => setShowTransition(false), 800);
     };
-    resize();
-    window.addEventListener('resize', resize);
-    return () => window.removeEventListener('resize', resize);
-  }, []);
+    const onGameWon = () => {
+      setWon(true);
+      gs.setWin();
+      AudioManager.complete();
+    };
 
-  const handleNearObject = useCallback((idx: number | null) => setNearObject(idx), []);
-  const handleNearElevator = useCallback((near: boolean) => setNearElevator(near), []);
+    EventBus.on('near_object', onNearObject);
+    EventBus.on('near_elevator', onNearElevator);
+    EventBus.on('near_cctv', onNearCCTV);
+    EventBus.on('open_quiz', onOpenQuiz);
+    EventBus.on('open_cctv', onOpenCCTV);
+    EventBus.on('floor_changed', onFloorChanged);
+    EventBus.on('game_won', onGameWon);
 
-  const handleFloorChange = useCallback((f: 1 | 2) => {
-    setCurrentFloor(f);
-    setTransFloor(f);
-    setShowTransition(true);
-    setTimeout(() => setShowTransition(false), 800);
-  }, []);
-
-  const handleWin = useCallback(() => {
-    if (won) return;
-    setWon(true);
-    gs.setWin();
-    AudioManager.complete();
-  }, [gs, won]);
-
-  // Open quiz when gs.quizActive is set by game loop
-  useEffect(() => {
-    if (gs.quizActive && gs.quizObjectIndex !== null) {
-      setQuizKey(gs.quizObjectIndex);
-    }
-  });
-
-  const handleCorrect = useCallback(() => {
-    if (gs.quizObjectIndex !== null) {
-      floor.allObjects[gs.quizObjectIndex]?.solve();
-      setSolvedCount(floor.solvedCount);
-    }
-    gs.quizActive = false;
-    gs.quizObjectIndex = null;
-    setQuizKey(null);
-    if (floor.allSolved) handleWin();
-  }, [floor, gs, handleWin]);
-
-  const handleWrong = useCallback(() => {
-    gs.quizActive = false;
-    gs.quizObjectIndex = null;
-    setQuizKey(null);
+    return () => {
+      EventBus.off('near_object', onNearObject);
+      EventBus.off('near_elevator', onNearElevator);
+      EventBus.off('near_cctv', onNearCCTV);
+      EventBus.off('open_quiz', onOpenQuiz);
+      EventBus.off('open_cctv', onOpenCCTV);
+      EventBus.off('floor_changed', onFloorChanged);
+      EventBus.off('game_won', onGameWon);
+    };
   }, [gs]);
 
-  useGameLoop({
-    canvasRef, sprites, player, floor, gs, keys, consumeKey,
-    onNearObject: handleNearObject,
-    onNearElevator: handleNearElevator,
-    onFloorChange: handleFloorChange,
-    onWin: handleWin,
-  });
+  const handleCorrect = useCallback(() => {
+    setSolvedCount(floor.solvedCount + 1); // optimism update
+    EventBus.emit('quiz_closed', true);
+    setQuizKey(null);
+  }, [floor]);
+
+  const handleWrong = useCallback(() => {
+    EventBus.emit('quiz_closed', false);
+    setQuizKey(null);
+  }, []);
 
   const activeQuiz = quizKey !== null
     ? HOSPITAL_QUIZZES[quizKey % HOSPITAL_QUIZZES.length]
@@ -114,22 +113,43 @@ export default function GameScreen({ sprites, onReturnToWelcome }: Props) {
         <span className="text-hospital-sky">🏥 Lantai {currentFloor}</span>
         <span className="text-text-dim flex-1">🔎 Temukan &amp; perbaiki perangkat IT rusak!</span>
         <span className="text-medical-green">📊 {solvedCount}/{floor.totalObjects}</span>
+        <button 
+          onClick={() => setShowInfo(true)}
+          className="text-hospital-sky hover:text-white bg-hospital-blue/20 hover:bg-hospital-blue/40 border border-hospital-blue px-2 py-1 rounded cursor-pointer transition-colors text-[0.6rem] ml-2 flex items-center gap-1"
+          title="Informasi Ikon"
+        >
+          <span>ℹ️</span> Info
+        </button>
+        <button 
+          onClick={handlePause}
+          className="text-hospital-sky hover:text-white bg-hospital-blue/20 hover:bg-hospital-blue/40 border border-hospital-blue px-2 py-1.5 rounded cursor-pointer transition-colors ml-1 flex items-center justify-center"
+          title="Pause Game"
+        >
+          <span className="text-sm sm:text-base leading-none">⏸️</span>
+        </button>
       </div>
 
-      {/* Canvas */}
-      <canvas ref={canvasRef} id="gameCanvas" />
+      {/* Phaser Game Container */}
+      <div className="flex-1 overflow-hidden relative">
+        <PhaserGame floorManager={floor} gameState={gs} />
 
-      {/* Interaction hints */}
-      {nearObject !== null && !activeQuiz && (
-        <div className="fixed bottom-4 left-1/2 -translate-x-1/2 bg-dark/90 border border-hospital-sky py-1.5 px-4 text-[0.5rem] text-hospital-sky rounded pointer-events-none whitespace-nowrap">
-          ⌨️ Tekan <span className="bg-hospital-blue py-0.5 px-1.5 rounded-sm mx-0.5">[SPASI]</span> untuk interaksi
-        </div>
-      )}
-      {nearElevator && nearObject === null && !activeQuiz && (
-        <div className="fixed bottom-4 left-1/2 -translate-x-1/2 bg-dark/90 border border-hospital-sky py-1.5 px-4 text-[0.5rem] text-hospital-sky rounded pointer-events-none whitespace-nowrap">
-          🛗 Tekan <span className="bg-hospital-blue py-0.5 px-1.5 rounded-sm mx-0.5">[SPASI]</span> naik/turun lantai
-        </div>
-      )}
+        {/* Interaction hints */}
+        {nearObject !== null && !activeQuiz && (
+          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-dark/90 border border-hospital-sky py-1.5 px-4 text-[0.5rem] text-hospital-sky rounded pointer-events-none whitespace-nowrap">
+            ⌨️ Tekan <span className="bg-hospital-blue py-0.5 px-1.5 rounded-sm mx-0.5">[SPASI]</span> untuk interaksi
+          </div>
+        )}
+        {nearElevator && nearObject === null && !activeQuiz && (
+          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-dark/90 border border-hospital-sky py-1.5 px-4 text-[0.5rem] text-hospital-sky rounded pointer-events-none whitespace-nowrap">
+            🛗 Tekan <span className="bg-hospital-blue py-0.5 px-1.5 rounded-sm mx-0.5">[SPASI]</span> naik/turun lantai
+          </div>
+        )}
+        {nearCCTV && nearObject === null && !activeQuiz && !nearElevator && (
+          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-dark/90 border border-[#4fc3f7] py-1.5 px-4 text-[0.5rem] text-[#4fc3f7] rounded pointer-events-none whitespace-nowrap">
+            📹 Tekan <span className="bg-[#1b4f72] py-0.5 px-1.5 rounded-sm mx-0.5">[SPASI]</span> Monitor CCTV
+          </div>
+        )}
+      </div>
 
       {/* Floor Transition */}
       {showTransition && (
@@ -146,6 +166,26 @@ export default function GameScreen({ sprites, onReturnToWelcome }: Props) {
           onCorrect={handleCorrect}
           onWrong={handleWrong}
         />
+      )}
+
+      {/* Info Modal */}
+      {showInfo && (
+        <InfoModal onClose={() => setShowInfo(false)} />
+      )}
+
+      {/* Pause Modal */}
+      {showPause && (
+        <PauseModal 
+          onResume={handleResume} 
+          onReturnToWelcome={handleReturnToWelcomeFromPause} 
+          solvedCount={solvedCount} 
+          totalObjects={floor.totalObjects} 
+        />
+      )}
+
+      {/* CCTV Monitor Modal */}
+      {showCCTV && (
+        <CCTVMonitorModal onClose={() => setShowCCTV(false)} />
       )}
 
       {/* Win Modal */}

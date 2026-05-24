@@ -30,7 +30,7 @@ export default function WelcomeScreen({ onStart }: Props) {
         🎯 Temukan dan perbaiki semua perangkat IT rusak!
       </div>
       <div className="text-[0.45rem] text-hospital-sky border border-hospital-sky/30 py-1 px-3 rounded-full">
-        🏆 Submission #JuaraVibeCoding 2025
+        🏆 Submission #JuaraVibeCoding 2026
       </div>
     </div>
   );

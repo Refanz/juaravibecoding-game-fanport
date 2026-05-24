@@ -10,9 +10,11 @@ export interface Camera { x: number; y: number; }
 export class GameState {
   screen: Screen = 'welcome';
   quizActive = false;
+  isPaused = false;
   quizObjectIndex: number | null = null;
   nearObjectIndex: number | null = null;
   nearElevator = false;
+  nearCCTV = false;
   showTransition = false;
   transitionFloor: 1 | 2 = 1;
   camera: Camera = { x: 0, y: 0 };
@@ -20,6 +22,7 @@ export class GameState {
   reset(): void {
     this.screen = 'welcome';
     this.quizActive = false;
+    this.isPaused = false;
     this.quizObjectIndex = null;
     this.nearObjectIndex = null;
     this.nearElevator = false;
