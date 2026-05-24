@@ -14,15 +14,24 @@ export default function App() {
   const [screen,  setScreen]  = useState<AppScreen>('welcome');
   const [gameKey, setGameKey] = useState(0);
 
-  const handleStart = () => { setGameKey(k => k + 1); setScreen('game'); };
-  const handleReturnToWelcome = () => setScreen('welcome');
+  const handleStart = () => { setScreen('game'); };
+  const handleReturnToWelcome = () => { setGameKey(k => k + 1); setScreen('welcome'); };
 
   return (
-    <>
-      {screen === 'welcome' && <WelcomeScreen onStart={handleStart} />}
-      {screen === 'game'    && (
-        <GameScreen key={gameKey} onReturnToWelcome={handleReturnToWelcome} />
+    <div className="relative w-screen h-screen overflow-hidden">
+      {/* GameScreen runs continuously in the background */}
+      <GameScreen 
+        key={gameKey} 
+        onReturnToWelcome={handleReturnToWelcome} 
+        isWelcome={screen === 'welcome'} 
+      />
+
+      {/* WelcomeScreen overlays on top of the game when active */}
+      {screen === 'welcome' && (
+        <div className="absolute inset-0 z-[100]">
+          <WelcomeScreen onStart={handleStart} />
+        </div>
       )}
-    </>
+    </div>
   );
 }

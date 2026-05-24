@@ -28,6 +28,7 @@ export class GameScene extends Phaser.Scene {
   decorationsGroup!: Phaser.GameObjects.Group;
   npcsGroup!: Phaser.GameObjects.Group;
   private cctvCapturing = false;
+  private lastPosEmitTime = 0;
 
   constructor() {
     super('GameScene');
@@ -331,6 +332,11 @@ export class GameScene extends Phaser.Scene {
     else if (this.cursors.down.isDown || this.keys.S.isDown || this.virtualInput.down) vy = speed;
 
     this.player.setVelocity(vx, vy);
+
+    if (time > this.lastPosEmitTime + 100) {
+      this.lastPosEmitTime = time;
+      EventBus.emit('player_position', { x: this.player.x, y: this.player.y, floor: this.floorManager.currentFloor });
+    }
 
     // Player bobbing animation based on velocity
     if (vx !== 0 || vy !== 0) {
