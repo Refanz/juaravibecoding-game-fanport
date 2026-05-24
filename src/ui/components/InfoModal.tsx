@@ -27,6 +27,18 @@ export default function InfoModal({ onClose }: Props) {
     { key: 'gate', label: 'Gerbang' },
     { key: 'car', label: 'Mobil' },
     { key: 'motorcycle', label: 'Motor' },
+    { key: 'cctvCamera', label: 'Kamera CCTV' },
+    { key: 'cctvMonitor', label: 'Monitor CCTV' },
+    { key: 'serverRack', label: 'Rak Server' },
+    { key: 'ups', label: 'UPS (Baterai Cadangan)' },
+    { key: 'firewall', label: 'Firewall / Router' },
+    { key: 'switchCore', label: 'Switch Core' },
+    { key: 'switchAccess', label: 'Switch Access' },
+    { key: 'ac', label: 'AC (Pendingin Ruangan)' },
+    { key: 'accessDoor', label: 'Pintu Akses (Biometrik)' },
+    { key: 'modemSenang', label: 'ISP: ISP Senang' },
+    { key: 'modemCepat', label: 'ISP: ISP Cepat' },
+    { key: 'modemGatotkaca', label: 'ISP: Gatotkaca' },
   ];
 
   return (

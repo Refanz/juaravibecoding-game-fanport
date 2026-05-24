@@ -16,7 +16,7 @@ export class GameState {
   nearElevator = false;
   nearCCTV = false;
   showTransition = false;
-  transitionFloor: 1 | 2 = 1;
+  transitionFloor: 1 | 2 | 3 = 1;
   camera: Camera = { x: 0, y: 0 };
   teleportTargetIndex: number | null = null;
   activeMarkerIndex: number | null = null;

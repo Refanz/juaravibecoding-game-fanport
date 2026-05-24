@@ -11,11 +11,11 @@ export abstract class InteractableObject {
   readonly x: number;
   readonly y: number;
   readonly label: string;
-  readonly floor: 1 | 2;
+  readonly floor: 1 | 2 | 3;
   quizIndex: number;
   solved = false;
 
-  constructor(x: number, y: number, label: string, floor: 1 | 2, quizIndex: number) {
+  constructor(x: number, y: number, label: string, floor: 1 | 2 | 3, quizIndex: number) {
     this.x = x;
     this.y = y;
     this.label = label;
@@ -46,6 +46,16 @@ export class BrokenMonitor extends InteractableObject {
   get spriteKey() { return 'medBroken'; }
 }
 
+/** Perangkat jaringan / alat baru dengan sprite kustom */
+export class GenericBrokenDevice extends InteractableObject {
+  private _spriteKey: string;
+  constructor(x: number, y: number, label: string, floor: 1 | 2 | 3, quizIndex: number, spriteKey: string) {
+    super(x, y, label, floor, quizIndex);
+    this._spriteKey = spriteKey;
+  }
+  get spriteKey() { return this._spriteKey; }
+}
+
 import type { BrokenObjectData } from '../../infrastructure/data/floorData';
 
 /** Factory: buat InteractableObject dari raw data */
@@ -53,5 +63,9 @@ export function createInteractable(data: BrokenObjectData, quizIndex: number): I
   if (data.type === 'monitor') {
     return new BrokenMonitor(data.x, data.y, data.label, data.floor, quizIndex);
   }
-  return new BrokenPC(data.x, data.y, data.label, data.floor, quizIndex);
+  if (data.type === 'computer') {
+    return new BrokenPC(data.x, data.y, data.label, data.floor, quizIndex);
+  }
+  // Fallback ke GenericBrokenDevice untuk tipe-tipe baru seperti serverRack, ups, dll
+  return new GenericBrokenDevice(data.x, data.y, data.label, data.floor, quizIndex, data.type);
 }

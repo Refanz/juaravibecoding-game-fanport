@@ -5,7 +5,7 @@ import { GameState } from '../GameState';
 import { AudioManager } from '../../infrastructure/assets/AudioManager';
 import { EventBus } from '../../infrastructure/events/EventBus';
 import { ELEVATOR_POS, SOLID_TILES } from '../../infrastructure/data/maps';
-import { AreaBounds, FLOOR1_AREA_BOUNDS, FLOOR2_AREA_BOUNDS } from '../../infrastructure/data/floorData';
+import { AreaBounds, FLOOR1_AREA_BOUNDS, FLOOR2_AREA_BOUNDS, FLOOR3_AREA_BOUNDS } from '../../infrastructure/data/floorData';
 import { Player } from '../entities/Player';
 
 const TILE = 48;
@@ -106,6 +106,7 @@ export class GameScene extends Phaser.Scene {
     EventBus.on('virtual_pad_move', this.onVirtualMove, this);
     EventBus.on('virtual_pad_interact', this.onVirtualInteract, this);
     EventBus.on('pan_to_object', this.panToObject, this);
+    EventBus.on('do_change_floor', this.doChangeFloor, this);
     
     this.events.on('shutdown', () => {
       EventBus.off('quiz_closed', this.onQuizClosed, this);
@@ -113,6 +114,7 @@ export class GameScene extends Phaser.Scene {
       EventBus.off('virtual_pad_move', this.onVirtualMove, this);
       EventBus.off('virtual_pad_interact', this.onVirtualInteract, this);
       EventBus.off('pan_to_object', this.panToObject, this);
+      EventBus.off('do_change_floor', this.doChangeFloor, this);
     });
 
     this.updateMarker();
@@ -506,11 +508,14 @@ export class GameScene extends Phaser.Scene {
       EventBus.emit('open_cctv');
     } else if (nearElevator) {
       AudioManager.elevator();
-      const targetFloor = this.floorManager.oppositeFloor();
-      this.floorManager.loadFloor(targetFloor);
-      EventBus.emit('floor_changed', targetFloor);
-      this.scene.restart({ floorManager: this.floorManager, gameState: this.gameState });
+      EventBus.emit('open_elevator_ui');
     }
+  }
+
+  doChangeFloor(targetFloor: 1 | 2 | 3) {
+    this.floorManager.loadFloor(targetFloor);
+    EventBus.emit('floor_changed', targetFloor);
+    this.scene.restart({ floorManager: this.floorManager, gameState: this.gameState });
   }
 
   // ── CCTV Capture ────────────────────────────────────────────
@@ -527,7 +532,7 @@ export class GameScene extends Phaser.Scene {
     this.npcsGroup = this.add.group();
   }
 
-  private rebuildFloor(floor: 1 | 2) {
+  private rebuildFloor(floor: 1 | 2 | 3) {
     this.floorManager.loadFloor(floor);
     const mapW = this.floorManager.map[0].length * TILE;
     const mapH = this.floorManager.map.length * TILE;
@@ -555,7 +560,7 @@ export class GameScene extends Phaser.Scene {
 
     const results: { id: string; src: string }[] = [];
 
-    const captureFloor = (floor: 1 | 2, cams: any[], onComplete: () => void) => {
+    const captureFloor = (floor: 1 | 2 | 3, cams: any[], onComplete: () => void) => {
       if (this.floorManager.currentFloor !== floor) {
         this.clearWorld();
         this.rebuildFloor(floor);
@@ -567,20 +572,23 @@ export class GameScene extends Phaser.Scene {
     captureFloor(1, FLOOR1_AREA_BOUNDS, () => {
       // Phase 2: Capture Floor 2
       captureFloor(2, FLOOR2_AREA_BOUNDS, () => {
-        // Phase 3: Restore Original State
-        if (this.floorManager.currentFloor !== originalFloor) {
-          this.clearWorld();
-          this.rebuildFloor(originalFloor);
-        }
+        // Phase 3: Capture Floor 3
+        captureFloor(3, FLOOR3_AREA_BOUNDS, () => {
+          // Restore Original State
+          if (this.floorManager.currentFloor !== originalFloor) {
+            this.clearWorld();
+            this.rebuildFloor(originalFloor);
+          }
 
-        // Recreate player
-        this.player = new Player(this, savedX, savedY);
-        this.physics.add.collider(this.player, this.wallsGroup);
+          // Recreate player
+          this.player = new Player(this, savedX, savedY);
+          this.physics.add.collider(this.player, this.wallsGroup);
 
-        this.cameras.main.setScroll(savedScrollX, savedScrollY);
-        this.cameras.main.startFollow(this.player);
-        this.cctvCapturing = false;
-        EventBus.emit('cctv_frames', results);
+          this.cameras.main.setScroll(savedScrollX, savedScrollY);
+          this.cameras.main.startFollow(this.player);
+          this.cctvCapturing = false;
+          EventBus.emit('cctv_frames', results);
+        });
       });
     });
   }
