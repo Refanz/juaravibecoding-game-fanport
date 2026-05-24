@@ -29,6 +29,8 @@ export class GameScene extends Phaser.Scene {
   npcsGroup!: Phaser.GameObjects.Group;
   private cctvCapturing = false;
   private lastPosEmitTime = 0;
+  private activeMarker: Phaser.GameObjects.Text | null = null;
+  private activeMarkerTween: Phaser.Tweens.Tween | null = null;
 
   constructor() {
     super('GameScene');
@@ -62,7 +64,15 @@ export class GameScene extends Phaser.Scene {
     // Player
     let px = 3 * TILE + TILE/2;
     let py = 3 * TILE + TILE/2;
-    if (this.floorManager.currentFloor === 2) {
+    
+    if (this.gameState.teleportTargetIndex !== null) {
+      const obj = this.floorManager.allObjects[this.gameState.teleportTargetIndex];
+      if (obj && obj.floor === this.floorManager.currentFloor) {
+        px = obj.x * TILE + TILE/2;
+        py = obj.y * TILE + TILE/2;
+      }
+      this.gameState.teleportTargetIndex = null;
+    } else if (this.floorManager.currentFloor === 2) {
       px = ELEVATOR_POS.x * TILE - TILE/2;
       py = ELEVATOR_POS.y * TILE + TILE/2;
     }
@@ -94,13 +104,17 @@ export class GameScene extends Phaser.Scene {
     EventBus.on('request_cctv_capture', this.startCCTVCapture, this);
     EventBus.on('virtual_pad_move', this.onVirtualMove, this);
     EventBus.on('virtual_pad_interact', this.onVirtualInteract, this);
+    EventBus.on('pan_to_object', this.panToObject, this);
     
     this.events.on('shutdown', () => {
       EventBus.off('quiz_closed', this.onQuizClosed, this);
       EventBus.off('request_cctv_capture', this.startCCTVCapture, this);
       EventBus.off('virtual_pad_move', this.onVirtualMove, this);
       EventBus.off('virtual_pad_interact', this.onVirtualInteract, this);
+      EventBus.off('pan_to_object', this.panToObject, this);
     });
+
+    this.updateMarker();
   }
 
   onQuizClosed(solved: boolean) {
@@ -126,6 +140,73 @@ export class GameScene extends Phaser.Scene {
 
   onVirtualInteract() {
     this.handleInteraction();
+  }
+
+  panToObject(idx: number) {
+    const obj = this.floorManager.allObjects[idx];
+    if (!obj) return;
+    
+    this.updateMarker();
+
+    if (this.floorManager.currentFloor !== obj.floor) {
+      // Show notification if object is on a different floor
+      const text = this.add.text(this.cameras.main.worldView.centerX, this.cameras.main.worldView.centerY - 50, `Lokasi masalah ada di Lantai ${obj.floor}. Silakan gunakan Lift!`, {
+        fontFamily: '"Press Start 2P", monospace',
+        fontSize: '8px',
+        color: '#ffffff',
+        backgroundColor: '#e74c3c',
+        padding: { x: 8, y: 8 }
+      }).setOrigin(0.5).setDepth(200);
+      
+      this.time.delayedCall(3000, () => text.destroy());
+    } else {
+      // Pan camera to object on same floor
+      this.cameras.main.stopFollow();
+      const objX = obj.x * TILE + TILE / 2;
+      const objY = obj.y * TILE + TILE / 2;
+      
+      this.cameras.main.pan(objX, objY, 1000, 'Sine.easeInOut');
+      
+      this.time.delayedCall(3000, () => {
+        this.cameras.main.pan(this.player.x, this.player.y, 800, 'Sine.easeInOut', false, (camera: any, progress: number) => {
+          if (progress === 1) {
+            this.cameras.main.startFollow(this.player);
+          }
+        });
+      });
+    }
+  }
+
+  updateMarker() {
+    if (this.activeMarker) {
+      this.activeMarker.destroy();
+      this.activeMarker = null;
+    }
+    if (this.activeMarkerTween) {
+      this.activeMarkerTween.stop();
+      this.activeMarkerTween = null;
+    }
+
+    const idx = this.gameState.activeMarkerIndex;
+    if (idx !== null) {
+      const obj = this.floorManager.allObjects[idx];
+      if (obj && obj.floor === this.floorManager.currentFloor && !obj.solved) {
+        const objX = obj.x * TILE + TILE / 2;
+        const objY = obj.y * TILE + TILE / 2;
+        
+        this.activeMarker = this.add.text(objX, objY - 40, '🔽', {
+          fontSize: '16px'
+        }).setOrigin(0.5).setDepth(100);
+
+        this.activeMarkerTween = this.tweens.add({
+          targets: this.activeMarker,
+          y: objY - 30,
+          yoyo: true,
+          repeat: -1,
+          duration: 400
+        });
+      }
+    }
   }
 
   renderMap() {
@@ -390,6 +471,13 @@ export class GameScene extends Phaser.Scene {
 
     if (nearObj) {
       AudioManager.interact();
+      
+      // Clear marker if interacting with the marked object
+      if (this.gameState.activeMarkerIndex === nearIdx) {
+        this.gameState.activeMarkerIndex = null;
+        this.updateMarker();
+      }
+      
       this.gameState.quizActive = true;
       this.gameState.quizObjectIndex = nearIdx;
       EventBus.emit('open_quiz', nearIdx);
