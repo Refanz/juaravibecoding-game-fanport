@@ -17,6 +17,7 @@ import PauseModal from './PauseModal';
 import CCTVMonitorModal from './CCTVMonitorModal';
 import VirtualGamepad from './VirtualGamepad';
 import MapModal from './MapModal';
+import DesktopUIModal from './DesktopUIModal';
 
 interface Props {
   onReturnToWelcome: () => void;
@@ -42,6 +43,7 @@ export default function GameScreen({ onReturnToWelcome, isWelcome = false }: Pro
   const [showMap, setShowMap] = useState(false);
   const [showPause, setShowPause] = useState(false);
   const [showCCTV, setShowCCTV] = useState(false);
+  const [showDesktop, setShowDesktop] = useState(false);
 
   const handlePause = () => {
     gs.isPaused = true;
@@ -135,6 +137,23 @@ export default function GameScreen({ onReturnToWelcome, isWelcome = false }: Pro
               <span className="text-[0.65rem] font-bold tracking-wider hidden sm:block">PAUSE</span>
             </button>
             <button 
+              onClick={() => setShowDesktop(true)}
+              className="text-hospital-sky hover:text-white bg-dark/50 hover:bg-dark border border-hospital-blue/40 hover:border-hospital-blue w-10 h-10 sm:w-auto sm:h-auto sm:px-4 sm:py-2 rounded-full cursor-pointer transition-all duration-300 opacity-60 hover:opacity-100 shadow-[0_0_10px_rgba(0,0,0,0.5)] backdrop-blur-sm flex items-center justify-center gap-2 group relative"
+              title="Sistem Tiketing OS"
+            >
+              <span className="text-lg leading-none group-hover:scale-110 transition-transform">💻</span>
+              <span className="text-[0.65rem] font-bold tracking-wider hidden sm:block">TICKETS</span>
+              {/* Notification Badge if there are unsolved tickets */}
+              {floor.allObjects.filter(o => !o.solved).length > 0 && (
+                <span className="absolute -top-1 -right-1 flex h-3 w-3 sm:h-4 sm:w-4 items-center justify-center">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-3 w-3 sm:h-4 sm:w-4 bg-red-500 text-[0.45rem] text-white font-bold items-center justify-center">
+                    !
+                  </span>
+                </span>
+              )}
+            </button>
+            <button 
               onClick={() => setShowMap(true)}
               className="text-hospital-sky hover:text-white bg-dark/50 hover:bg-dark border border-hospital-blue/40 hover:border-hospital-blue w-10 h-10 sm:w-auto sm:h-auto sm:px-4 sm:py-2 rounded-full cursor-pointer transition-all duration-300 opacity-60 hover:opacity-100 shadow-[0_0_10px_rgba(0,0,0,0.5)] backdrop-blur-sm flex items-center justify-center gap-2 group"
               title="Buka Map"
@@ -214,6 +233,26 @@ export default function GameScreen({ onReturnToWelcome, isWelcome = false }: Pro
       {/* Map Modal */}
       {showMap && (
         <MapModal onClose={() => setShowMap(false)} initialFloor={currentFloor} />
+      )}
+
+      {/* Desktop OS Modal */}
+      {showDesktop && (
+        <DesktopUIModal 
+          objects={floor.allObjects}
+          onClose={() => setShowDesktop(false)}
+          onGoToLocation={(idx) => {
+            if (gs.activeMarkerIndex !== null && gs.activeMarkerIndex !== idx) {
+              alert("Anda sudah memiliki tiket yang sedang ditelusuri. Selesaikan tiket sebelumnya terlebih dahulu atau berinteraksi dengan sumber masalah untuk membatalkannya.");
+              return;
+            }
+            gs.activeMarkerIndex = idx;
+            setShowDesktop(false);
+            EventBus.emit('pan_to_object', idx);
+          }}
+          onFixTicket={(idx) => {
+            // Disabled: user must go to location
+          }}
+        />
       )}
 
       {/* Win Modal */}
