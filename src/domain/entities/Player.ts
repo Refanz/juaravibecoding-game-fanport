@@ -1,65 +1,99 @@
 // ==========================================
 // domain/entities/Player.ts
-// Entitas Player — OOP dengan enkapsulasi
+// Entitas Player — OOP dengan enkapsulasi (Phaser Extension)
 // ==========================================
 
-import { TileMap, SOLID_TILES } from '../../infrastructure/data/maps';
+import Phaser from 'phaser';
 
-const TILE = 48;
-const SPEED = 160;
+export class Player extends Phaser.Physics.Arcade.Sprite {
+  // Kecepatan gerak player disesuaikan menjadi lebih lambat
+  public readonly speed = 110; 
 
-export type Direction = 'up' | 'down' | 'left' | 'right';
+  constructor(scene: Phaser.Scene, x: number, y: number) {
+    super(scene, x, y, 'player');
+    
+    scene.add.existing(this);
+    scene.physics.add.existing(this);
 
-export class Player {
-  x: number;
-  y: number;
-  readonly w = 36;
-  readonly h = 36;
-  dir: Direction = 'down';
-  moving = false;
+    this.setSize(24, 24);
+    this.setOffset(12, 24);
+    this.setDepth(10);
+    this.setCollideWorldBounds(true);
+    this.setData('dir', 'down');
 
-  constructor(startTileX: number, startTileY: number) {
-    this.x = startTileX * TILE + 6;
-    this.y = startTileY * TILE + 6;
+    this.createAnimations();
   }
 
-  /** Pindahkan player berdasarkan input dan collision map. */
-  update(keys: Record<string, boolean>, map: TileMap, dt: number): void {
-    let dx = 0, dy = 0;
-    this.moving = false;
+  private createAnimations() {
+    const anims = this.scene.anims;
 
-    if (keys['arrowup']    || keys['w']) { dy = -1; this.dir = 'up';    this.moving = true; }
-    if (keys['arrowdown']  || keys['s']) { dy =  1; this.dir = 'down';  this.moving = true; }
-    if (keys['arrowleft']  || keys['a']) { dx = -1; this.dir = 'left';  this.moving = true; }
-    if (keys['arrowright'] || keys['d']) { dx =  1; this.dir = 'right'; this.moving = true; }
-
-    if (dx !== 0 && dy !== 0) {
-      const d = 1 / Math.sqrt(2);
-      dx *= d; dy *= d;
+    if (!anims.exists('walk_down')) {
+      anims.create({
+        key: 'walk_down',
+        frames: anims.generateFrameNumbers('player', { start: 0, end: 2 }),
+        frameRate: 8,
+        repeat: -1
+      });
+      anims.create({
+        key: 'walk_up',
+        frames: anims.generateFrameNumbers('player', { start: 3, end: 5 }),
+        frameRate: 8,
+        repeat: -1
+      });
+      anims.create({
+        key: 'walk_right',
+        frames: anims.generateFrameNumbers('player', { start: 6, end: 8 }),
+        frameRate: 8,
+        repeat: -1
+      });
+      
+      anims.create({ key: 'idle_down', frames: [{ key: 'player', frame: 0 }], frameRate: 1 });
+      anims.create({ key: 'idle_up', frames: [{ key: 'player', frame: 3 }], frameRate: 1 });
+      anims.create({ key: 'idle_right', frames: [{ key: 'player', frame: 6 }], frameRate: 1 });
     }
-
-    const nx = this.x + dx * SPEED * dt;
-    const ny = this.y + dy * SPEED * dt;
-
-    if (!this._isSolid(nx, this.y, map)) this.x = nx;
-    if (!this._isSolid(this.x, ny, map)) this.y = ny;
   }
 
-  get centerX() { return this.x + this.w / 2; }
-  get centerY() { return this.y + this.h / 2; }
-
-  private _isSolid(px: number, py: number, map: TileMap): boolean {
-    const m = 4;
-    const corners: [number, number][] = [
-      [px + m, py + m], [px + this.w - m, py + m],
-      [px + m, py + this.h - m], [px + this.w - m, py + this.h - m],
-    ];
-    for (const [cx, cy] of corners) {
-      const col = Math.floor(cx / TILE);
-      const row = Math.floor(cy / TILE);
-      if (row < 0 || row >= map.length || col < 0 || col >= map[0].length) return true;
-      if (SOLID_TILES.includes(map[row][col])) return true;
+  public updateMovement(vx: number, vy: number) {
+    // Normalize diagonal velocity
+    if (vx !== 0 && vy !== 0) {
+      vx *= Math.SQRT1_2;
+      vy *= Math.SQRT1_2;
     }
-    return false;
+
+    this.setVelocity(vx, vy);
+
+    let dir = this.getData('dir');
+    if (vx < 0) dir = 'left';
+    else if (vx > 0) dir = 'right';
+    else if (vy < 0) dir = 'up';
+    else if (vy > 0) dir = 'down';
+
+    this.setData('dir', dir);
+
+    if (vx !== 0 || vy !== 0) {
+      if (dir === 'left') {
+        this.setFlipX(true);
+        this.anims.play('walk_right', true);
+      } else if (dir === 'right') {
+        this.setFlipX(false);
+        this.anims.play('walk_right', true);
+      } else if (dir === 'up') {
+        this.anims.play('walk_up', true);
+      } else if (dir === 'down') {
+        this.anims.play('walk_down', true);
+      }
+    } else {
+      if (dir === 'left') {
+        this.setFlipX(true);
+        this.anims.play('idle_right');
+      } else if (dir === 'right') {
+        this.setFlipX(false);
+        this.anims.play('idle_right');
+      } else if (dir === 'up') {
+        this.anims.play('idle_up');
+      } else if (dir === 'down') {
+        this.anims.play('idle_down');
+      }
+    }
   }
 }
