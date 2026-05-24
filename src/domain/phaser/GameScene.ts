@@ -157,7 +157,7 @@ export class GameScene extends Phaser.Scene {
         color: '#ffffff',
         backgroundColor: '#e74c3c',
         padding: { x: 8, y: 8 }
-      }).setOrigin(0.5).setDepth(200);
+      }).setOrigin(0.5).setDepth(3200);
       
       this.time.delayedCall(3000, () => text.destroy());
     } else {
@@ -197,7 +197,7 @@ export class GameScene extends Phaser.Scene {
         
         this.activeMarker = this.add.text(objX, objY - 40, '🔽', {
           fontSize: '16px'
-        }).setOrigin(0.5).setDepth(100);
+        }).setOrigin(0.5).setDepth(3200);
 
         this.activeMarkerTween = this.tweens.add({
           targets: this.activeMarker,
@@ -228,21 +228,25 @@ export class GameScene extends Phaser.Scene {
         }
 
         if (SOLID_TILES.includes(type)) {
-          const wall = this.add.rectangle(x + TILE/2, y + TILE/2, TILE, TILE, 0x000000, 0);
-          this.wallsGroup.add(wall);
-          
+          // If it's a wall, we handle visual and physics differently
           if (type === 1) {
-             const innerWall = this.add.rectangle(x + TILE/2, y + TILE/2, TILE - 8, TILE - 8, 0x42a5f5);
-             innerWall.setStrokeStyle(2, 0x64b5f6);
-             innerWall.setDepth(1);
-          } else if (type === 2) {
-             const desk = this.add.rectangle(x + TILE/2, y + TILE/2, TILE - 4, TILE - 4, 0xa1887f);
-             desk.setStrokeStyle(1, 0x6d4c41);
-             desk.setDepth(1);
-          } else if (type === 3) {
-             const bed = this.add.rectangle(x + TILE/2, y + TILE/2, TILE - 8, TILE - 4, 0xeceff1);
-             bed.setStrokeStyle(1, 0xb0bec5);
-             bed.setDepth(1);
+             const wallSprite = this.wallsGroup.create(x + TILE/2, y, 'wall') as Phaser.Physics.Arcade.Sprite;
+             wallSprite.setSize(TILE, TILE);
+             wallSprite.setOffset(0, TILE); // The SVG is 96px high, collision is the bottom 48px
+             wallSprite.setDepth(y + TILE); // Y-sort based on the bottom of the tile
+          } else {
+             const collisionBox = this.add.rectangle(x + TILE/2, y + TILE/2, TILE, TILE, 0x000000, 0);
+             this.wallsGroup.add(collisionBox);
+             
+             if (type === 2) {
+                const desk = this.add.rectangle(x + TILE/2, y + TILE/2, TILE - 4, TILE - 4, 0xa1887f);
+                desk.setStrokeStyle(1, 0x6d4c41);
+                desk.setDepth(y + TILE);
+             } else if (type === 3) {
+                const bed = this.add.rectangle(x + TILE/2, y + TILE/2, TILE - 8, TILE - 4, 0xeceff1);
+                bed.setStrokeStyle(1, 0xb0bec5);
+                bed.setDepth(y + TILE);
+             }
           }
         }
       }
@@ -254,7 +258,7 @@ export class GameScene extends Phaser.Scene {
         fontFamily: '"Press Start 2P", monospace',
         fontSize: '7px',
         color: '#2196f3',
-      }).setOrigin(0.5).setDepth(2);
+      }).setOrigin(0.5).setDepth(1);
     }
   }
 
@@ -267,11 +271,11 @@ export class GameScene extends Phaser.Scene {
       if (dec.type === 'cctvCamera') {
         // CCTV Camera: ceiling-mounted, high Z, 70% opacity
         const spr = this.add.image(x, y, key);
-        spr.setDepth(90);
+        spr.setDepth(3000);
         spr.setAlpha(0.7);
         // Blink the red LED indicator
         const led = this.add.circle(x + 14, y - 10, 3, 0xe74c3c);
-        led.setDepth(91);
+        led.setDepth(3001);
         this.tweens.add({
           targets: led,
           alpha: 0,
@@ -282,7 +286,7 @@ export class GameScene extends Phaser.Scene {
       } else if (dec.type === 'cctvMonitor') {
         // CCTV Monitor: large screen with pulsing blue glow
         const glow = this.add.rectangle(x, y, TILE + 10, TILE + 10, 0x4fc3f7, 0.25);
-        glow.setDepth(2);
+        glow.setDepth(y + TILE/2 - 1);
         this.tweens.add({
           targets: glow,
           alpha: 0.05,
@@ -291,21 +295,21 @@ export class GameScene extends Phaser.Scene {
           duration: 1200,
         });
         const spr = this.add.image(x, y, key);
-        spr.setDepth(3);
+        spr.setDepth(y + TILE/2);
         // Label
         this.add.text(x, y - 30, 'Monitor CCTV', {
           fontFamily: '"Press Start 2P", monospace',
           fontSize: '5px',
           color: '#4fc3f7',
-        }).setOrigin(0.5).setDepth(5);
+        }).setOrigin(0.5).setDepth(y + TILE/2 + 1);
       } else if (dec.type === 'accessPoint') {
         // Access Point Rule: rendered on ceiling, highest Z-index, 60% opacity
         const spr = this.add.image(x, y, key);
-        spr.setDepth(100);
+        spr.setDepth(3100);
         spr.setAlpha(0.6);
       } else {
         const spr = this.wallsGroup.create(x, y, key) as Phaser.Physics.Arcade.Sprite;
-        spr.setDepth(2);
+        spr.setDepth(y + TILE/2);
       }
     }
   }
@@ -314,7 +318,7 @@ export class GameScene extends Phaser.Scene {
     const ex = ELEVATOR_POS.x * TILE + TILE/2;
     const ey = ELEVATOR_POS.y * TILE + TILE/2;
     const elev = this.add.image(ex, ey, 'elevator');
-    elev.setDepth(2);
+    elev.setDepth(ey + TILE/2);
   }
 
   renderNPCs() {
@@ -322,13 +326,13 @@ export class GameScene extends Phaser.Scene {
       const x = npc.x * TILE + TILE/2;
       const y = npc.y * TILE + TILE/2;
       const spr = this.add.image(x, y, npc.spriteKey);
-      spr.setDepth(5);
+      spr.setDepth(y + TILE/2);
 
       const labelText = this.add.text(x, y - 24, npc.label, {
         fontFamily: '"Press Start 2P", monospace',
         fontSize: '6px',
         color: '#1565c0'
-      }).setOrigin(0.5).setDepth(5);
+      }).setOrigin(0.5).setDepth(y + TILE/2 + 1);
       
       if (['guest', 'nurseWheelchair', 'nurseBed', 'walkingNurse'].includes(npc.role)) {
         const distance = (Math.random() > 0.5 ? 1 : -1) * (150 + Math.random() * 150);
@@ -374,7 +378,7 @@ export class GameScene extends Phaser.Scene {
       if (!obj.solved) {
         // Glow effect for broken objects
         const glow = this.add.rectangle(x, y, TILE + 8, TILE + 8, 0xff3232, 0.3);
-        glow.setDepth(1);
+        glow.setDepth(y + TILE/2 - 1);
         this.tweens.add({
           targets: glow,
           alpha: 0.1,
@@ -387,11 +391,11 @@ export class GameScene extends Phaser.Scene {
           fontFamily: '"Press Start 2P", monospace',
           fontSize: '6px',
           color: '#ff5252'
-        }).setOrigin(0.5).setDepth(5);
+        }).setOrigin(0.5).setDepth(y + TILE/2 + 1);
       }
       
       const spr = this.wallsGroup.create(x, y, obj.spriteKey) as Phaser.Physics.Arcade.Sprite;
-      spr.setDepth(4);
+      spr.setDepth(y + TILE/2);
     }
   }
 
@@ -414,6 +418,7 @@ export class GameScene extends Phaser.Scene {
     else if (this.cursors.down.isDown || this.keys.S.isDown || this.virtualInput.down) vy = speed;
 
     this.player.updateMovement(vx, vy);
+    this.player.setDepth(this.player.y + 24); // Player depth dynamically Y-sorted
 
     if (time > this.lastPosEmitTime + 100) {
       this.lastPosEmitTime = time;

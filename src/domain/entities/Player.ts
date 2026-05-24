@@ -17,7 +17,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
 
     this.setSize(24, 24);
     this.setOffset(12, 24);
-    this.setDepth(10);
+    this.setDepth(y + 24);
     this.setCollideWorldBounds(true);
     this.setData('dir', 'down');
 
