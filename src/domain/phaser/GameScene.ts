@@ -18,6 +18,7 @@ export class GameScene extends Phaser.Scene {
   player!: Phaser.Physics.Arcade.Sprite;
   cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
   keys!: any;
+  virtualInput: { up: boolean, down: boolean, left: boolean, right: boolean } = { up: false, down: false, left: false, right: false };
   
   floorManager!: FloorManager;
   gameState!: GameState;
@@ -90,9 +91,14 @@ export class GameScene extends Phaser.Scene {
     // Events
     EventBus.on('quiz_closed', this.onQuizClosed, this);
     EventBus.on('request_cctv_capture', this.startCCTVCapture, this);
+    EventBus.on('virtual_pad_move', this.onVirtualMove, this);
+    EventBus.on('virtual_pad_interact', this.onVirtualInteract, this);
+    
     this.events.on('shutdown', () => {
       EventBus.off('quiz_closed', this.onQuizClosed, this);
       EventBus.off('request_cctv_capture', this.startCCTVCapture, this);
+      EventBus.off('virtual_pad_move', this.onVirtualMove, this);
+      EventBus.off('virtual_pad_interact', this.onVirtualInteract, this);
     });
   }
 
@@ -108,6 +114,17 @@ export class GameScene extends Phaser.Scene {
     }
     this.gameState.quizActive = false;
     this.gameState.quizObjectIndex = null;
+    
+    // Reset virtual input on quiz close to avoid sticking
+    this.virtualInput = { up: false, down: false, left: false, right: false };
+  }
+
+  onVirtualMove({ dir, isDown }: { dir: 'up' | 'down' | 'left' | 'right', isDown: boolean }) {
+    this.virtualInput[dir] = isDown;
+  }
+
+  onVirtualInteract() {
+    this.handleInteraction();
   }
 
   renderMap() {
@@ -307,11 +324,11 @@ export class GameScene extends Phaser.Scene {
     let vx = 0;
     let vy = 0;
 
-    if (this.cursors.left.isDown || this.keys.A.isDown) vx = -speed;
-    else if (this.cursors.right.isDown || this.keys.D.isDown) vx = speed;
+    if (this.cursors.left.isDown || this.keys.A.isDown || this.virtualInput.left) vx = -speed;
+    else if (this.cursors.right.isDown || this.keys.D.isDown || this.virtualInput.right) vx = speed;
 
-    if (this.cursors.up.isDown || this.keys.W.isDown) vy = -speed;
-    else if (this.cursors.down.isDown || this.keys.S.isDown) vy = speed;
+    if (this.cursors.up.isDown || this.keys.W.isDown || this.virtualInput.up) vy = -speed;
+    else if (this.cursors.down.isDown || this.keys.S.isDown || this.virtualInput.down) vy = speed;
 
     this.player.setVelocity(vx, vy);
 
@@ -355,21 +372,30 @@ export class GameScene extends Phaser.Scene {
 
     // Space interaction
     if (Phaser.Input.Keyboard.JustDown(this.keys.SPACE)) {
-      if (nearObj) {
-        AudioManager.interact();
-        this.gameState.quizActive = true;
-        this.gameState.quizObjectIndex = nearIdx;
-        EventBus.emit('open_quiz', nearIdx);
-      } else if (nearCCTV) {
-        AudioManager.interact();
-        EventBus.emit('open_cctv');
-      } else if (nearElevator) {
-        AudioManager.elevator();
-        const targetFloor = this.floorManager.oppositeFloor();
-        this.floorManager.loadFloor(targetFloor);
-        EventBus.emit('floor_changed', targetFloor);
-        this.scene.restart({ floorManager: this.floorManager, gameState: this.gameState });
-      }
+      this.handleInteraction();
+    }
+  }
+
+  handleInteraction() {
+    const nearObj = this.floorManager.nearestObject(this.player.x, this.player.y);
+    const nearIdx = nearObj ? this.floorManager.allObjects.indexOf(nearObj) : null;
+    const nearCCTV = this.floorManager.isNearCCTVMonitor(this.player.x, this.player.y);
+    const nearElevator = this.floorManager.isNearElevator(this.player.x, this.player.y);
+
+    if (nearObj) {
+      AudioManager.interact();
+      this.gameState.quizActive = true;
+      this.gameState.quizObjectIndex = nearIdx;
+      EventBus.emit('open_quiz', nearIdx);
+    } else if (nearCCTV) {
+      AudioManager.interact();
+      EventBus.emit('open_cctv');
+    } else if (nearElevator) {
+      AudioManager.elevator();
+      const targetFloor = this.floorManager.oppositeFloor();
+      this.floorManager.loadFloor(targetFloor);
+      EventBus.emit('floor_changed', targetFloor);
+      this.scene.restart({ floorManager: this.floorManager, gameState: this.gameState });
     }
   }
 
