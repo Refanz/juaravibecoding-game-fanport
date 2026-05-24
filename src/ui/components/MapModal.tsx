@@ -12,15 +12,15 @@ import { ELEVATOR_POS } from '../../infrastructure/data/maps';
 
 interface Props {
   onClose: () => void;
-  initialFloor: 1 | 2;
+  initialFloor: 1 | 2 | 3;
 }
 
 export default function MapModal({ onClose, initialFloor }: Props) {
-  const [viewFloor, setViewFloor] = useState<1 | 2>(initialFloor);
-  const [playerPos, setPlayerPos] = useState<{x: number, y: number, floor: 1 | 2} | null>(null);
+  const [viewFloor, setViewFloor] = useState<1 | 2 | 3>(initialFloor);
+  const [playerPos, setPlayerPos] = useState<{x: number, y: number, floor: 1 | 2 | 3} | null>(null);
 
   useEffect(() => {
-    const handlePlayerPos = (pos: {x: number, y: number, floor: 1 | 2}) => {
+    const handlePlayerPos = (pos: {x: number, y: number, floor: 1 | 2 | 3}) => {
       setPlayerPos(pos);
     };
 
