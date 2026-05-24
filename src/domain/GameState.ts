@@ -18,6 +18,8 @@ export class GameState {
   showTransition = false;
   transitionFloor: 1 | 2 = 1;
   camera: Camera = { x: 0, y: 0 };
+  teleportTargetIndex: number | null = null;
+  activeMarkerIndex: number | null = null;
 
   reset(): void {
     this.screen = 'welcome';
@@ -28,6 +30,8 @@ export class GameState {
     this.nearElevator = false;
     this.showTransition = false;
     this.camera = { x: 0, y: 0 };
+    this.teleportTargetIndex = null;
+    this.activeMarkerIndex = null;
   }
 
   startPlaying(): void { this.screen = 'playing'; }
