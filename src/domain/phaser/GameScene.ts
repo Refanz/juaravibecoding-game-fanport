@@ -6,6 +6,7 @@ import { AudioManager } from '../../infrastructure/assets/AudioManager';
 import { EventBus } from '../../infrastructure/events/EventBus';
 import { ELEVATOR_POS, SOLID_TILES } from '../../infrastructure/data/maps';
 import { AreaBounds, FLOOR1_AREA_BOUNDS, FLOOR2_AREA_BOUNDS } from '../../infrastructure/data/floorData';
+import { Player } from '../entities/Player';
 
 const TILE = 48;
 const TILE_COLORS: Record<number, number> = {
@@ -15,7 +16,7 @@ const TILE_COLORS: Record<number, number> = {
 };
 
 export class GameScene extends Phaser.Scene {
-  player!: Phaser.Physics.Arcade.Sprite;
+  player!: Player;
   cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
   keys!: any;
   virtualInput: { up: boolean, down: boolean, left: boolean, right: boolean } = { up: false, down: false, left: false, right: false };
@@ -44,7 +45,11 @@ export class GameScene extends Phaser.Scene {
   preload() {
     const uris = getAllSpriteUris();
     for (const [key, uri] of Object.entries(uris)) {
-      this.load.image(key, uri);
+      if (key === 'player') {
+        this.load.spritesheet(key, uri, { frameWidth: 48, frameHeight: 48 });
+      } else {
+        this.load.image(key, uri);
+      }
     }
   }
 
@@ -76,11 +81,7 @@ export class GameScene extends Phaser.Scene {
       px = ELEVATOR_POS.x * TILE - TILE/2;
       py = ELEVATOR_POS.y * TILE + TILE/2;
     }
-    this.player = this.physics.add.sprite(px, py, 'player');
-    this.player.setSize(24, 24);
-    this.player.setOffset(12, 24);
-    this.player.setDepth(10);
-    this.player.setCollideWorldBounds(true);
+    this.player = new Player(this, px, py);
 
     // Collision
     this.physics.add.collider(this.player, this.wallsGroup);
@@ -402,7 +403,7 @@ export class GameScene extends Phaser.Scene {
       return;
     }
 
-    const speed = 180;
+    const speed = this.player.speed;
     let vx = 0;
     let vy = 0;
 
@@ -412,18 +413,11 @@ export class GameScene extends Phaser.Scene {
     if (this.cursors.up.isDown || this.keys.W.isDown || this.virtualInput.up) vy = -speed;
     else if (this.cursors.down.isDown || this.keys.S.isDown || this.virtualInput.down) vy = speed;
 
-    this.player.setVelocity(vx, vy);
+    this.player.updateMovement(vx, vy);
 
     if (time > this.lastPosEmitTime + 100) {
       this.lastPosEmitTime = time;
       EventBus.emit('player_position', { x: this.player.x, y: this.player.y, floor: this.floorManager.currentFloor });
-    }
-
-    // Player bobbing animation based on velocity
-    if (vx !== 0 || vy !== 0) {
-      this.player.setAngle(Math.sin(time / 100) * 10);
-    } else {
-      this.player.setAngle(0);
     }
 
     // Interaction checks
@@ -554,11 +548,7 @@ export class GameScene extends Phaser.Scene {
         }
 
         // Recreate player
-        this.player = this.physics.add.sprite(savedX, savedY, 'player');
-        this.player.setSize(24, 24);
-        this.player.setOffset(12, 24);
-        this.player.setDepth(10);
-        this.player.setCollideWorldBounds(true);
+        this.player = new Player(this, savedX, savedY);
         this.physics.add.collider(this.player, this.wallsGroup);
 
         this.cameras.main.setScroll(savedScrollX, savedScrollY);
