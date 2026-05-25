@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48">
+  <!-- Right Side Horizontal Wall Front Face -->
+  <rect x="30" y="12" width="18" height="36" fill="#FDFEFE"/>
+  <rect x="30" y="26" width="18" height="6" fill="#3498DB"/>
+  <rect x="30" y="44" width="18" height="4" fill="#BDC3C7"/>
+
+  <!-- Left Side Face (Vertical wall left side) -->
+  <rect x="12" y="0" width="6" height="48" fill="#FDFEFE"/>
+  <!-- Left side subtle shadow -->
+  <rect x="12" y="0" width="2" height="48" fill="#ECF0F1"/>
+
+  <!-- Top Face (Horizontal Wall on right) -->
+  <rect x="30" y="0" width="18" height="12" fill="#95A5A6"/>
+
+  <!-- Top Face (Main Vertical Wall) -->
+  <rect x="18" y="0" width="12" height="48" fill="#95A5A6"/>
+  
+  <!-- Top Face Edge Highlights/Shadows -->
+  <rect x="18" y="0" width="2" height="48" fill="#ECF0F1"/>
+  <rect x="28" y="0" width="2" height="48" fill="#7F8C8D"/>
+
+  <!-- Pillars -->
+  <!-- Middle pillar connecting vertical -->
+  <rect x="18" y="0" width="12" height="12" fill="#7F8C8D"/>
+  
+  <!-- Right pillar -->
+  <rect x="40" y="0" width="8" height="12" fill="#7F8C8D"/>
+  <rect x="40" y="12" width="8" height="36" fill="#ECF0F1"/>
+  <rect x="40" y="12" width="2" height="36" fill="#BDC3C7"/>
+  <rect x="46" y="12" width="2" height="36" fill="#BDC3C7"/>
+</svg>

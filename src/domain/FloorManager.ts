@@ -97,8 +97,8 @@ export class FloorManager {
     );
   }
 
-  // CCTV Monitor at tile (24, 17) — Ruang CCTV khusus di Lantai 1
-  readonly cctvMonitorPos = { x: 24, y: 17 };
+  // CCTV Monitor at tile (34, 17) — Ruang CCTV khusus di Lantai 1
+  readonly cctvMonitorPos = { x: 34, y: 17 };
 
   get cctvMonitorCenterX() {
     return this.cctvMonitorPos.x * TILE + TILE / 2;

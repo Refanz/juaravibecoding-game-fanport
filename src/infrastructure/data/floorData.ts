@@ -123,24 +123,24 @@ export interface AreaBounds {
 }
 
 export const FLOOR1_AREA_BOUNDS: AreaBounds[] = [
-  { id: "resepsionis", startX: 1, startY: 1, endX: 6, endY: 5 },
-  { id: "igd", startX: 8, startY: 1, endX: 14, endY: 5 },
-  { id: "farmasi", startX: 16, startY: 1, endX: 26, endY: 5 },
-  { id: "icu", startX: 1, startY: 7, endX: 6, endY: 12 },
-  { id: "rawat_inap_1", startX: 8, startY: 7, endX: 12, endY: 12 },
-  { id: "rawat_inap_2", startX: 14, startY: 7, endX: 18, endY: 12 },
-  { id: "rawat_inap_3", startX: 20, startY: 7, endX: 26, endY: 12 },
-  { id: "poliklinik", startX: 1, startY: 15, endX: 21, endY: 19 },
-  { id: "ruang_cctv", startX: 23, startY: 15, endX: 26, endY: 19 },
+  { id: "resepsionis", startX: 11, startY: 1, endX: 16, endY: 5 },
+  { id: "igd", startX: 18, startY: 1, endX: 24, endY: 5 },
+  { id: "farmasi", startX: 26, startY: 1, endX: 36, endY: 5 },
+  { id: "icu", startX: 11, startY: 7, endX: 16, endY: 12 },
+  { id: "rawat_inap_1", startX: 18, startY: 7, endX: 22, endY: 12 },
+  { id: "rawat_inap_2", startX: 24, startY: 7, endX: 28, endY: 12 },
+  { id: "rawat_inap_3", startX: 30, startY: 7, endX: 36, endY: 12 },
+  { id: "poliklinik", startX: 11, startY: 15, endX: 31, endY: 19 },
+  { id: "ruang_cctv", startX: 33, startY: 15, endX: 36, endY: 19 },
 ];
 
 export const FLOOR2_AREA_BOUNDS: AreaBounds[] = [
-  { id: "ruang_operasi", startX: 1, startY: 1, endX: 10, endY: 5 },
-  { id: "radiologi", startX: 12, startY: 1, endX: 26, endY: 5 },
-  { id: "hemodialisa", startX: 1, startY: 7, endX: 10, endY: 12 },
-  { id: "vip", startX: 12, startY: 7, endX: 26, endY: 12 },
+  { id: "ruang_operasi", startX: 11, startY: 1, endX: 20, endY: 5 },
+  { id: "radiologi", startX: 22, startY: 1, endX: 36, endY: 5 },
+  { id: "hemodialisa", startX: 11, startY: 7, endX: 20, endY: 12 },
+  { id: "vip", startX: 22, startY: 7, endX: 36, endY: 12 },
 ];
 
 export const FLOOR3_AREA_BOUNDS: AreaBounds[] = [
-  { id: "server_room", startX: 1, startY: 1, endX: 26, endY: 28 },
+  { id: "server_room", startX: 11, startY: 1, endX: 36, endY: 28 },
 ];

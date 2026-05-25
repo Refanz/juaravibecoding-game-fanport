@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48">
+  <!-- Horizontal Wall Front Face -->
+  <rect x="0" y="12" width="48" height="36" fill="#FDFEFE"/>
+  <rect x="0" y="26" width="48" height="6" fill="#3498DB"/>
+  <rect x="0" y="44" width="48" height="4" fill="#BDC3C7"/>
+  
+  <!-- Subtle Wall Panels (Vertical Lines) -->
+  <rect x="16" y="12" width="2" height="32" fill="#ECF0F1"/>
+  <rect x="30" y="12" width="2" height="32" fill="#ECF0F1"/>
+
+  <!-- Top Face -->
+  <rect x="0" y="0" width="48" height="12" fill="#95A5A6"/>
+
+  <!-- Pillars -->
+  <!-- Left pillar -->
+  <rect x="0" y="0" width="8" height="12" fill="#7F8C8D"/>
+  <rect x="0" y="12" width="8" height="36" fill="#ECF0F1"/>
+  <rect x="0" y="12" width="2" height="36" fill="#BDC3C7"/>
+  <rect x="6" y="12" width="2" height="36" fill="#BDC3C7"/>
+  
+  <!-- Right pillar -->
+  <rect x="40" y="0" width="8" height="12" fill="#7F8C8D"/>
+  <rect x="40" y="12" width="8" height="36" fill="#ECF0F1"/>
+  <rect x="40" y="12" width="2" height="36" fill="#BDC3C7"/>
+  <rect x="46" y="12" width="2" height="36" fill="#BDC3C7"/>
+
+  <!-- Middle pillar connecting vertical UP -->
+  <rect x="18" y="0" width="12" height="8" fill="#7F8C8D"/>
+</svg>
