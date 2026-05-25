@@ -1358,5 +1358,7 @@
     }
   ],
   "type": "map",
-  "version": "1.10"
+  "version": "1.10",
+  "orientation": "orthogonal",
+  "renderorder": "right-down"
 }

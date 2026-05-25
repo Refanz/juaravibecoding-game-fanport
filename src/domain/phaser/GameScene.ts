@@ -61,71 +61,76 @@ export class GameScene extends Phaser.Scene {
   }
 
   create() {
-    // Reset groups
-    this.objectsGroup = this.add.group();
-    this.wallsGroup = this.physics.add.staticGroup();
-    this.decorationsGroup = this.add.group();
-    this.npcsGroup = this.add.group();
+    try {
+      // Reset groups
+      this.objectsGroup = this.add.group();
+      this.wallsGroup = this.physics.add.staticGroup();
+      this.decorationsGroup = this.add.group();
+      this.npcsGroup = this.add.group();
 
-    this.renderMap();
-    this.renderDecorations();
-    this.renderElevator();
-    this.renderNPCs();
-    this.renderObjects();
+      this.renderMap();
+      this.renderDecorations();
+      this.renderElevator();
+      this.renderNPCs();
+      this.renderObjects();
 
-    // Player
-    let px = 3 * TILE + TILE/2;
-    let py = 3 * TILE + TILE/2;
-    
-    if (this.gameState.teleportTargetIndex !== null) {
-      const obj = this.floorManager.allObjects[this.gameState.teleportTargetIndex];
-      if (obj && obj.floor === this.floorManager.currentFloor) {
-        px = obj.x * TILE + TILE/2;
-        py = obj.y * TILE + TILE/2;
+      // Player
+      let px = 3 * TILE + TILE/2;
+      let py = 3 * TILE + TILE/2;
+      
+      if (this.gameState.teleportTargetIndex !== null) {
+        const obj = this.floorManager.allObjects[this.gameState.teleportTargetIndex];
+        if (obj && obj.floor === this.floorManager.currentFloor) {
+          px = obj.x * TILE + TILE/2;
+          py = obj.y * TILE + TILE/2;
+        }
+        this.gameState.teleportTargetIndex = null;
+      } else if (this.floorManager.currentFloor === 2) {
+        px = ELEVATOR_POS.x * TILE - TILE/2;
+        py = ELEVATOR_POS.y * TILE + TILE/2;
       }
-      this.gameState.teleportTargetIndex = null;
-    } else if (this.floorManager.currentFloor === 2) {
-      px = ELEVATOR_POS.x * TILE - TILE/2;
-      py = ELEVATOR_POS.y * TILE + TILE/2;
+      this.player = new Player(this, px, py);
+
+      // Collision
+      this.physics.add.collider(this.player, this.wallsGroup);
+      this.physics.add.collider(this.player, this.groundLayer);
+
+      // Camera
+      const mapW = this.currentTilemap.widthInPixels;
+      const mapH = this.currentTilemap.heightInPixels;
+      this.physics.world.setBounds(0, 0, mapW, mapH);
+      this.cameras.main.setBounds(0, 0, mapW, mapH);
+      this.cameras.main.startFollow(this.player);
+      this.cameras.main.setBackgroundColor('#e0e8f0');
+
+      // Controls
+      if (this.input.keyboard) {
+          this.cursors = this.input.keyboard.createCursorKeys();
+          this.keys = this.input.keyboard.addKeys('W,A,S,D,SPACE');
+      }
+
+      // Events
+      EventBus.on('quiz_closed', this.onQuizClosed, this);
+      EventBus.on('request_cctv_capture', this.startCCTVCapture, this);
+      EventBus.on('virtual_pad_move', this.onVirtualMove, this);
+      EventBus.on('virtual_pad_interact', this.onVirtualInteract, this);
+      EventBus.on('pan_to_object', this.panToObject, this);
+      EventBus.on('do_change_floor', this.doChangeFloor, this);
+      
+      this.events.on('shutdown', () => {
+        EventBus.off('quiz_closed', this.onQuizClosed, this);
+        EventBus.off('request_cctv_capture', this.startCCTVCapture, this);
+        EventBus.off('virtual_pad_move', this.onVirtualMove, this);
+        EventBus.off('virtual_pad_interact', this.onVirtualInteract, this);
+        EventBus.off('pan_to_object', this.panToObject, this);
+        EventBus.off('do_change_floor', this.doChangeFloor, this);
+      });
+
+      this.updateMarker();
+    } catch (e: any) {
+      this.add.text(10, 10, 'ERROR: ' + e.message + '\n' + e.stack, { color: '#ff0000', fontSize: '12px' }).setDepth(1000);
+      console.error(e);
     }
-    this.player = new Player(this, px, py);
-
-    // Collision
-    this.physics.add.collider(this.player, this.wallsGroup);
-    this.physics.add.collider(this.player, this.groundLayer);
-
-    // Camera
-    const mapW = this.currentTilemap.widthInPixels;
-    const mapH = this.currentTilemap.heightInPixels;
-    this.physics.world.setBounds(0, 0, mapW, mapH);
-    this.cameras.main.setBounds(0, 0, mapW, mapH);
-    this.cameras.main.startFollow(this.player);
-    this.cameras.main.setBackgroundColor('#e0e8f0');
-
-    // Controls
-    if (this.input.keyboard) {
-        this.cursors = this.input.keyboard.createCursorKeys();
-        this.keys = this.input.keyboard.addKeys('W,A,S,D,SPACE');
-    }
-
-    // Events
-    EventBus.on('quiz_closed', this.onQuizClosed, this);
-    EventBus.on('request_cctv_capture', this.startCCTVCapture, this);
-    EventBus.on('virtual_pad_move', this.onVirtualMove, this);
-    EventBus.on('virtual_pad_interact', this.onVirtualInteract, this);
-    EventBus.on('pan_to_object', this.panToObject, this);
-    EventBus.on('do_change_floor', this.doChangeFloor, this);
-    
-    this.events.on('shutdown', () => {
-      EventBus.off('quiz_closed', this.onQuizClosed, this);
-      EventBus.off('request_cctv_capture', this.startCCTVCapture, this);
-      EventBus.off('virtual_pad_move', this.onVirtualMove, this);
-      EventBus.off('virtual_pad_interact', this.onVirtualInteract, this);
-      EventBus.off('pan_to_object', this.panToObject, this);
-      EventBus.off('do_change_floor', this.doChangeFloor, this);
-    });
-
-    this.updateMarker();
   }
 
   onQuizClosed(solved: boolean) {
