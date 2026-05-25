@@ -5,10 +5,6 @@
 // ==========================================
 
 import {
-  MAP_FLOOR1,
-  MAP_FLOOR2,
-  MAP_FLOOR3,
-  TileMap,
   ELEVATOR_POS,
 } from "../infrastructure/data/maps";
 import {
@@ -38,7 +34,6 @@ const INTERACT_RANGE = 56;
 
 export class FloorManager {
   currentFloor: 1 | 2 | 3 = 1;
-  map: TileMap = MAP_FLOOR1;
   labels: RoomLabel[] = [];
   npcs: NPC[] = [];
   decorations: DecorData[] = [];
@@ -61,19 +56,16 @@ export class FloorManager {
   loadFloor(floor: 1 | 2 | 3): void {
     this.currentFloor = floor;
     if (floor === 1) {
-      this.map = MAP_FLOOR1;
       this.labels = ROOM_LABELS_F1;
       this.npcs = FLOOR1_NPCS.map(createNPC);
       this.decorations = FLOOR1_DECORATIONS;
       this.floorObjects = this.allObjects.filter((o) => o.floor === 1);
     } else if (floor === 2) {
-      this.map = MAP_FLOOR2;
       this.labels = ROOM_LABELS_F2;
       this.npcs = FLOOR2_NPCS.map(createNPC);
       this.decorations = FLOOR2_DECORATIONS;
       this.floorObjects = this.allObjects.filter((o) => o.floor === 2);
     } else {
-      this.map = MAP_FLOOR3;
       this.labels = ROOM_LABELS_F3;
       this.npcs = FLOOR3_NPCS.map(createNPC);
       this.decorations = FLOOR3_DECORATIONS;
@@ -105,8 +97,8 @@ export class FloorManager {
     );
   }
 
-  // CCTV Monitor at tile (24, 17) — Ruang CCTV khusus di Lantai 1
-  readonly cctvMonitorPos = { x: 24, y: 17 };
+  // CCTV Monitor at tile (34, 17) — Ruang CCTV khusus di Lantai 1
+  readonly cctvMonitorPos = { x: 34, y: 17 };
 
   get cctvMonitorCenterX() {
     return this.cctvMonitorPos.x * TILE + TILE / 2;

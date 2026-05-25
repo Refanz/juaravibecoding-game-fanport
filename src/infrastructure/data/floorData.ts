@@ -4,213 +4,115 @@
 // ruangan per lantai
 // ==========================================
 
-export interface RoomLabel { x: number; y: number; text: string; }
-export interface NPCData { x: number; y: number; role: 'doctor' | 'nurse' | 'guest' | 'nurseWheelchair' | 'nurseBed' | 'walkingNurse' | 'security'; label: string; }
-export interface DecorData { x: number; y: number; type: 'bed' | 'medicine' | 'radiation' | 'accessPoint' | 'car' | 'motorcycle' | 'gate' | 'securityPost' | 'cctvCamera' | 'cctvMonitor'; }
+export interface RoomLabel {
+  x: number;
+  y: number;
+  text: string;
+}
+export interface NPCData {
+  x: number;
+  y: number;
+  role:
+    | "doctor"
+    | "nurse"
+    | "guest"
+    | "nurseWheelchair"
+    | "nurseBed"
+    | "walkingNurse"
+    | "security";
+  label: string;
+}
+export interface DecorData {
+  x: number;
+  y: number;
+  type:
+    | "bed"
+    | "medicine"
+    | "radiation"
+    | "accessPoint"
+    | "car"
+    | "motorcycle"
+    | "gate"
+    | "securityPost"
+    | "cctvCamera"
+    | "cctvMonitor";
+}
 export interface BrokenObjectData {
-  x: number; y: number;
-  type: 'computer' | 'monitor' | 'serverRack' | 'ups' | 'firewall' | 'switchCore' | 'switchAccess' | 'ac' | 'accessDoor' | 'modemSenang' | 'modemCepat' | 'modemGatotkaca';
+  x: number;
+  y: number;
+  type:
+    | "computer"
+    | "monitor"
+    | "serverRack"
+    | "ups"
+    | "firewall"
+    | "switchCore"
+    | "switchAccess"
+    | "ac"
+    | "accessDoor"
+    | "modemSenang"
+    | "modemCepat"
+    | "modemGatotkaca";
   label: string;
   floor: 1 | 2 | 3;
 }
 
-// ---- Lantai 1 ----
-export const ROOM_LABELS_F1: RoomLabel[] = [
-  { x: 3, y: 1, text: 'RESEPSIONIS' },
-  { x: 12, y: 1, text: 'IGD' },
-  { x: 20, y: 1, text: 'FARMASI' },
-  { x: 3, y: 7, text: 'ICU' },
-  { x: 10, y: 7, text: 'RAWAT INAP' },
-  { x: 10, y: 8, text: 'Kelas 1' },
-  { x: 15, y: 8, text: 'Kelas 2' },
-  { x: 20, y: 8, text: 'Kelas 3' },
-  { x: 3, y: 14, text: 'POLIKLINIK / RAWAT JALAN' },
-  { x: 3, y: 15, text: 'Anak' }, { x: 7, y: 15, text: 'P.Dalam' },
-  { x: 11, y: 15, text: 'Kandung' }, { x: 15, y: 15, text: 'Bedah' },
-  { x: 19, y: 15, text: 'Mata' }, { x: 3, y: 18, text: 'THT' },
-  { x: 7, y: 18, text: 'Gigi' }, { x: 11, y: 18, text: 'Saraf' },
-  { x: 15, y: 18, text: 'Kulit' }, { x: 19, y: 18, text: 'Jantung' },
-  { x: 26, y: 10, text: 'LIFT' },
-  { x: 24, y: 14, text: 'IT HUB' },
-  { x: 24, y: 16, text: 'RUANG CCTV' },
-];
+import floor1Json from "./maps/floor1.json";
+import floor2Json from "./maps/floor2.json";
+import floor3Json from "./maps/floor3.json";
 
-export const FLOOR1_NPCS: NPCData[] = [
-  { x: 5, y: 3, role: 'nurse', label: 'Perawat' },
-  { x: 10, y: 3, role: 'doctor', label: 'Dokter IGD' },
-  { x: 22, y: 3, role: 'nurse', label: 'Apoteker' },
-  { x: 4, y: 9, role: 'doctor', label: 'Dokter ICU' },
-  { x: 14, y: 16, role: 'doctor', label: 'Dokter Bedah' },
-  { x: 6, y: 19, role: 'nurse', label: 'Dokter Gigi' },
-  // Moving Interior NPCs
-  { x: 8, y: 11, role: 'nurseBed', label: 'Pasien Masuk' },
-  { x: 14, y: 3, role: 'walkingNurse', label: 'Perawat' },
-  // Exterior NPCs
-  { x: 2, y: 26, role: 'guest', label: 'Tamu' },
-  { x: 16, y: 27, role: 'guest', label: 'Tamu' },
-  { x: 6, y: 23, role: 'nurseWheelchair', label: 'Pasien' },
-  // Security NPCs
-  { x: 5, y: 22, role: 'security', label: 'Satpam' },
-  { x: 21, y: 22, role: 'security', label: 'Satpam' },
-];
+const parseObjects = (json: any, floor: 1 | 2 | 3) => {
+  const objectsLayer = json.layers.find((l: any) => l.type === "objectgroup");
+  if (!objectsLayer) return { labels: [], npcs: [], decor: [], broken: [] };
 
-export const FLOOR1_DECORATIONS: DecorData[] = [
-  { x: 9, y: 8, type: 'bed' }, { x: 11, y: 8, type: 'bed' },
-  { x: 9, y: 10, type: 'bed' }, { x: 11, y: 10, type: 'bed' },
-  { x: 15, y: 8, type: 'bed' }, { x: 17, y: 8, type: 'bed' },
-  { x: 15, y: 10, type: 'bed' }, { x: 17, y: 10, type: 'bed' },
-  { x: 21, y: 8, type: 'bed' }, { x: 23, y: 8, type: 'bed' },
-  { x: 21, y: 10, type: 'bed' }, { x: 23, y: 10, type: 'bed' },
-  { x: 20, y: 2, type: 'medicine' },
-  { x: 22, y: 2, type: 'medicine' },
-  // Access Points for each room
-  { x: 4, y: 0, type: 'accessPoint' },   // Resepsionis
-  { x: 13, y: 0, type: 'accessPoint' },  // IGD
-  { x: 21, y: 0, type: 'accessPoint' },  // Farmasi
-  { x: 4, y: 6, type: 'accessPoint' },   // ICU
-  { x: 11, y: 6, type: 'accessPoint' },  // Rawat Inap 1
-  { x: 16, y: 6, type: 'accessPoint' },  // Rawat Inap 2
-  { x: 21, y: 6, type: 'accessPoint' },  // Rawat Inap 3
-  { x: 4, y: 13, type: 'accessPoint' },  // Poli Anak
-  { x: 8, y: 13, type: 'accessPoint' },  // Poli Dalam
-  { x: 12, y: 13, type: 'accessPoint' }, // Poli Kandung
-  { x: 16, y: 13, type: 'accessPoint' }, // Poli Bedah
-  { x: 20, y: 13, type: 'accessPoint' }, // Poli Mata
-  { x: 4, y: 17, type: 'accessPoint' },  // Poli THT
-  { x: 8, y: 17, type: 'accessPoint' },  // Poli Gigi
-  { x: 12, y: 17, type: 'accessPoint' }, // Poli Saraf
-  { x: 16, y: 17, type: 'accessPoint' }, // Poli Kulit
-  { x: 20, y: 17, type: 'accessPoint' }, // Poli Jantung
-  // Exterior Parking
-  { x: 5, y: 21, type: 'securityPost' },
-  { x: 6, y: 21, type: 'gate' },
-  { x: 7, y: 21, type: 'gate' },
-  { x: 20, y: 21, type: 'securityPost' },
-  { x: 21, y: 21, type: 'gate' },
-  { x: 22, y: 21, type: 'gate' },
-  // Parking area motors (left side)
-  { x: 1, y: 22, type: 'motorcycle' },
-  { x: 3, y: 22, type: 'motorcycle' },
-  { x: 1, y: 23, type: 'motorcycle' },
-  { x: 3, y: 23, type: 'motorcycle' },
-  { x: 1, y: 24, type: 'motorcycle' },
-  { x: 3, y: 24, type: 'motorcycle' },
-  { x: 10, y: 22, type: 'motorcycle' },
-  { x: 12, y: 22, type: 'motorcycle' },
-  { x: 10, y: 23, type: 'motorcycle' },
-  { x: 12, y: 23, type: 'motorcycle' },
-  // Parking area cars (right & middle)
-  { x: 2, y: 23, type: 'car' },
-  { x: 14, y: 22, type: 'car' },
-  { x: 14, y: 24, type: 'car' },
-  { x: 17, y: 22, type: 'car' },
-  { x: 17, y: 24, type: 'car' },
-  { x: 24, y: 22, type: 'car' },
-  { x: 24, y: 24, type: 'car' },
-  { x: 25, y: 23, type: 'car' },
-  // CCTV Cameras — Lantai 1
-  { x: 3, y: 1, type: 'cctvCamera' },    // Resepsionis
-  { x: 12, y: 1, type: 'cctvCamera' },   // IGD
-  { x: 12, y: 7, type: 'cctvCamera' },   // Lorong Rawat Inap
-  { x: 3, y: 7, type: 'cctvCamera' },    // ICU
-  { x: 4, y: 14, type: 'cctvCamera' },   // Lorong Rawat Jalan
-  { x: 26, y: 12, type: 'cctvCamera' },  // Dekat Lift Lt.1
-  { x: 15, y: 22, type: 'cctvCamera' },  // Area Parkir
-  // CCTV Control Room Monitor (di Ruang CCTV baru)
-  { x: 24, y: 17, type: 'cctvMonitor' },
-];
+  const labels: RoomLabel[] = [];
+  const npcs: NPCData[] = [];
+  const decor: DecorData[] = [];
+  const broken: BrokenObjectData[] = [];
 
-export const FLOOR1_OBJECTS: BrokenObjectData[] = [
-  { x: 3, y: 2, type: 'computer', label: 'PC Resepsionis', floor: 1 },
-  { x: 11, y: 2, type: 'monitor', label: 'Monitor IGD', floor: 1 },
-  { x: 18, y: 2, type: 'computer', label: 'PC Farmasi', floor: 1 },
-  { x: 2, y: 8, type: 'computer', label: 'PC ICU', floor: 1 },
-  { x: 16, y: 10, type: 'monitor', label: 'Alat R.Inap', floor: 1 },
-  { x: 2, y: 15, type: 'computer', label: 'PC Poli Anak', floor: 1 },
-  { x: 10, y: 15, type: 'computer', label: 'PC Poli Kandung', floor: 1 },
-  { x: 18, y: 18, type: 'computer', label: 'PC Poli Kulit', floor: 1 },
-  { x: 24, y: 15, type: 'switchAccess', label: 'Switch Distribusi Lt.1', floor: 1 },
-];
+  for (const obj of objectsLayer.objects || []) {
+    const x = obj.x / 48;
+    const y = obj.y / 48;
+    const getProp = (name: string) =>
+      obj.properties?.find((p: any) => p.name === name)?.value;
 
-// ---- Lantai 2 ----
-export const ROOM_LABELS_F2: RoomLabel[] = [
-  { x: 3, y: 1, text: 'RUANG OPERASI' },
-  { x: 14, y: 1, text: 'RADIOLOGI' },
-  { x: 3, y: 7, text: 'HEMODIALISA' },
-  { x: 14, y: 7, text: 'RAWAT INAP VIP' },
-  { x: 24, y: 9, text: 'IT HUB' },
-  { x: 26, y: 10, text: 'LIFT' },
-];
+    if (obj.type === "Label") {
+      labels.push({ x, y, text: getProp("text") });
+    } else if (obj.type === "NPC") {
+      npcs.push({ x, y, role: getProp("role"), label: getProp("label") });
+    } else if (obj.type === "Decoration") {
+      decor.push({ x, y, type: getProp("type") });
+    } else if (obj.type === "BrokenObject") {
+      broken.push({
+        x,
+        y,
+        type: getProp("type"),
+        label: getProp("label"),
+        floor,
+      });
+    }
+  }
+  return { labels, npcs, decor, broken };
+};
 
-export const FLOOR2_NPCS: NPCData[] = [
-  { x: 5, y: 2, role: 'doctor', label: 'Dokter Bedah' },
-  { x: 16, y: 3, role: 'nurse', label: 'Radiolog' },
-  { x: 3, y: 9, role: 'doctor', label: 'Dokter' },
-  { x: 17, y: 9, role: 'nurse', label: 'Perawat VIP' },
-  // Moving Interior NPCs
-  { x: 10, y: 5, role: 'walkingNurse', label: 'Perawat' },
-  { x: 8, y: 12, role: 'nurseBed', label: 'Transfer VIP' },
-];
+const f1Data = parseObjects(floor1Json, 1);
+const f2Data = parseObjects(floor2Json, 2);
+const f3Data = parseObjects(floor3Json, 3);
 
-export const FLOOR2_DECORATIONS: DecorData[] = [
-  { x: 5, y: 4, type: 'bed' },
-  { x: 8, y: 2, type: 'bed' },
-  { x: 15, y: 10, type: 'bed' },
-  { x: 18, y: 10, type: 'bed' },
-  { x: 14, y: 4, type: 'radiation' },
-  { x: 18, y: 4, type: 'radiation' },
-  // Access Points for each room
-  { x: 4, y: 0, type: 'accessPoint' },   // R. Operasi
-  { x: 15, y: 0, type: 'accessPoint' },  // Radiologi
-  { x: 4, y: 6, type: 'accessPoint' },   // Hemodialisa
-  { x: 15, y: 6, type: 'accessPoint' },  // VIP
-  // CCTV Cameras — Lantai 2
-  { x: 4, y: 1, type: 'cctvCamera' },    // Area Ruang Operasi
-  { x: 15, y: 1, type: 'cctvCamera' },   // Radiologi
-  { x: 4, y: 7, type: 'cctvCamera' },    // Hemodialisa
-  { x: 26, y: 12, type: 'cctvCamera' },  // Dekat Lift Lt.2
-];
+export const ROOM_LABELS_F1 = f1Data.labels;
+export const FLOOR1_NPCS = f1Data.npcs;
+export const FLOOR1_DECORATIONS = f1Data.decor;
+export const FLOOR1_OBJECTS = f1Data.broken;
 
-export const FLOOR2_OBJECTS: BrokenObjectData[] = [
-  { x: 2, y: 2, type: 'computer', label: 'PC R.Operasi', floor: 2 },
-  { x: 14, y: 2, type: 'monitor', label: 'Alat Radiologi', floor: 2 },
-  { x: 5, y: 8, type: 'computer', label: 'PC Hemodialisa', floor: 2 },
-  { x: 15, y: 8, type: 'monitor', label: 'Alat VIP', floor: 2 },
-  { x: 24, y: 10, type: 'switchAccess', label: 'Switch Distribusi Lt.2', floor: 2 },
-];
+export const ROOM_LABELS_F2 = f2Data.labels;
+export const FLOOR2_NPCS = f2Data.npcs;
+export const FLOOR2_DECORATIONS = f2Data.decor;
+export const FLOOR2_OBJECTS = f2Data.broken;
 
-// ---- Lantai 3 ----
-export const ROOM_LABELS_F3: RoomLabel[] = [
-  { x: 10, y: 14, text: 'SERVER ROOM' },
-  { x: 23, y: 11, text: 'LORONG LIFT' },
-  { x: 26, y: 10, text: 'LIFT' },
-];
-export const FLOOR3_NPCS: NPCData[] = [];
-export const FLOOR3_DECORATIONS: DecorData[] = [
-  { x: 4, y: 4, type: 'cctvCamera' },
-  { x: 17, y: 25, type: 'cctvCamera' },
-];
-export const FLOOR3_OBJECTS: BrokenObjectData[] = [
-  { x: 20, y: 11, type: 'accessDoor', label: 'Access Door Server', floor: 3 },
-  { x: 3, y: 3, type: 'ac', label: 'AC Server Room', floor: 3 },
-  { x: 16, y: 4, type: 'modemSenang', label: 'Modem SenangNet', floor: 3 },
-  { x: 16, y: 5, type: 'modemCepat', label: 'Modem CepatNet', floor: 3 },
-  { x: 16, y: 6, type: 'modemGatotkaca', label: 'Modem GatotkacaNet', floor: 3 },
-  { x: 16, y: 7, type: 'firewall', label: 'Fortigate Firewall', floor: 3 },
-  { x: 16, y: 8, type: 'switchCore', label: 'Switch Core', floor: 3 },
-  { x: 16, y: 9, type: 'ups', label: 'UPS Utama', floor: 3 },
-  { x: 6, y: 10, type: 'serverRack', label: 'Rak Server A1', floor: 3 },
-  { x: 6, y: 12, type: 'serverRack', label: 'Rak Server A2', floor: 3 },
-  { x: 6, y: 14, type: 'serverRack', label: 'Rak Server A3', floor: 3 },
-  { x: 6, y: 16, type: 'serverRack', label: 'Rak Server A4', floor: 3 },
-  { x: 6, y: 18, type: 'serverRack', label: 'Rak Server A5', floor: 3 },
-  { x: 10, y: 10, type: 'serverRack', label: 'Rak Server B1', floor: 3 },
-  { x: 10, y: 12, type: 'serverRack', label: 'Rak Server B2', floor: 3 },
-  { x: 10, y: 14, type: 'serverRack', label: 'Rak Server B3', floor: 3 },
-  { x: 10, y: 16, type: 'serverRack', label: 'Rak Server B4', floor: 3 },
-  { x: 10, y: 18, type: 'serverRack', label: 'Rak Server B5', floor: 3 },
-  { x: 16, y: 24, type: 'computer', label: 'PC Monitoring', floor: 3 },
-];
+export const ROOM_LABELS_F3 = f3Data.labels;
+export const FLOOR3_NPCS = f3Data.npcs;
+export const FLOOR3_DECORATIONS = f3Data.decor;
+export const FLOOR3_OBJECTS = f3Data.broken;
 
 export interface AreaBounds {
   id: string;
@@ -221,24 +123,24 @@ export interface AreaBounds {
 }
 
 export const FLOOR1_AREA_BOUNDS: AreaBounds[] = [
-  { id: 'resepsionis', startX: 1, startY: 1, endX: 6, endY: 5 },
-  { id: 'igd', startX: 8, startY: 1, endX: 14, endY: 5 },
-  { id: 'farmasi', startX: 16, startY: 1, endX: 26, endY: 5 },
-  { id: 'icu', startX: 1, startY: 7, endX: 6, endY: 12 },
-  { id: 'rawat_inap_1', startX: 8, startY: 7, endX: 12, endY: 12 },
-  { id: 'rawat_inap_2', startX: 14, startY: 7, endX: 18, endY: 12 },
-  { id: 'rawat_inap_3', startX: 20, startY: 7, endX: 26, endY: 12 },
-  { id: 'poliklinik', startX: 1, startY: 15, endX: 21, endY: 19 },
-  { id: 'ruang_cctv', startX: 23, startY: 15, endX: 26, endY: 19 },
+  { id: "resepsionis", startX: 11, startY: 1, endX: 16, endY: 5 },
+  { id: "igd", startX: 18, startY: 1, endX: 24, endY: 5 },
+  { id: "farmasi", startX: 26, startY: 1, endX: 36, endY: 5 },
+  { id: "icu", startX: 11, startY: 7, endX: 16, endY: 12 },
+  { id: "rawat_inap_1", startX: 18, startY: 7, endX: 22, endY: 12 },
+  { id: "rawat_inap_2", startX: 24, startY: 7, endX: 28, endY: 12 },
+  { id: "rawat_inap_3", startX: 30, startY: 7, endX: 36, endY: 12 },
+  { id: "poliklinik", startX: 11, startY: 15, endX: 31, endY: 19 },
+  { id: "ruang_cctv", startX: 33, startY: 15, endX: 36, endY: 19 },
 ];
 
 export const FLOOR2_AREA_BOUNDS: AreaBounds[] = [
-  { id: 'ruang_operasi', startX: 1, startY: 1, endX: 10, endY: 5 },
-  { id: 'radiologi', startX: 12, startY: 1, endX: 26, endY: 5 },
-  { id: 'hemodialisa', startX: 1, startY: 7, endX: 10, endY: 12 },
-  { id: 'vip', startX: 12, startY: 7, endX: 26, endY: 12 },
+  { id: "ruang_operasi", startX: 11, startY: 1, endX: 20, endY: 5 },
+  { id: "radiologi", startX: 22, startY: 1, endX: 36, endY: 5 },
+  { id: "hemodialisa", startX: 11, startY: 7, endX: 20, endY: 12 },
+  { id: "vip", startX: 22, startY: 7, endX: 36, endY: 12 },
 ];
 
 export const FLOOR3_AREA_BOUNDS: AreaBounds[] = [
-  { id: 'server_room', startX: 1, startY: 1, endX: 26, endY: 28 },
+  { id: "server_room", startX: 11, startY: 1, endX: 36, endY: 28 },
 ];

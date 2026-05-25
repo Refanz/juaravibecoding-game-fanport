@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48">
+  <!-- Left Side Face (giving a slight 3D pop, colored like the white wall) -->
+  <rect x="12" y="0" width="6" height="48" fill="#FDFEFE"/>
+  <!-- Left side subtle shadow -->
+  <rect x="12" y="0" width="2" height="48" fill="#ECF0F1"/>
+
+  <!-- Right Side Face (shadow side) -->
+  <rect x="30" y="0" width="6" height="48" fill="#BDC3C7"/>
+  <!-- Right side darker shadow -->
+  <rect x="34" y="0" width="2" height="48" fill="#7F8C8D"/>
+
+  <!-- Top Face (Main Vertical Wall) -->
+  <rect x="18" y="0" width="12" height="48" fill="#95A5A6"/>
+  
+  <!-- Top Face Edge Highlights/Shadows -->
+  <rect x="18" y="0" width="2" height="48" fill="#ECF0F1"/>
+  <rect x="28" y="0" width="2" height="48" fill="#7F8C8D"/>
+
+  <!-- Top Face Pillar Highlights (Connecting ends) to match horizontal wall's 8px width -->
+  <rect x="18" y="0" width="12" height="8" fill="#7F8C8D"/>
+  <rect x="18" y="40" width="12" height="8" fill="#7F8C8D"/>
+</svg>

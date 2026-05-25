@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48">
+  <!-- Top Face -->
+      <rect x="0" y="0" width="48" height="12" fill="#95A5A6"/>
+      <rect x="0" y="0" width="8" height="12" fill="#7F8C8D"/>
+      <rect x="40" y="0" width="8" height="12" fill="#7F8C8D"/>
+      
+      <!-- Front Face (Main Wall) -->
+      <rect x="0" y="12" width="48" height="36" fill="#FDFEFE"/>
+      <rect x="0" y="44" width="48" height="4" fill="#BDC3C7"/>
+      
+      <!-- Window Frame -->
+      <rect x="10" y="16" width="28" height="22" fill="#BDC3C7"/>
+      <!-- Window Glass -->
+      <rect x="12" y="18" width="24" height="18" fill="#85C1E9"/>
+      <!-- Window Highlights / Reflection -->
+      <polygon points="16,36 32,18 36,18 20,36" fill="#D4E6F1" opacity="0.6"/>
+      <polygon points="24,36 36,22 36,26 28,36" fill="#D4E6F1" opacity="0.6"/>
+      
+      <!-- Front Face Pillars -->
+      <rect x="0" y="12" width="8" height="36" fill="#ECF0F1"/>
+      <rect x="0" y="12" width="2" height="36" fill="#BDC3C7"/>
+      <rect x="6" y="12" width="2" height="36" fill="#BDC3C7"/>
+      <rect x="40" y="12" width="8" height="36" fill="#ECF0F1"/>
+      <rect x="40" y="12" width="2" height="36" fill="#BDC3C7"/>
+      <rect x="46" y="12" width="2" height="36" fill="#BDC3C7"/>
+</svg>
