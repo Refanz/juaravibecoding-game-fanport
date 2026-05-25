@@ -258,6 +258,38 @@ const SVG_DEFS: Record<string, string> = {
     <rect x="18" y="22" width="12" height="4" fill="#2C3E50"/>
     <circle cx="24" cy="32" r="3" fill="#F1C40F"/>
   </svg>`,
+  hospitalTiles: `<svg xmlns="http://www.w3.org/2000/svg" width="432" height="48">
+    <g transform="translate(0, 0)">
+      <rect x="0" y="0" width="48" height="48" fill="#e8f0f8" stroke="#d6e4f0" stroke-width="2"/>
+    </g>
+    <g transform="translate(48, 0)">
+      <rect x="0" y="0" width="48" height="48" fill="#000000"/>
+      <rect x="4" y="4" width="40" height="40" fill="#42a5f5" stroke="#64b5f6" stroke-width="4"/>
+    </g>
+    <g transform="translate(96, 0)">
+      <rect x="0" y="0" width="48" height="48" fill="#000000"/>
+      <rect x="2" y="2" width="44" height="44" fill="#a1887f" stroke="#6d4c41" stroke-width="2"/>
+    </g>
+    <g transform="translate(144, 0)">
+      <rect x="0" y="0" width="48" height="48" fill="#000000"/>
+      <rect x="4" y="2" width="40" height="44" fill="#eceff1" stroke="#b0bec5" stroke-width="2"/>
+    </g>
+    <g transform="translate(192, 0)">
+      <rect x="0" y="0" width="48" height="48" fill="#66bb6a"/>
+    </g>
+    <g transform="translate(240, 0)">
+      <rect x="0" y="0" width="48" height="48" fill="#bbdefb" stroke="#d6e4f0" stroke-width="2"/>
+    </g>
+    <g transform="translate(288, 0)">
+      <rect x="0" y="0" width="48" height="48" fill="#9e9e9e" stroke="#d6e4f0" stroke-width="2"/>
+    </g>
+    <g transform="translate(336, 0)">
+      <rect x="0" y="0" width="48" height="48" fill="#34495e"/>
+    </g>
+    <g transform="translate(384, 0)">
+      <rect x="0" y="0" width="48" height="48" fill="#7f8c8d"/>
+    </g>
+  </svg>`,
 };
 
 export type SpriteKey = keyof typeof SVG_DEFS;

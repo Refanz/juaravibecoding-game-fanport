@@ -4,7 +4,7 @@ import { FloorManager } from '../FloorManager';
 import { GameState } from '../GameState';
 import { AudioManager } from '../../infrastructure/assets/AudioManager';
 import { EventBus } from '../../infrastructure/events/EventBus';
-import { ELEVATOR_POS, SOLID_TILES } from '../../infrastructure/data/maps';
+import { ELEVATOR_POS, SOLID_TILES, floor1Url, floor2Url, floor3Url } from '../../infrastructure/data/maps';
 import { AreaBounds, FLOOR1_AREA_BOUNDS, FLOOR2_AREA_BOUNDS, FLOOR3_AREA_BOUNDS } from '../../infrastructure/data/floorData';
 import { Player } from '../entities/Player';
 
@@ -23,6 +23,8 @@ export class GameScene extends Phaser.Scene {
   
   floorManager!: FloorManager;
   gameState!: GameState;
+  currentTilemap!: Phaser.Tilemaps.Tilemap;
+  groundLayer!: Phaser.Tilemaps.TilemapLayer;
   
   objectsGroup!: Phaser.GameObjects.Group;
   wallsGroup!: Phaser.Physics.Arcade.StaticGroup;
@@ -51,6 +53,11 @@ export class GameScene extends Phaser.Scene {
         this.load.image(key, uri);
       }
     }
+    
+    // Load maps
+    this.load.tilemapTiledJSON('floor1', floor1Url);
+    this.load.tilemapTiledJSON('floor2', floor2Url);
+    this.load.tilemapTiledJSON('floor3', floor3Url);
   }
 
   create() {
@@ -85,10 +92,11 @@ export class GameScene extends Phaser.Scene {
 
     // Collision
     this.physics.add.collider(this.player, this.wallsGroup);
+    this.physics.add.collider(this.player, this.groundLayer);
 
     // Camera
-    const mapW = this.floorManager.map[0].length * TILE;
-    const mapH = this.floorManager.map.length * TILE;
+    const mapW = this.currentTilemap.widthInPixels;
+    const mapH = this.currentTilemap.heightInPixels;
     this.physics.world.setBounds(0, 0, mapW, mapH);
     this.cameras.main.setBounds(0, 0, mapW, mapH);
     this.cameras.main.startFollow(this.player);
@@ -213,42 +221,13 @@ export class GameScene extends Phaser.Scene {
   }
 
   renderMap() {
-    const map = this.floorManager.map;
-    for (let r = 0; r < map.length; r++) {
-      for (let c = 0; c < map[0].length; c++) {
-        const type = map[r][c];
-        const x = c * TILE;
-        const y = r * TILE;
-        
-        // Base tile
-        const color = TILE_COLORS[type] || 0xe8f0f8;
-        const rect = this.add.rectangle(x + TILE/2, y + TILE/2, TILE, TILE, color);
-        rect.setDepth(0);
-
-        if ([0, 5, 6].includes(type)) {
-          rect.setStrokeStyle(1, 0xd6e4f0);
-        }
-
-        if (SOLID_TILES.includes(type)) {
-          const wall = this.add.rectangle(x + TILE/2, y + TILE/2, TILE, TILE, 0x000000, 0);
-          this.wallsGroup.add(wall);
-          
-          if (type === 1) {
-             const innerWall = this.add.rectangle(x + TILE/2, y + TILE/2, TILE - 8, TILE - 8, 0x42a5f5);
-             innerWall.setStrokeStyle(2, 0x64b5f6);
-             innerWall.setDepth(1);
-          } else if (type === 2) {
-             const desk = this.add.rectangle(x + TILE/2, y + TILE/2, TILE - 4, TILE - 4, 0xa1887f);
-             desk.setStrokeStyle(1, 0x6d4c41);
-             desk.setDepth(1);
-          } else if (type === 3) {
-             const bed = this.add.rectangle(x + TILE/2, y + TILE/2, TILE - 8, TILE - 4, 0xeceff1);
-             bed.setStrokeStyle(1, 0xb0bec5);
-             bed.setDepth(1);
-          }
-        }
-      }
-    }
+    this.currentTilemap = this.make.tilemap({ key: `floor${this.floorManager.currentFloor}` });
+    const tileset = this.currentTilemap.addTilesetImage('hospitalTiles', 'hospitalTiles');
+    this.groundLayer = this.currentTilemap.createLayer('ground', tileset as any, 0, 0) as Phaser.Tilemaps.TilemapLayer;
+    this.groundLayer.setDepth(0);
+    
+    // Set collision by array of solid tile IDs (2=wall, 3=desk, 4=bed)
+    this.groundLayer.setCollision([2, 3, 4]);
 
     // Room labels
     for (const lbl of this.floorManager.labels) {
@@ -508,15 +487,15 @@ export class GameScene extends Phaser.Scene {
 
   private rebuildFloor(floor: 1 | 2 | 3) {
     this.floorManager.loadFloor(floor);
-    const mapW = this.floorManager.map[0].length * TILE;
-    const mapH = this.floorManager.map.length * TILE;
-    this.physics.world.setBounds(0, 0, mapW, mapH);
-    this.cameras.main.setBounds(0, 0, mapW, mapH);
     this.renderMap();
     this.renderDecorations();
     this.renderElevator();
     this.renderNPCs();
     this.renderObjects();
+    const mapW = this.currentTilemap.widthInPixels;
+    const mapH = this.currentTilemap.heightInPixels;
+    this.physics.world.setBounds(0, 0, mapW, mapH);
+    this.cameras.main.setBounds(0, 0, mapW, mapH);
   }
 
   startCCTVCapture() {
@@ -557,6 +536,7 @@ export class GameScene extends Phaser.Scene {
           // Recreate player
           this.player = new Player(this, savedX, savedY);
           this.physics.add.collider(this.player, this.wallsGroup);
+          this.physics.add.collider(this.player, this.groundLayer);
 
           this.cameras.main.setScroll(savedScrollX, savedScrollY);
           this.cameras.main.startFollow(this.player);
