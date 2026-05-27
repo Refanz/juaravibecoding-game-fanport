@@ -23,6 +23,13 @@ export class NPC {
   get centerX() { return this.x * TILE + TILE / 2; }
   get centerY() { return this.y * TILE + TILE / 2; }
   get spriteKey() { return npcSpriteKey(this.role); }
+
+  isNear(px: number, py: number): boolean {
+    const INTERACT_RANGE = 72;
+    const dx = this.centerX - px;
+    const dy = this.centerY - py;
+    return Math.sqrt(dx * dx + dy * dy) <= INTERACT_RANGE;
+  }
 }
 
 import type { NPCData } from '../../infrastructure/data/floorData';

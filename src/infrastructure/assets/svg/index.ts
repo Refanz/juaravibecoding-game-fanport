@@ -29,6 +29,8 @@ import gateSvg from "./decor/gate.svg?raw";
 import securityPostSvg from "./decor/securityPost.svg?raw";
 import acSvg from "./decor/ac.svg?raw";
 import accessDoorSvg from "./decor/accessDoor.svg?raw";
+import fixIconSvg from "./ui/fixIcon.svg?raw";
+import chatIconSvg from "./ui/chatIcon.svg?raw";
 
 // Individual tiles
 import floorTile from "./tiles/floor.svg?raw";
@@ -124,6 +126,8 @@ export const SVG_DEFS: Record<string, string> = {
   ac: acSvg,
   accessDoor: accessDoorSvg,
   hospitalTiles: hospitalTilesSvg,
+  fixIcon: fixIconSvg,
+  chatIcon: chatIconSvg,
 };
 
 export type SpriteKey = keyof typeof SVG_DEFS;

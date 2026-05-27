@@ -32,6 +32,7 @@ import MapModal from "./MapModal";
 import NetworkTopologyModal from "./NetworkTopologyModal";
 import DesktopUIModal from "./DesktopUIModal";
 import ElevatorModal from "./ElevatorModal";
+import { NPCDialogModal } from "./NPCDialogModal";
 
 interface Props {
   onReturnToWelcome: () => void;
@@ -68,6 +69,9 @@ export default function GameScreen({
     nearObject,
     nearElevator,
     nearCCTV,
+    nearNPC,
+    dialogData,
+    setDialogData,
     quizKey,
     setQuizKey,
     showTransition,
@@ -155,9 +159,10 @@ export default function GameScreen({
         {!isWelcome && (
           <InteractionHints
             nearObject={nearObject}
-            activeQuiz={activeQuiz !== null}
+            activeQuiz={activeQuiz !== null || dialogData !== null}
             nearElevator={nearElevator}
             nearCCTV={nearCCTV}
+            nearNPC={nearNPC}
           />
         )}
       </div>
@@ -178,6 +183,18 @@ export default function GameScreen({
           quiz={activeQuiz}
           onCorrect={handleCorrect}
           onWrong={handleWrong}
+        />
+      )}
+
+      {dialogData && (
+        <NPCDialogModal
+          role={dialogData.role as any}
+          label={dialogData.label}
+          onClose={() => {
+            setDialogData(null);
+            gs.dialogActive = false;
+            EventBus.emit("dialog_closed");
+          }}
         />
       )}
 
