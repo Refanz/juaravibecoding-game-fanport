@@ -7,6 +7,7 @@
 import { useState } from 'react';
 import WelcomeScreen from './WelcomeScreen';
 import GameScreen from './GameScreen';
+import { InstallPWAPrompt } from './InstallPWAPrompt';
 
 type AppScreen = 'welcome' | 'game';
 
@@ -32,6 +33,8 @@ export default function App() {
           <WelcomeScreen onStart={handleStart} />
         </div>
       )}
+
+      <InstallPWAPrompt />
     </div>
   );
 }
