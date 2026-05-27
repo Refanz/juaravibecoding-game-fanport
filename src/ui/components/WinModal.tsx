@@ -7,7 +7,7 @@ interface Props {
 export default function WinModal({ onReturnToWelcome }: Props) {
   return (
     <div className="fixed inset-0 bg-black/88 flex flex-col items-center justify-start sm:justify-center z-300 animate-fade-in p-4 overflow-y-auto">
-      <div className="bg-dark border-2 border-medical-green rounded-lg p-8 text-center flex flex-col gap-5 max-w-[400px] w-full my-auto shrink-0 max-h-[95vh] overflow-y-auto">
+      <div className="bg-dark border-2 border-medical-green rounded-lg p-8 text-center flex flex-col gap-5 max-w-[400px] w-full my-auto shrink-0 max-h-[95vh] overflow-y-auto scale-[0.75] sm:scale-100 origin-top sm:origin-center">
         <div className="text-[2.5rem]">🏆</div>
         <div className="text-[clamp(0.8rem,2vw,1.2rem)] text-medical-light">
           MISI SELESAI!

@@ -15,7 +15,7 @@ export default function ElevatorModal({ currentFloor, onSelectFloor, onClose }: 
 
   return (
     <div className="fixed inset-0 z-[200] flex flex-col items-center justify-start sm:justify-center bg-black/80 backdrop-blur-sm animate-fade-in p-4 overflow-y-auto">
-      <div className="bg-dark/95 border-2 border-hospital-sky rounded-lg p-6 w-[90%] max-w-sm flex flex-col items-center gap-4 shadow-[0_0_20px_rgba(214,228,240,0.2)] my-auto shrink-0 max-h-[95vh] overflow-y-auto">
+      <div className="bg-dark/95 border-2 border-hospital-sky rounded-lg p-6 w-[90%] max-w-sm flex flex-col items-center gap-4 shadow-[0_0_20px_rgba(214,228,240,0.2)] my-auto shrink-0 max-h-[95vh] overflow-y-auto scale-[0.75] sm:scale-100 origin-top sm:origin-center">
         <div className="text-3xl">🛗</div>
         <h2 className="text-hospital-sky font-bold text-lg mb-2">Panel Lift</h2>
         

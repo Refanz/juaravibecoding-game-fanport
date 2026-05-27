@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48">
+  <!-- Left Side Face -->
+  <rect x="12" y="0" width="6" height="48" fill="#FDFEFE"/>
+  <rect x="12" y="0" width="2" height="48" fill="#ECF0F1"/>
+
+  <!-- Right Side Face -->
+  <rect x="30" y="0" width="6" height="48" fill="#BDC3C7"/>
+  <rect x="34" y="0" width="2" height="48" fill="#7F8C8D"/>
+
+  <!-- Top Face (Main Vertical Wall) -->
+  <rect x="18" y="0" width="12" height="48" fill="#95A5A6"/>
+  <rect x="18" y="0" width="2" height="48" fill="#ECF0F1"/>
+  <rect x="28" y="0" width="2" height="48" fill="#7F8C8D"/>
+
+  <!-- Top Face Pillar (Top and Bottom edges) -->
+  <rect x="18" y="0" width="12" height="8" fill="#7F8C8D"/>
+  <rect x="18" y="40" width="12" height="8" fill="#7F8C8D"/>
+
+  <!-- Window Frame -->
+  <rect x="16" y="10" width="16" height="28" fill="#BDC3C7"/>
+  <!-- Window Glass -->
+  <rect x="18" y="12" width="12" height="24" fill="#85C1E9"/>
+  <!-- Window Highlights -->
+  <polygon points="18,16 26,12 30,12 18,20" fill="#D4E6F1" opacity="0.6"/>
+  <polygon points="18,30 30,22 30,26 18,34" fill="#D4E6F1" opacity="0.6"/>
+</svg>

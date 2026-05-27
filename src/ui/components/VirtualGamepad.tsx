@@ -79,29 +79,29 @@ export default function VirtualGamepad() {
   };
 
   const renderDPad = () => (
-    <div className="relative w-32 h-32 opacity-80 pointer-events-auto">
+    <div className="relative w-32 h-32 opacity-80 pointer-events-auto touch-none select-none">
       <button
         className="absolute top-0 left-1/2 -translate-x-1/2 w-10 h-12 bg-white/20 active:bg-white/50 rounded-t-lg shadow-sm border border-white/30"
-        onTouchStart={(e) => { e.preventDefault(); emitMove('up', true); }}
-        onTouchEnd={(e) => { e.preventDefault(); emitMove('up', false); }}
+        onTouchStart={(e) => { if (e.cancelable) e.preventDefault(); emitMove('up', true); }}
+        onTouchEnd={(e) => { if (e.cancelable) e.preventDefault(); emitMove('up', false); }}
         onTouchCancel={() => emitMove('up', false)}
       />
       <button
         className="absolute bottom-0 left-1/2 -translate-x-1/2 w-10 h-12 bg-white/20 active:bg-white/50 rounded-b-lg shadow-sm border border-white/30"
-        onTouchStart={(e) => { e.preventDefault(); emitMove('down', true); }}
-        onTouchEnd={(e) => { e.preventDefault(); emitMove('down', false); }}
+        onTouchStart={(e) => { if (e.cancelable) e.preventDefault(); emitMove('down', true); }}
+        onTouchEnd={(e) => { if (e.cancelable) e.preventDefault(); emitMove('down', false); }}
         onTouchCancel={() => emitMove('down', false)}
       />
       <button
         className="absolute left-0 top-1/2 -translate-y-1/2 w-12 h-10 bg-white/20 active:bg-white/50 rounded-l-lg shadow-sm border border-white/30"
-        onTouchStart={(e) => { e.preventDefault(); emitMove('left', true); }}
-        onTouchEnd={(e) => { e.preventDefault(); emitMove('left', false); }}
+        onTouchStart={(e) => { if (e.cancelable) e.preventDefault(); emitMove('left', true); }}
+        onTouchEnd={(e) => { if (e.cancelable) e.preventDefault(); emitMove('left', false); }}
         onTouchCancel={() => emitMove('left', false)}
       />
       <button
         className="absolute right-0 top-1/2 -translate-y-1/2 w-12 h-10 bg-white/20 active:bg-white/50 rounded-r-lg shadow-sm border border-white/30"
-        onTouchStart={(e) => { e.preventDefault(); emitMove('right', true); }}
-        onTouchEnd={(e) => { e.preventDefault(); emitMove('right', false); }}
+        onTouchStart={(e) => { if (e.cancelable) e.preventDefault(); emitMove('right', true); }}
+        onTouchEnd={(e) => { if (e.cancelable) e.preventDefault(); emitMove('right', false); }}
         onTouchCancel={() => emitMove('right', false)}
       />
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 bg-white/30 rounded-full" />
@@ -111,11 +111,11 @@ export default function VirtualGamepad() {
   const renderJoystick = () => (
     <div 
       ref={joystickRef}
-      className="relative w-32 h-32 opacity-80 pointer-events-auto bg-white/10 border-2 border-white/20 rounded-full shadow-inner"
-      onTouchStart={(e) => { e.preventDefault(); handleJoyMove(e); }}
-      onTouchMove={(e) => { e.preventDefault(); handleJoyMove(e); }}
-      onTouchEnd={(e) => { e.preventDefault(); handleJoyEnd(); }}
-      onTouchCancel={(e) => { e.preventDefault(); handleJoyEnd(); }}
+      className="relative w-32 h-32 opacity-80 pointer-events-auto bg-white/10 border-2 border-white/20 rounded-full shadow-inner touch-none select-none"
+      onTouchStart={(e) => { if (e.cancelable) e.preventDefault(); handleJoyMove(e); }}
+      onTouchMove={(e) => { if (e.cancelable) e.preventDefault(); handleJoyMove(e); }}
+      onTouchEnd={(e) => { if (e.cancelable) e.preventDefault(); handleJoyEnd(); }}
+      onTouchCancel={(e) => { if (e.cancelable) e.preventDefault(); handleJoyEnd(); }}
     >
       <div 
         className="absolute top-1/2 left-1/2 w-14 h-14 bg-white/40 border border-white/50 rounded-full shadow-md transition-none"
@@ -130,11 +130,11 @@ export default function VirtualGamepad() {
       {type === 'dpad' ? renderDPad() : renderJoystick()}
 
       {/* Action Button */}
-      <div className="opacity-80 pointer-events-auto">
+      <div className="opacity-80 pointer-events-auto touch-none select-none">
         <button
           className="w-16 h-16 bg-hospital-blue/70 active:bg-hospital-blue border-2 border-hospital-sky rounded-full text-white text-[0.6rem] font-bold shadow-lg flex items-center justify-center font-[var(--font-pixel)] leading-none"
-          onTouchStart={(e) => { e.preventDefault(); emitInteract(); }}
-          onClick={(e) => { e.preventDefault(); emitInteract(); }}
+          onTouchStart={(e) => { if (e.cancelable) e.preventDefault(); emitInteract(); }}
+          onClick={(e) => { if (e.cancelable) e.preventDefault(); emitInteract(); }}
         >
           AKSI
         </button>
