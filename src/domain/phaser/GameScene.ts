@@ -55,6 +55,8 @@ export class GameScene extends Phaser.Scene {
   private pagiOverlay!: Phaser.GameObjects.Rectangle;
   private soreOverlay!: Phaser.GameObjects.Rectangle;
   private malamOverlay!: Phaser.GameObjects.Rectangle;
+  private activeFixIcon: Phaser.GameObjects.Image | null = null;
+  private activeChatIcon: Phaser.GameObjects.Image | null = null;
 
   constructor() {
     super("GameScene");
@@ -250,6 +252,11 @@ export class GameScene extends Phaser.Scene {
     }
     this.gameState.quizActive = false;
     this.gameState.quizObjectIndex = null;
+    
+    if (this.activeFixIcon) {
+      this.activeFixIcon.destroy();
+      this.activeFixIcon = null;
+    }
 
     // Reset virtual input on quiz close to avoid sticking
     this.virtualInput = { up: false, down: false, left: false, right: false };
@@ -588,6 +595,7 @@ export class GameScene extends Phaser.Scene {
     if (
       this.gameState.screen !== "playing" ||
       this.gameState.quizActive ||
+      this.gameState.dialogActive ||
       this.gameState.isPaused
     ) {
       this.player.setVelocity(0);
@@ -673,28 +681,72 @@ export class GameScene extends Phaser.Scene {
       EventBus.emit("near_cctv", nearCCTV);
     }
 
+    // Check nearest NPC
+    const nearNPC = this.floorManager.nearestNPC(px, py);
+    const npcIdx = nearNPC ? this.floorManager.npcs.indexOf(nearNPC) : null;
+    if (this.gameState.nearNPCIndex !== npcIdx) {
+      this.gameState.nearNPCIndex = npcIdx;
+      if (nearNPC && !this.gameState.quizActive && !this.gameState.dialogActive) {
+        EventBus.emit("near_npc", npcIdx);
+      } else {
+        EventBus.emit("near_npc", null);
+      }
+    }
+
+    // Manage Chat Icon
+    if (nearNPC && !this.gameState.quizActive && !this.gameState.dialogActive) {
+      if (!this.activeChatIcon) {
+        this.activeChatIcon = this.add.image(this.player.x, this.player.y - 40, "chatIcon").setDepth(10000);
+        this.tweens.add({
+          targets: this.activeChatIcon,
+          y: "-=5",
+          yoyo: true,
+          repeat: -1,
+          duration: 500
+        });
+      }
+      this.activeChatIcon.setPosition(this.player.x, this.player.y - 40);
+    } else {
+      if (this.activeChatIcon) {
+        this.activeChatIcon.destroy();
+        this.activeChatIcon = null;
+      }
+    }
+
+    // Manage Fix Icon
+    if (nearObj && !this.gameState.quizActive && !this.gameState.dialogActive) {
+      if (!this.activeFixIcon) {
+        this.activeFixIcon = this.add.image(this.player.x, this.player.y - 40, "fixIcon").setDepth(10000);
+        this.tweens.add({
+          targets: this.activeFixIcon,
+          y: "-=5",
+          yoyo: true,
+          repeat: -1,
+          duration: 500
+        });
+      }
+      this.activeFixIcon.setPosition(this.player.x, this.player.y - 40);
+    } else {
+      if (this.activeFixIcon) {
+        this.activeFixIcon.destroy();
+        this.activeFixIcon = null;
+      }
+    }
+
     // Space interaction
-    if (Phaser.Input.Keyboard.JustDown(this.keys.SPACE)) {
+    if (Phaser.Input.Keyboard.JustDown(this.keys.SPACE) && !this.gameState.dialogActive && !this.gameState.quizActive) {
       this.handleInteraction();
     }
   }
 
   handleInteraction() {
-    const nearObj = this.floorManager.nearestObject(
-      this.player.x,
-      this.player.y,
-    );
-    const nearIdx = nearObj
-      ? this.floorManager.allObjects.indexOf(nearObj)
-      : null;
-    const nearCCTV = this.floorManager.isNearCCTVMonitor(
-      this.player.x,
-      this.player.y,
-    );
-    const nearElevator = this.floorManager.isNearElevator(
-      this.player.x,
-      this.player.y,
-    );
+    const px = this.player.x;
+    const py = this.player.y;
+    const nearObj = this.floorManager.nearestObject(px, py);
+    const nearIdx = nearObj ? this.floorManager.allObjects.indexOf(nearObj) : null;
+    const nearNPC = this.floorManager.nearestNPC(px, py);
+    const nearCCTV = this.floorManager.isNearCCTVMonitor(px, py);
+    const nearElevator = this.floorManager.isNearElevator(px, py);
 
     if (nearObj) {
       AudioManager.interact();
@@ -708,6 +760,12 @@ export class GameScene extends Phaser.Scene {
       this.gameState.quizActive = true;
       this.gameState.quizObjectIndex = nearIdx;
       EventBus.emit("open_quiz", nearIdx);
+    } else if (nearNPC) {
+      AudioManager.interact();
+      this.gameState.dialogActive = true;
+      this.gameState.dialogNPCRole = nearNPC.role;
+      this.gameState.dialogNPCLabel = nearNPC.label;
+      EventBus.emit("open_npc_dialog", { role: nearNPC.role, label: nearNPC.label });
     } else if (nearCCTV) {
       AudioManager.interact();
       EventBus.emit("open_cctv");

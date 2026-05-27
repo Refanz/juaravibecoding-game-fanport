@@ -122,5 +122,12 @@ export class FloorManager {
     return null;
   }
 
+  nearestNPC(px: number, py: number): NPC | null {
+    for (const npc of this.npcs) {
+      if (npc.isNear(px, py)) return npc;
+    }
+    return null;
+  }
+
   // oppositeFloor() is removed since we have a proper elevator selection modal now
 }

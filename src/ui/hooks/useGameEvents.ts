@@ -8,6 +8,8 @@ export function useGameEvents(gs: GameState) {
   const [nearObject, setNearObject] = useState<number | null>(null);
   const [nearElevator, setNearElevator] = useState(false);
   const [nearCCTV, setNearCCTV] = useState(false);
+  const [nearNPC, setNearNPC] = useState<number | null>(null);
+  const [dialogData, setDialogData] = useState<{ role: string; label: string } | null>(null);
   const [quizKey, setQuizKey] = useState<number | null>(null);
   const [showTransition, setShowTransition] = useState(false);
   const [transFloor, setTransFloor] = useState<1 | 2 | 3>(1);
@@ -22,6 +24,8 @@ export function useGameEvents(gs: GameState) {
     const onOpenQuiz = (idx: number) => setQuizKey(idx);
     const onOpenCCTV = () => setShowCCTV(true);
     const onOpenElevatorUI = () => setShowElevator(true);
+    const onNearNPC = (idx: number | null) => setNearNPC(idx);
+    const onOpenNPCDialog = (data: { role: string; label: string }) => setDialogData(data);
     const onFloorChanged = (f: 1 | 2 | 3) => {
       setCurrentFloor(f);
       setTransFloor(f);
@@ -40,6 +44,8 @@ export function useGameEvents(gs: GameState) {
     EventBus.on("open_quiz", onOpenQuiz);
     EventBus.on("open_cctv", onOpenCCTV);
     EventBus.on("open_elevator_ui", onOpenElevatorUI);
+    EventBus.on("near_npc", onNearNPC);
+    EventBus.on("open_npc_dialog", onOpenNPCDialog);
     EventBus.on("floor_changed", onFloorChanged);
     EventBus.on("game_won", onGameWon);
 
@@ -50,6 +56,8 @@ export function useGameEvents(gs: GameState) {
       EventBus.off("open_quiz", onOpenQuiz);
       EventBus.off("open_cctv", onOpenCCTV);
       EventBus.off("open_elevator_ui", onOpenElevatorUI);
+      EventBus.off("near_npc", onNearNPC);
+      EventBus.off("open_npc_dialog", onOpenNPCDialog);
       EventBus.off("floor_changed", onFloorChanged);
       EventBus.off("game_won", onGameWon);
     };
@@ -60,6 +68,8 @@ export function useGameEvents(gs: GameState) {
     nearObject,
     nearElevator,
     nearCCTV,
+    nearNPC,
+    dialogData, setDialogData,
     quizKey, setQuizKey,
     showTransition,
     transFloor,

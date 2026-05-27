@@ -13,6 +13,10 @@ export class GameState {
   isPaused = false;
   quizObjectIndex: number | null = null;
   nearObjectIndex: number | null = null;
+  nearNPCIndex: number | null = null;
+  dialogActive = false;
+  dialogNPCRole: string | null = null;
+  dialogNPCLabel: string | null = null;
   nearElevator = false;
   nearCCTV = false;
   showTransition = false;
@@ -30,6 +34,10 @@ export class GameState {
     this.isPaused = false;
     this.quizObjectIndex = null;
     this.nearObjectIndex = null;
+    this.nearNPCIndex = null;
+    this.dialogActive = false;
+    this.dialogNPCRole = null;
+    this.dialogNPCLabel = null;
     this.nearElevator = false;
     this.showTransition = false;
     this.camera = { x: 0, y: 0 };

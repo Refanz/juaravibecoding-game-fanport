@@ -5,6 +5,7 @@ interface Props {
   activeQuiz: boolean;
   nearElevator: boolean;
   nearCCTV: boolean;
+  nearNPC?: number | null;
 }
 
 export default function InteractionHints({
@@ -12,6 +13,7 @@ export default function InteractionHints({
   activeQuiz,
   nearElevator,
   nearCCTV,
+  nearNPC = null,
 }: Props) {
   return (
     <>
@@ -24,7 +26,16 @@ export default function InteractionHints({
           untuk interaksi
         </div>
       )}
-      {nearElevator && nearObject === null && !activeQuiz && (
+      {nearNPC !== null && nearObject === null && !activeQuiz && (
+        <div className="absolute bottom-32 sm:bottom-28 left-1/2 -translate-x-1/2 bg-dark/90 border border-[#4fc3f7] py-1.5 px-4 text-[0.5rem] text-[#4fc3f7] rounded pointer-events-none whitespace-nowrap z-40 scale-[0.75] sm:scale-100 origin-bottom">
+          💬 Tekan{" "}
+          <span className="bg-[#1b4f72] py-0.5 px-1.5 rounded-sm mx-0.5">
+            [SPASI] / AKSI
+          </span>{" "}
+          untuk berbicara
+        </div>
+      )}
+      {nearElevator && nearObject === null && nearNPC === null && !activeQuiz && (
         <div className="absolute bottom-32 sm:bottom-28 left-1/2 -translate-x-1/2 bg-dark/90 border border-hospital-sky py-1.5 px-4 text-[0.5rem] text-hospital-sky rounded pointer-events-none whitespace-nowrap z-40 scale-[0.75] sm:scale-100 origin-bottom">
           🛗 Tekan{" "}
           <span className="bg-hospital-blue py-0.5 px-1.5 rounded-sm mx-0.5">
@@ -33,7 +44,7 @@ export default function InteractionHints({
           naik/turun lantai
         </div>
       )}
-      {nearCCTV && nearObject === null && !activeQuiz && !nearElevator && (
+      {nearCCTV && nearObject === null && nearNPC === null && !activeQuiz && !nearElevator && (
         <div className="absolute bottom-32 sm:bottom-28 left-1/2 -translate-x-1/2 bg-dark/90 border border-[#4fc3f7] py-1.5 px-4 text-[0.5rem] text-[#4fc3f7] rounded pointer-events-none whitespace-nowrap z-40 scale-[0.75] sm:scale-100 origin-bottom">
           📹 Tekan{" "}
           <span className="bg-[#1b4f72] py-0.5 px-1.5 rounded-sm mx-0.5">
