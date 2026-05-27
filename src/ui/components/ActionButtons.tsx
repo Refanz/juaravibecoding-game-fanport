@@ -18,7 +18,7 @@ export default function ActionButtons({
   unsolvedCount,
 }: Props) {
   return (
-    <div className="absolute top-[110px] left-4 translate-x-0 sm:top-auto sm:bottom-6 sm:left-1/2 sm:-translate-x-1/2 z-50 pointer-events-auto bg-black/60 backdrop-blur-md border border-white/20 p-2 rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.5)] flex flex-col sm:flex-row items-center gap-2 transition-all hover:bg-black/70 hover:border-white/30">
+    <div className="absolute top-[110px] left-4 translate-x-0 sm:top-auto sm:bottom-4 sm:left-1/2 sm:-translate-x-1/2 z-50 pointer-events-auto bg-black/60 backdrop-blur-md border border-white/20 p-2 rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.5)] flex flex-col sm:flex-row items-center gap-2 transition-all hover:bg-black/70 hover:border-white/30 scale-[0.8] md:scale-100 origin-left sm:origin-bottom">
       <button
         onClick={onPause}
         className="text-hospital-sky hover:text-white bg-dark/50 hover:bg-dark border border-hospital-blue/40 hover:border-hospital-blue w-[40px] h-[40px] rounded-xl cursor-pointer transition-all duration-300 opacity-80 hover:opacity-100 shadow-[0_0_10px_rgba(0,0,0,0.5)] backdrop-blur-sm flex flex-col items-center justify-center gap-1 group relative"

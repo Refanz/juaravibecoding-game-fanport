@@ -23,9 +23,12 @@ export const PhaserGame: React.FC<PhaserGameProps> = ({ floorManager, gameState 
 
     const config: Phaser.Types.Core.GameConfig = {
       type: Phaser.AUTO,
-      width: window.innerWidth,
-      height: window.innerHeight - 40, // subtract HUD height roughly
-      parent: gameContainer.current,
+      scale: {
+        mode: Phaser.Scale.RESIZE,
+        parent: gameContainer.current,
+        width: '100%',
+        height: '100%'
+      },
       physics: {
         default: 'arcade',
         arcade: {
@@ -42,15 +45,7 @@ export const PhaserGame: React.FC<PhaserGameProps> = ({ floorManager, gameState 
     // Pass data to scene
     gameInstance.current.scene.start('GameScene', { floorManager, gameState });
 
-    const handleResize = () => {
-      if (gameInstance.current) {
-        gameInstance.current.scale.resize(window.innerWidth, window.innerHeight - 40);
-      }
-    };
-    window.addEventListener('resize', handleResize);
-
     return () => {
-      window.removeEventListener('resize', handleResize);
       if (gameInstance.current) {
         gameInstance.current.destroy(true);
         gameInstance.current = null;
@@ -58,5 +53,5 @@ export const PhaserGame: React.FC<PhaserGameProps> = ({ floorManager, gameState 
     };
   }, [floorManager, gameState]);
 
-  return <div ref={gameContainer} id="phaser-container" />;
+  return <div ref={gameContainer} id="phaser-container" className="w-full h-full" />;
 };

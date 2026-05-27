@@ -25,7 +25,7 @@ export default function FloatingHUD({
   }[currentPeriod];
 
   return (
-    <div className="absolute top-4 left-4 z-50 flex flex-col gap-1.5 pointer-events-auto bg-black/60 backdrop-blur-md border border-white/20 p-2 rounded-xl shadow-[0_8px_32px_rgba(0,0,0,0.5)] transition-all hover:bg-black/70 hover:border-white/30 w-fit">
+    <div className="absolute top-4 left-4 z-50 flex flex-col gap-1.5 pointer-events-auto bg-black/60 backdrop-blur-md border border-white/20 p-2 rounded-xl shadow-[0_8px_32px_rgba(0,0,0,0.5)] transition-all hover:bg-black/70 hover:border-white/30 w-fit scale-[0.8] md:scale-100 origin-top-left">
       <div className="flex items-center gap-1.5">
         {/* Lantai Badge */}
         <div className="flex items-center gap-1.5 bg-black/40 border border-hospital-sky/30 px-2 py-1 rounded-md shadow-inner backdrop-blur-sm transition-all hover:bg-black/50">

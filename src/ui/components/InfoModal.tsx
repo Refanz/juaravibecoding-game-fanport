@@ -42,8 +42,8 @@ export default function InfoModal({ onClose }: Props) {
   ];
 
   return (
-    <div className="fixed inset-0 bg-black/80 flex flex-col items-center justify-start sm:justify-center z-300 animate-fade-in p-4 overflow-y-auto">
-      <div className="bg-dark border-2 border-hospital-blue rounded-lg p-6 max-w-lg w-full max-h-[90vh] overflow-y-auto relative shadow-[0_0_15px_#1565c0] my-auto shrink-0 scale-[0.75] sm:scale-100 origin-top sm:origin-center">
+    <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-300 animate-fade-in p-2 sm:p-4">
+      <div className="bg-dark border-2 border-hospital-blue rounded-lg p-4 sm:p-6 max-w-lg w-full max-h-[90vh] overflow-y-auto custom-scrollbar relative shadow-[0_0_15px_#1565c0]">
         <button
           onClick={onClose}
           className="absolute top-3 right-3 text-hospital-sky hover:text-white text-xl font-bold cursor-pointer bg-transparent border-none"

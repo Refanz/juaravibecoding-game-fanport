@@ -41,8 +41,8 @@ export default function SettingsModal({ onClose }: Props) {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-[200] animate-fade-in p-4 overflow-y-auto">
-      <div className="bg-dark-deep border-2 border-hospital-sky rounded-xl p-6 w-full max-w-[320px] max-h-[95dvh] overflow-y-auto shadow-[0_0_20px_rgba(79,195,247,0.3)] my-auto shrink-0 scale-[0.75] sm:scale-100 origin-top sm:origin-center">
+    <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-[200] animate-fade-in p-2 sm:p-4">
+      <div className="bg-dark-deep border-2 border-hospital-sky rounded-xl p-4 sm:p-6 w-full max-w-[320px] max-h-[95dvh] overflow-y-auto custom-scrollbar shadow-[0_0_20px_rgba(79,195,247,0.3)]">
         <h2 className="text-hospital-sky font-[var(--font-pixel)] text-center text-lg mb-6 border-b border-hospital-sky/30 pb-2">
           ⚙️ PENGATURAN
         </h2>
