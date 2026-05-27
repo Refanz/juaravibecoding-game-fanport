@@ -19,7 +19,7 @@ export default function App() {
   const handleReturnToWelcome = () => { setGameKey(k => k + 1); setScreen('welcome'); };
 
   return (
-    <div className="relative w-screen h-screen overflow-hidden">
+    <div className="relative w-full h-[100dvh] overflow-x-hidden overflow-y-auto">
       {/* GameScreen runs continuously in the background */}
       <GameScreen 
         key={gameKey} 

@@ -361,8 +361,8 @@ export default function DesktopUIModal({
   }, []);
 
   return (
-    <div className="fixed inset-0 bg-black/50 z-[200] flex items-center justify-center p-2 sm:p-8 animate-fade-in pointer-events-auto">
-      <div className="w-full h-full max-w-[1000px] max-h-[700px] bg-[#008080] rounded-lg shadow-[0_0_30px_rgba(0,0,0,0.8)] flex flex-col overflow-hidden relative font-sans">
+    <div className="fixed inset-0 bg-black/50 z-[200] flex flex-col items-center justify-start sm:justify-center p-2 sm:p-8 animate-fade-in pointer-events-auto overflow-y-auto">
+      <div className="w-full min-h-[500px] h-[95vh] sm:h-full max-w-[1000px] max-h-[700px] bg-[#008080] rounded-lg shadow-[0_0_30px_rgba(0,0,0,0.8)] flex flex-col overflow-hidden relative font-sans my-auto shrink-0">
         {/* Desktop Icons */}
         <div className="flex-1 p-4 flex flex-col gap-4 items-start relative z-10">
           <button
