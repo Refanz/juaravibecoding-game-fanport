@@ -1,8 +1,10 @@
 import Phaser from "phaser";
 import { EventBus } from "../../infrastructure/events/EventBus";
+import { GameState } from "../GameState";
 
 export class TimeManager {
   private scene: Phaser.Scene;
+  private gameState: GameState;
   private timerEvent: Phaser.Time.TimerEvent;
 
   // State untuk melacak waktu in-game
@@ -12,15 +14,16 @@ export class TimeManager {
   public month: number;
   public year: number;
 
-  constructor(scene: Phaser.Scene) {
+  constructor(scene: Phaser.Scene, gameState: GameState) {
     this.scene = scene;
+    this.gameState = gameState;
     
-    // Initial date: 1 Januari 2026, 08:00
-    this.minute = 0;
-    this.hour = 8;
-    this.day = 1;
-    this.month = 0; // 0-indexed, 0 = Januari
-    this.year = 2026;
+    // Initial date from GameState
+    this.minute = this.gameState.gameTime.minute;
+    this.hour = this.gameState.gameTime.hour;
+    this.day = this.gameState.gameTime.day;
+    this.month = this.gameState.gameTime.month; 
+    this.year = this.gameState.gameTime.year;
 
     // Skala waktu: 1 jam in-game = 1 menit real-time.
     // Berarti 1 menit in-game = 1 detik real-time.
@@ -55,6 +58,15 @@ export class TimeManager {
     this.day = d.getDate();
     this.month = d.getMonth();
     this.year = d.getFullYear();
+
+    // Save back to GameState
+    this.gameState.gameTime = {
+      minute: this.minute,
+      hour: this.hour,
+      day: this.day,
+      month: this.month,
+      year: this.year
+    };
 
     this.emitTime();
   }
