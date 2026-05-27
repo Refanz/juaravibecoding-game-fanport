@@ -52,6 +52,7 @@ import wallTjunctionLeftTile from "./tiles/wallTjunctionLeft.svg?raw";
 import wallCrossTile from "./tiles/wallCross.svg?raw";
 import glassDoorTile from "./tiles/glassDoor.svg?raw";
 import glassDoorVerticalTile from "./tiles/glassDoorVertical.svg?raw";
+import windowVerticalTile from "./tiles/windowVertical.svg?raw";
 
 const tileList = [
   floorTile,
@@ -75,6 +76,7 @@ const tileList = [
   wallCrossTile,
   glassDoorTile,
   glassDoorVerticalTile,
+  windowVerticalTile,
 ];
 
 function stitchTiles(tiles: string[]): string {

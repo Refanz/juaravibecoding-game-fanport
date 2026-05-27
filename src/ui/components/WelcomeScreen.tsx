@@ -19,24 +19,24 @@ export default function WelcomeScreen({ onStart }: Props) {
 
       {/* Main Content */}
       <div className="relative z-10 flex flex-col items-center justify-center gap-6 sm:gap-8 text-center p-8 animate-fade-in w-full max-w-2xl mx-auto my-auto">
-        <div className="text-[clamp(3rem,8vw,5rem)] animate-pulse-icon drop-shadow-[0_0_15px_rgba(79,195,247,0.5)]">🏥</div>
-        <h1 className="text-[clamp(1.2rem,4vw,2rem)] text-hospital-sky leading-relaxed [text-shadow:0_0_20px_#4fc3f7aa]">
+        <div className="text-[clamp(2rem,10vmin,5rem)] animate-pulse-icon drop-shadow-[0_0_15px_rgba(79,195,247,0.5)]">🏥</div>
+        <h1 className="text-[clamp(1rem,5vmin,2rem)] text-hospital-sky leading-relaxed [text-shadow:0_0_20px_#4fc3f7aa]">
           IT SUPPORT<br />HOSPITAL VIBE
         </h1>
-        <p className="text-[clamp(0.55rem,1.5vw,0.85rem)] text-text-dim bg-dark/60 px-4 py-1.5 rounded-full border border-hospital-blue/30 backdrop-blur-sm">
+        <p className="text-[clamp(0.5rem,2vmin,0.85rem)] text-text-dim bg-dark/60 px-4 py-1.5 rounded-full border border-hospital-blue/30 backdrop-blur-sm">
           #JuaraVibeCoding — Google Cloud Run
         </p>
-        <div className="flex gap-4 mt-2">
+        <div className="flex gap-3 sm:gap-4 mt-2">
           <button
             id="btn-start"
             onClick={handleStart}
-            className="bg-linear-to-br from-hospital-blue to-[#0d47a1] border-2 border-hospital-sky text-white font-[var(--font-pixel)] text-[clamp(0.5rem,1.5vw,0.8rem)] py-3.5 px-8 cursor-pointer rounded uppercase tracking-widest transition-all duration-200 hover:bg-hospital-sky hover:text-dark-deep hover:scale-105 hover:shadow-[0_0_20px_#4fc3f7]"
+            className="bg-linear-to-br from-hospital-blue to-[#0d47a1] border-2 border-hospital-sky text-white font-[var(--font-pixel)] text-[clamp(0.5rem,2vmin,0.8rem)] py-2 px-6 sm:py-3.5 sm:px-8 cursor-pointer rounded uppercase tracking-widest transition-all duration-200 hover:bg-hospital-sky hover:text-dark-deep hover:scale-105 hover:shadow-[0_0_20px_#4fc3f7]"
           >
             ▶ START GAME
           </button>
           <button
             onClick={() => { AudioManager.click(); setShowSettings(true); }}
-            className="bg-dark/50 border-2 border-[#607d8b] text-text-light font-[var(--font-pixel)] text-[clamp(0.5rem,1.5vw,0.8rem)] py-3.5 px-4 cursor-pointer rounded transition-all duration-200 hover:bg-[#607d8b] hover:text-white hover:scale-105 backdrop-blur-sm"
+            className="bg-dark/50 border-2 border-[#607d8b] text-text-light font-[var(--font-pixel)] text-[clamp(0.5rem,2vmin,0.8rem)] py-2 px-4 sm:py-3.5 sm:px-4 cursor-pointer rounded transition-all duration-200 hover:bg-[#607d8b] hover:text-white hover:scale-105 backdrop-blur-sm"
             title="Pengaturan"
           >
             ⚙️

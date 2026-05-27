@@ -87,7 +87,7 @@ export class GameScene extends Phaser.Scene {
       this.objectsGroup = this.add.group();
       this.wallsGroup = this.physics.add.staticGroup();
       this.decorationsGroup = this.add.group();
-      this.npcsGroup = this.add.group();
+      this.npcsGroup = this.physics.add.group({ immovable: true });
 
       this.renderMap();
       this.renderDecorations();
@@ -121,6 +121,7 @@ export class GameScene extends Phaser.Scene {
       // Collision
       this.physics.add.collider(this.player, this.wallsGroup);
       this.physics.add.collider(this.player, this.groundLayer);
+      this.physics.add.collider(this.player, this.npcsGroup);
 
       // Camera
       const mapW = this.currentTilemap.widthInPixels;
@@ -129,7 +130,7 @@ export class GameScene extends Phaser.Scene {
       this.cameras.main.setBounds(0, 0, mapW, mapH);
       this.cameras.main.startFollow(this.player);
       this.cameras.main.setBackgroundColor("#e0e8f0");
-      this.defaultZoom = this.scale.width < 768 ? 1.0 : 1.5;
+      this.defaultZoom = this.scale.width < 768 ? 0.7 : (this.scale.width <= 1024 ? 1.05 : 1.5);
       this.cameras.main.setZoom(this.defaultZoom);
 
       // Overlays untuk Day/Night Cycle (ukurannya selebar map)
@@ -369,9 +370,9 @@ export class GameScene extends Phaser.Scene {
     ) as Phaser.Tilemaps.TilemapLayer;
     this.groundLayer.setDepth(0);
 
-    // Set collision by array of solid tile IDs (2=wall, 3=wall, 4=desk, 6=window, 10-19=new walls)
+    // Set collision by array of solid tile IDs (2=wall, 3=wall, 4=desk, 6=window, 10-19=new walls, 22=windowVertical)
     // Doors (20, 21) are excluded so they can be passed through.
-    this.groundLayer.setCollision([2, 3, 4, 6, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]);
+    this.groundLayer.setCollision([2, 3, 4, 6, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 22]);
 
     // Room labels
     for (const lbl of this.floorManager.labels) {
@@ -425,8 +426,10 @@ export class GameScene extends Phaser.Scene {
           repeat: -1,
           duration: 1200,
         });
-        const spr = this.add.image(x, y, key);
+        const spr = this.wallsGroup.create(x, y, key) as Phaser.Physics.Arcade.Sprite;
         spr.setDepth(3);
+        spr.body?.setSize(TILE, TILE / 2);
+        spr.body?.setOffset(0, TILE / 2);
         // Label
         this.add
           .text(x, y - 30, "Monitor CCTV", {
@@ -473,7 +476,9 @@ export class GameScene extends Phaser.Scene {
         x,
         y,
         npc.spriteKey,
-      ) as Phaser.GameObjects.Sprite;
+      ) as Phaser.Physics.Arcade.Sprite;
+      spr.body?.setSize(TILE, TILE / 2);
+      spr.body?.setOffset(0, TILE / 2);
 
       const labelText = this.add
         .text(x, y - 24, npc.label, {

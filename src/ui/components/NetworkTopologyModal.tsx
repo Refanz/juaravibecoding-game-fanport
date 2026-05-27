@@ -7,7 +7,7 @@ interface Props {
 export default function NetworkTopologyModal({ onClose }: Props) {
   return (
     <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/90 backdrop-blur-md animate-fade-in">
-      <div className="relative bg-dark/95 border-2 border-hospital-sky rounded-xl p-6 w-[95%] max-w-6xl h-[85vh] flex flex-col shadow-[0_0_40px_rgba(214,228,240,0.3)]">
+      <div className="relative bg-dark/95 border-2 border-hospital-sky rounded-xl p-6 w-[95%] max-w-6xl h-[85vh] flex flex-col shadow-[0_0_40px_rgba(214,228,240,0.3)] scale-[0.75] sm:scale-100 origin-top sm:origin-center">
         {/* Header */}
         <div className="flex items-center justify-between border-b border-hospital-sky/30 pb-4 mb-4">
           <div>

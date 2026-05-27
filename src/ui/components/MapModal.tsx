@@ -42,7 +42,7 @@ export default function MapModal({ onClose, initialFloor }: Props) {
 
   return (
     <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-      <div className="bg-dark border border-hospital-blue rounded-lg w-full max-w-4xl h-[90vh] flex flex-col shadow-[0_0_20px_rgba(33,150,243,0.3)] animate-fade-in">
+      <div className="bg-dark border border-hospital-blue rounded-lg w-full max-w-4xl h-[90vh] flex flex-col shadow-[0_0_20px_rgba(33,150,243,0.3)] animate-fade-in scale-[0.75] sm:scale-100 origin-top sm:origin-center">
         
         {/* Header */}
         <div className="flex justify-between items-center p-4 border-b border-hospital-blue/30 bg-hospital-blue/10">

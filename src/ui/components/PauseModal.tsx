@@ -8,7 +8,7 @@ interface Props {
 export default function PauseModal({ onResume, onReturnToWelcome, solvedCount, totalObjects }: Props) {
   return (
     <div className="fixed inset-0 bg-black/80 flex flex-col items-center justify-start sm:justify-center z-300 animate-fade-in p-4 overflow-y-auto">
-      <div className="bg-dark border-2 border-hospital-blue rounded-lg p-6 max-w-sm w-full text-center relative shadow-[0_0_15px_#1565c0] my-auto shrink-0">
+      <div className="bg-dark border-2 border-hospital-blue rounded-lg p-6 max-w-sm w-full text-center relative shadow-[0_0_15px_#1565c0] my-auto shrink-0 scale-[0.75] sm:scale-100 origin-top sm:origin-center">
         <h2 className="text-hospital-sky text-2xl mb-2 font-[var(--font-pixel)]">PAUSED</h2>
         
         <div className="my-6 p-4 bg-surface rounded border border-hospital-blue/30 text-left">

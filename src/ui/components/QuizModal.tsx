@@ -38,7 +38,7 @@ export default function QuizModal({ quiz, onCorrect, onWrong }: Props) {
 
   return (
     <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-100 p-4 animate-fade-in" id="quiz-modal">
-      <div className="bg-dark border-2 border-hospital-blue rounded-lg p-6 max-w-[580px] w-full max-h-[95dvh] overflow-y-auto flex flex-col gap-4">
+      <div className="bg-dark border-2 border-hospital-blue rounded-lg p-6 max-w-[580px] w-full max-h-[95dvh] overflow-y-auto flex flex-col gap-4 scale-[0.75] sm:scale-100 origin-top sm:origin-center">
         <div className="text-2xl text-center">{quiz.icon}</div>
         <div className="text-[clamp(0.6rem,1.5vw,0.85rem)] text-hospital-sky text-center">{quiz.title}</div>
         <div className="text-[clamp(0.45rem,1.2vw,0.65rem)] text-text-bright leading-[1.9]">{quiz.question}</div>
