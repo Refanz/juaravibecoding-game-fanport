@@ -349,6 +349,40 @@ export default function DesktopUIModal({
 }: Props) {
   const [time, setTime] = useState("");
   const [activeApp, setActiveApp] = useState<"ticketing" | "cctv" | null>("ticketing");
+  const [layout, setLayout] = useState({ width: 1000, height: 700, scale: 1 });
+
+  useEffect(() => {
+    const handleResize = () => {
+      const W = window.innerWidth;
+      const H = window.innerHeight;
+      
+      // Responsive layout strategy:
+      if (W < 768) {
+        // On mobile, we stretch the virtual resolution to match the screen's exact aspect ratio.
+        // We use a baseline virtual width (e.g. 900) so the content isn't cramped.
+        const virtualWidth = 900;
+        const virtualHeight = virtualWidth * (H / W);
+        setLayout({
+          width: virtualWidth,
+          height: virtualHeight,
+          scale: W / virtualWidth
+        });
+      } else {
+        // On desktop, we preserve the classic 1000x700 windowed look
+        const scaleX = (W - 32) / 1000;
+        const scaleY = (H - 32) / 700;
+        setLayout({
+          width: 1000,
+          height: 700,
+          scale: Math.min(scaleX, scaleY, 1)
+        });
+      }
+    };
+    
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   useEffect(() => {
     const onTimeUpdated = ({ time }: { time: string }) => {
@@ -361,9 +395,17 @@ export default function DesktopUIModal({
   }, []);
 
   return (
-    <div className="fixed inset-0 bg-black/70 z-[200] overflow-y-auto sm:overflow-hidden overflow-x-hidden custom-scrollbar animate-fade-in pointer-events-auto">
-      <div className="min-h-full flex flex-col items-center justify-start sm:justify-center p-0 sm:p-8">
-        <div className="w-full h-[120dvh] min-h-[600px] sm:h-full sm:min-h-0 sm:max-h-[700px] max-w-[1000px] bg-[#008080] sm:rounded-lg shadow-[0_0_30px_rgba(0,0,0,0.8)] flex flex-col overflow-hidden relative font-sans shrink-0">
+    <div className="fixed inset-0 bg-black/70 z-[200] flex items-center justify-center animate-fade-in pointer-events-auto">
+      <div 
+        className="bg-[#008080] shadow-[0_0_30px_rgba(0,0,0,0.8)] flex flex-col overflow-hidden relative font-sans shrink-0"
+        style={{ 
+          width: layout.width, 
+          height: layout.height, 
+          transform: `scale(${layout.scale})`, 
+          transformOrigin: "center",
+          borderRadius: layout.width === 1000 ? 8 : 0 // round corners only in desktop mode
+        }}
+      >
         {/* Desktop Icons */}
         <div className="flex-1 p-4 flex flex-col gap-4 items-start relative z-10">
           <button
@@ -421,7 +463,7 @@ export default function DesktopUIModal({
 
         {/* Windows / Apps */}
         {activeApp === "ticketing" && (
-          <div className="absolute inset-1 sm:inset-10 top-2 sm:top-4 bottom-[3.25rem] sm:bottom-14 bg-white rounded-md shadow-2xl flex flex-col overflow-hidden z-20 border border-slate-300">
+          <div className="absolute inset-10 top-8 bottom-16 bg-white rounded-md shadow-2xl flex flex-col overflow-hidden z-20 border border-slate-300">
             {/* Window Title Bar */}
             <div className="bg-[#000080] text-white flex justify-between items-center px-2 py-1 select-none">
               <div className="flex items-center gap-2">
@@ -449,7 +491,7 @@ export default function DesktopUIModal({
         )}
 
         {activeApp === "cctv" && (
-          <div className="absolute inset-1 sm:inset-10 top-2 sm:top-4 bottom-[3.25rem] sm:bottom-14 rounded-md shadow-2xl flex flex-col overflow-hidden z-20 border border-slate-300">
+          <div className="absolute inset-10 top-8 bottom-16 rounded-md shadow-2xl flex flex-col overflow-hidden z-20 border border-slate-300">
             {/* Window Title Bar */}
             <div
               className="flex justify-between items-center px-2 py-1 select-none"
@@ -476,7 +518,7 @@ export default function DesktopUIModal({
         )}
 
         {/* Taskbar */}
-        <div className="h-10 bg-[#c0c0c0] border-t-2 border-white flex items-center justify-between px-2 z-30 shadow-[inset_0_2px_4px_rgba(255,255,255,0.5)] relative">
+        <div className="h-10 bg-[#c0c0c0] border-t-2 border-white flex items-center justify-between px-2 z-30 shadow-[inset_0_2px_4px_rgba(255,255,255,0.5)] relative mt-auto">
           <div className="flex items-center gap-2 h-full py-1">
             <button
               className="h-full bg-[#c0c0c0] border-2 border-white border-b-gray-600 border-r-gray-600 px-3 flex items-center gap-2 font-bold text-sm active:border-t-gray-600 active:border-l-gray-600 active:border-b-white active:border-r-white text-black"
@@ -505,7 +547,6 @@ export default function DesktopUIModal({
             </span>
           </div>
         </div>
-      </div>
       </div>
     </div>
   );

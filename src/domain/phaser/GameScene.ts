@@ -68,6 +68,13 @@ export class GameScene extends Phaser.Scene {
   }
 
   preload() {
+    this.load.on('progress', (value: number) => {
+      EventBus.emit('preload_progress', value);
+    });
+    this.load.on('complete', () => {
+      EventBus.emit('preload_complete');
+    });
+
     const uris = getAllSpriteUris();
     for (const [key, uri] of Object.entries(uris)) {
       if (key === "player") {
