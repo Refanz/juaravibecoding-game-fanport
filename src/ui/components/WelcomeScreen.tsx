@@ -24,9 +24,11 @@ export default function WelcomeScreen({ onStart }: Props) {
 
       {/* Main Content */}
       <div className="relative z-10 flex flex-col items-center gap-6 sm:gap-8 text-center p-4 sm:p-8 animate-fade-in w-full max-w-2xl mx-auto my-auto shrink-0">
-        <div className="text-[clamp(2rem,10vmin,5rem)] animate-pulse-icon drop-shadow-[0_0_15px_rgba(79,195,247,0.5)]">
-          🏥
-        </div>
+        <img 
+          src="/icons/icon.svg" 
+          alt="VibeHospital Icon" 
+          className="w-24 h-24 sm:w-32 sm:h-32 object-contain animate-pulse-icon drop-shadow-[0_0_15px_rgba(79,195,247,0.5)]"
+        />
         <h1 className="text-[clamp(1rem,5vmin,2rem)] text-hospital-sky leading-relaxed [text-shadow:0_0_20px_#4fc3f7aa]">
           IT SUPPORT
           <br />

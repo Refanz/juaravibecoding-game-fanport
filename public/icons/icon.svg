@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="112" fill="#0a1828" />
+  
+  <!-- Monitor -->
+  <rect x="116" y="80" width="280" height="190" rx="16" fill="#152b45" stroke="#4fc3f7" stroke-width="12" />
+  <!-- Monitor stand -->
+  <path d="M 236 270 L 236 310 L 276 310 L 276 270 Z" fill="#4fc3f7" />
+  <path d="M 186 310 L 326 310 L 346 330 L 166 330 Z" fill="#4fc3f7" />
+  
+  <!-- Red Cross inside Monitor -->
+  <path d="M 236 125 L 276 125 L 276 155 L 306 155 L 306 195 L 276 195 L 276 225 L 236 225 L 236 195 L 206 195 L 206 155 L 236 155 Z" fill="#e74c3c" />
+
+  <!-- Doctor Character -->
+  <g transform="translate(80, 200)">
+    <!-- Body -->
+    <rect x="0" y="40" width="60" height="90" rx="12" fill="#ffffff" />
+    <rect x="25" y="40" width="10" height="90" fill="#e0e0e0" /> <!-- coat opening -->
+    <rect x="20" y="40" width="20" height="25" fill="#3498db" /> <!-- shirt -->
+    <!-- Head -->
+    <circle cx="30" cy="20" r="26" fill="#f1c27d" />
+    <!-- Hair -->
+    <path d="M 4 20 C 4 -5, 56 -5, 56 20 Z" fill="#4a3b32" />
+    <rect x="15" y="10" width="30" height="10" rx="4" fill="#4a3b32" />
+    <!-- Stethoscope -->
+    <path d="M 12 45 Q 12 80 30 80 Q 48 80 48 45" fill="none" stroke="#2c3e50" stroke-width="4" />
+    <circle cx="48" cy="45" r="4" fill="#2c3e50" />
+    <circle cx="12" cy="45" r="4" fill="#2c3e50" />
+    <circle cx="30" cy="80" r="6" fill="#bdc3c7" stroke="#2c3e50" stroke-width="2" />
+  </g>
+
+  <!-- Nurse Character -->
+  <g transform="translate(372, 200)">
+    <!-- Body -->
+    <rect x="0" y="40" width="60" height="90" rx="12" fill="#ffb6c1" /> <!-- pink scrubs -->
+    <rect x="20" y="40" width="20" height="30" fill="#ffffff" /> <!-- apron top -->
+    <path d="M 0 70 Q 30 90 60 70 L 60 130 L 0 130 Z" fill="#ffffff" opacity="0.8" /> <!-- apron bottom -->
+    <!-- Head -->
+    <circle cx="30" cy="20" r="26" fill="#ffdbac" />
+    <!-- Hair -->
+    <path d="M 4 20 C 4 -10, 56 -10, 56 20 Z" fill="#8d5524" />
+    <!-- Hat -->
+    <rect x="12" y="-12" width="36" height="16" rx="4" fill="#ffffff" />
+    <!-- Red Cross on Hat -->
+    <rect x="28" y="-9" width="4" height="10" fill="#e74c3c" />
+    <rect x="25" y="-6" width="10" height="4" fill="#e74c3c" />
+  </g>
+
+  <!-- Text -->
+  <text x="256" y="410" font-family="monospace" font-size="34" font-weight="900" fill="#4fc3f7" text-anchor="middle" letter-spacing="1">VibeHospitals</text>
+  <text x="256" y="455" font-family="monospace" font-size="22" font-weight="bold" fill="#ffb6c1" text-anchor="middle" letter-spacing="2">| IT Support |</text>
+</svg>
