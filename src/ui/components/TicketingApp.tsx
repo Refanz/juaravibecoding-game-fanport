@@ -39,7 +39,7 @@ export default function TicketingApp({ objects, onGoToLocation, onFixTicket }: P
   return (
     <div className="flex w-full h-full bg-[#f0f0f0] rounded-sm overflow-hidden border-2 border-slate-400">
       {/* Left List */}
-      <div className={`w-full md:w-1/3 border-r-2 border-slate-400 flex-col bg-white ${selectedTicket !== null ? 'hidden md:flex' : 'flex'}`}>
+      <div className={`w-full md:w-1/3 border-r-2 border-slate-400 flex-col bg-white min-h-0 ${selectedTicket !== null ? 'hidden md:flex' : 'flex'}`}>
         {/* Filter bar */}
         <div className="p-2 border-b border-slate-300 bg-[#e0e0e0] flex flex-col gap-2">
           <div className="flex gap-2">
@@ -95,7 +95,7 @@ export default function TicketingApp({ objects, onGoToLocation, onFixTicket }: P
       </div>
 
       {/* Right Detail */}
-      <div className={`flex-1 bg-[#fafafa] p-4 flex-col ${selectedTicket === null ? 'hidden md:flex' : 'flex'}`}>
+      <div className={`flex-1 bg-[#fafafa] p-4 flex-col min-h-0 overflow-y-auto custom-scrollbar ${selectedTicket === null ? 'hidden md:flex' : 'flex'}`}>
         {selectedTicket !== null && activeObj && activeQuiz ? (
           <>
             {/* Mobile Back Button */}
@@ -118,7 +118,7 @@ export default function TicketingApp({ objects, onGoToLocation, onFixTicket }: P
               </div>
             </div>
 
-            <div className="flex-1 overflow-y-auto">
+            <div className="flex-1 overflow-visible">
               <div className="mb-4">
                 <div className="text-[0.65rem] font-bold text-slate-500 uppercase tracking-wider mb-1">Deskripsi Masalah</div>
                 <p className="text-[0.8rem] text-slate-700 leading-relaxed bg-white p-3 border border-slate-200 rounded shadow-sm">{activeQuiz.question}</p>

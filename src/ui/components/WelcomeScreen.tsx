@@ -13,7 +13,7 @@ export default function WelcomeScreen({ onStart }: Props) {
 
   const handleStart = () => { AudioManager.click(); onStart(); };
   return (
-    <div className="w-full h-[100dvh] sm:h-full relative bg-black/50 backdrop-blur-[2px] overflow-y-auto overflow-x-hidden flex flex-col items-center justify-center pointer-events-auto py-8 sm:py-0">
+    <div className="w-full h-[100dvh] sm:h-full relative bg-black/50 backdrop-blur-[2px] overflow-y-auto overflow-x-hidden flex flex-col items-center justify-center pointer-events-auto py-8 sm:py-0 custom-scrollbar">
       {/* Radial Gradient Overlay to ensure text readability */}
       <div className="absolute inset-0 pointer-events-none z-0 bg-[radial-gradient(circle_at_center,_transparent_0%,_rgba(4,16,32,0.9)_100%)]"></div>
 

@@ -361,8 +361,9 @@ export default function DesktopUIModal({
   }, []);
 
   return (
-    <div className="fixed inset-0 bg-black/50 z-[200] flex flex-col items-center justify-start sm:justify-center p-2 sm:p-8 animate-fade-in pointer-events-auto overflow-y-auto overflow-x-hidden">
-      <div className="w-full min-h-[500px] h-[95vh] sm:h-full max-w-[1000px] max-h-[700px] bg-[#008080] rounded-lg shadow-[0_0_30px_rgba(0,0,0,0.8)] flex flex-col overflow-hidden relative font-sans my-auto shrink-0 scale-[0.65] sm:scale-100 origin-top sm:origin-center">
+    <div className="fixed inset-0 bg-black/70 z-[200] overflow-y-auto sm:overflow-hidden overflow-x-hidden custom-scrollbar animate-fade-in pointer-events-auto">
+      <div className="min-h-full flex flex-col items-center justify-start sm:justify-center p-0 sm:p-8">
+        <div className="w-full h-[120dvh] min-h-[600px] sm:h-full sm:min-h-0 sm:max-h-[700px] max-w-[1000px] bg-[#008080] sm:rounded-lg shadow-[0_0_30px_rgba(0,0,0,0.8)] flex flex-col overflow-hidden relative font-sans shrink-0">
         {/* Desktop Icons */}
         <div className="flex-1 p-4 flex flex-col gap-4 items-start relative z-10">
           <button
@@ -420,7 +421,7 @@ export default function DesktopUIModal({
 
         {/* Windows / Apps */}
         {activeApp === "ticketing" && (
-          <div className="absolute inset-4 sm:inset-10 top-4 bottom-14 bg-white rounded-md shadow-2xl flex flex-col overflow-hidden z-20 border border-slate-300">
+          <div className="absolute inset-1 sm:inset-10 top-2 sm:top-4 bottom-[3.25rem] sm:bottom-14 bg-white rounded-md shadow-2xl flex flex-col overflow-hidden z-20 border border-slate-300">
             {/* Window Title Bar */}
             <div className="bg-[#000080] text-white flex justify-between items-center px-2 py-1 select-none">
               <div className="flex items-center gap-2">
@@ -448,7 +449,7 @@ export default function DesktopUIModal({
         )}
 
         {activeApp === "cctv" && (
-          <div className="absolute inset-4 sm:inset-10 top-4 bottom-14 rounded-md shadow-2xl flex flex-col overflow-hidden z-20 border border-slate-300">
+          <div className="absolute inset-1 sm:inset-10 top-2 sm:top-4 bottom-[3.25rem] sm:bottom-14 rounded-md shadow-2xl flex flex-col overflow-hidden z-20 border border-slate-300">
             {/* Window Title Bar */}
             <div
               className="flex justify-between items-center px-2 py-1 select-none"
@@ -504,6 +505,7 @@ export default function DesktopUIModal({
             </span>
           </div>
         </div>
+      </div>
       </div>
     </div>
   );

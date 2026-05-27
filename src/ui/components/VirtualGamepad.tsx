@@ -127,10 +127,12 @@ export default function VirtualGamepad() {
   return (
     <div className={`absolute bottom-6 left-6 right-6 flex items-end pointer-events-none z-[100] ${layout === 'left' ? 'flex-row-reverse justify-between' : 'justify-between'}`}>
       {/* Direction Control */}
-      {type === 'dpad' ? renderDPad() : renderJoystick()}
+      <div className={`scale-[0.8] sm:scale-100 origin-bottom ${layout === 'left' ? 'origin-bottom-right' : 'origin-bottom-left'}`}>
+        {type === 'dpad' ? renderDPad() : renderJoystick()}
+      </div>
 
       {/* Action Button */}
-      <div className="opacity-80 pointer-events-auto touch-none select-none">
+      <div className={`opacity-80 pointer-events-auto touch-none select-none scale-[0.85] sm:scale-100 origin-bottom ${layout === 'left' ? 'origin-bottom-left' : 'origin-bottom-right'}`}>
         <button
           className="w-16 h-16 bg-hospital-blue/70 active:bg-hospital-blue border-2 border-hospital-sky rounded-full text-white text-[0.6rem] font-bold shadow-lg flex items-center justify-center font-[var(--font-pixel)] leading-none"
           onTouchStart={(e) => { if (e.cancelable) e.preventDefault(); emitInteract(); }}
