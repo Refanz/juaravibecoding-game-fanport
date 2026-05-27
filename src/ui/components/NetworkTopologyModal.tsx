@@ -1,13 +1,36 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 interface Props {
   onClose: () => void;
 }
 
 export default function NetworkTopologyModal({ onClose }: Props) {
+  const [scale, setScale] = useState(1);
+
+  useEffect(() => {
+    const handleResize = () => {
+      // Available width is window width minus modal padding (~64px)
+      // Available height is window height minus modal padding and header (~150px)
+      const availableWidth = window.innerWidth - 64;
+      const availableHeight = window.innerHeight - 150;
+      const scaleX = availableWidth / 1000;
+      const scaleY = availableHeight / 600;
+      
+      let newScale = Math.min(scaleX, scaleY, 1);
+      // Enforce a minimum scale so it doesn't become too tiny to read on mobile.
+      // This will cause the overflow scroll to become active!
+      if (newScale < 0.6) newScale = 0.6;
+      
+      setScale(newScale);
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   return (
     <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/90 backdrop-blur-md animate-fade-in p-2 sm:p-4">
-      <div className="relative bg-dark/95 border-2 border-hospital-sky rounded-xl p-4 sm:p-6 w-full max-w-6xl h-full max-h-[85vh] flex flex-col shadow-[0_0_40px_rgba(214,228,240,0.3)]">
+      <div className="relative bg-dark/95 border-2 border-hospital-sky rounded-xl p-4 sm:p-6 w-full max-w-6xl h-full max-h-[85vh] flex flex-col shadow-[0_0_40px_rgba(214,228,240,0.3)] overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between border-b border-hospital-sky/30 pb-4 mb-4">
           <div>
@@ -29,7 +52,12 @@ export default function NetworkTopologyModal({ onClose }: Props) {
 
         {/* Canvas / Dashboard */}
         <div className="flex-1 relative bg-black/50 rounded-lg border border-white/10 overflow-auto w-full h-full custom-scrollbar">
-          <div className="relative min-w-[1000px] min-h-[600px] w-full h-full">
+          {/* Sizing wrapper to ensure scrollbars match scaled content exactly */}
+          <div style={{ width: 1000 * scale, height: 600 * scale }} className="relative mx-auto">
+            <div 
+              className="absolute top-0 left-0 w-[1000px] h-[600px] origin-top-left"
+              style={{ transform: `scale(${scale})` }}
+            >
             {/* Animated SVG Connections Background */}
             <svg
               className="absolute inset-0 w-full h-full pointer-events-none z-0"
@@ -274,6 +302,7 @@ export default function NetworkTopologyModal({ onClose }: Props) {
         </div>
       </div>
     </div>
+  </div>
   );
 }
 
