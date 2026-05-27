@@ -17,12 +17,12 @@ export class TimeManager {
   constructor(scene: Phaser.Scene, gameState: GameState) {
     this.scene = scene;
     this.gameState = gameState;
-    
+
     // Initial date from GameState
     this.minute = this.gameState.gameTime.minute;
     this.hour = this.gameState.gameTime.hour;
     this.day = this.gameState.gameTime.day;
-    this.month = this.gameState.gameTime.month; 
+    this.month = this.gameState.gameTime.month;
     this.year = this.gameState.gameTime.year;
 
     // Skala waktu: 1 jam in-game = 1 menit real-time.
@@ -31,22 +31,28 @@ export class TimeManager {
       delay: 1000,
       callback: this.tick,
       callbackScope: this,
-      loop: true
+      loop: true,
     });
-    
+
     this.emitTime();
   }
 
   private tick() {
     // Check if the game is currently playing
     const gameScene = this.scene as any;
-    if (gameScene.gameState && gameScene.gameState.screen !== 'playing') {
+    if (gameScene.gameState && gameScene.gameState.screen !== "playing") {
       return; // Do not advance time if on welcome screen, paused, etc.
     }
 
     // Menggunakan JS Date untuk kemudahan kalkulasi rollover (23:59 -> 00:00, lompat hari, bulan, tahun)
-    const d = new Date(this.year, this.month, this.day, this.hour, this.minute + 1);
-    
+    const d = new Date(
+      this.year,
+      this.month,
+      this.day,
+      this.hour,
+      this.minute + 1,
+    );
+
     // Shift kerja hanya 08:00 - 20:00, bila sudah jam 20:00, loncat ke besok jam 08:00
     if (d.getHours() >= 20) {
       d.setDate(d.getDate() + 1);
@@ -65,7 +71,7 @@ export class TimeManager {
       hour: this.hour,
       day: this.day,
       month: this.month,
-      year: this.year
+      year: this.year,
     };
 
     this.emitTime();
@@ -73,7 +79,10 @@ export class TimeManager {
 
   public getFormattedTime(): string {
     const d = new Date(this.year, this.month, this.day, this.hour, this.minute);
-    return d.toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" });
+    return d.toLocaleTimeString("id-ID", {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
   }
 
   public getFormattedDate(): string {
@@ -82,22 +91,22 @@ export class TimeManager {
       weekday: "short",
       day: "numeric",
       month: "short",
-      year: "numeric"
+      year: "numeric",
     });
   }
 
-  public getPeriod(): 'pagi' | 'siang' | 'sore' | 'malam' {
-    if (this.hour >= 6 && this.hour < 11) return 'pagi';
-    if (this.hour >= 11 && this.hour < 15) return 'siang';
-    if (this.hour >= 15 && this.hour < 18) return 'sore';
-    return 'malam';
+  public getPeriod(): "pagi" | "siang" | "sore" | "malam" {
+    if (this.hour >= 6 && this.hour < 11) return "pagi";
+    if (this.hour >= 11 && this.hour < 15) return "siang";
+    if (this.hour >= 15 && this.hour < 18) return "sore";
+    return "malam";
   }
 
   private emitTime() {
-    EventBus.emit("time_updated", { 
-      time: this.getFormattedTime(), 
+    EventBus.emit("time_updated", {
+      time: this.getFormattedTime(),
       date: this.getFormattedDate(),
-      period: this.getPeriod()
+      period: this.getPeriod(),
     });
   }
 

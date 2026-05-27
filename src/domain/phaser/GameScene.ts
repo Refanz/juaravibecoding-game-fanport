@@ -53,6 +53,7 @@ export class GameScene extends Phaser.Scene {
   private defaultZoom = 1.5;
   private timeManager!: TimeManager;
   private pagiOverlay!: Phaser.GameObjects.Rectangle;
+  private siangOverlay!: Phaser.GameObjects.Rectangle;
   private soreOverlay!: Phaser.GameObjects.Rectangle;
   private malamOverlay!: Phaser.GameObjects.Rectangle;
   private activeFixIcon: Phaser.GameObjects.Image | null = null;
@@ -142,10 +143,13 @@ export class GameScene extends Phaser.Scene {
       this.defaultZoom = this.scale.width < 768 ? 0.7 : (this.scale.width <= 1024 ? 1.05 : 1.5);
       this.cameras.main.setZoom(this.defaultZoom);
 
-      // Overlays untuk Day/Night Cycle (ukurannya selebar map)
-      this.pagiOverlay = this.add.rectangle(0, 0, mapW, mapH, 0xffaa00, 0).setOrigin(0).setScrollFactor(1).setDepth(99997);
-      this.soreOverlay = this.add.rectangle(0, 0, mapW, mapH, 0xff5500, 0).setOrigin(0).setScrollFactor(1).setDepth(99998);
-      this.malamOverlay = this.add.rectangle(0, 0, mapW, mapH, 0x000033, 0).setOrigin(0).setScrollFactor(1).setDepth(99999);
+      // Overlays untuk Day/Night Cycle (sangat besar agar menutupi layar walau di-zoom)
+      const sw = this.scale.width;
+      const sh = this.scale.height;
+      this.pagiOverlay = this.add.rectangle(sw / 2, sh / 2, sw * 4, sh * 4, 0xffaa00, 1).setScrollFactor(0).setDepth(999997).setAlpha(0);
+      this.siangOverlay = this.add.rectangle(sw / 2, sh / 2, sw * 4, sh * 4, 0xffbb44, 1).setScrollFactor(0).setDepth(999997).setAlpha(0);
+      this.soreOverlay = this.add.rectangle(sw / 2, sh / 2, sw * 4, sh * 4, 0xff7722, 1).setScrollFactor(0).setDepth(999998).setAlpha(0);
+      this.malamOverlay = this.add.rectangle(sw / 2, sh / 2, sw * 4, sh * 4, 0x000011, 1).setScrollFactor(0).setDepth(999999).setAlpha(0);
 
       // Controls
       if (this.input.keyboard) {
@@ -187,33 +191,45 @@ export class GameScene extends Phaser.Scene {
     }
   }
 
+  private currentPeriod: string = '';
+
   onTimeUpdated({ period }: { period: string }) {
     if (!this.cameras || !this.cameras.main) return;
     
+    // Hanya lakukan transisi jika periodenya berubah
+    if (this.currentPeriod === period) return;
+    this.currentPeriod = period;
+    
     let targetPagi = 0;
+    let targetSiang = 0;
     let targetSore = 0;
     let targetMalam = 0;
-    let bgColor = "#e0e8f0"; // default
 
     if (period === 'pagi') {
-      targetPagi = 0.1;
-      bgColor = "#e0e8f0";
+      // Pagi cerah (tidak ada overlay)
+      targetPagi = 0;
     } else if (period === 'siang') {
-      bgColor = "#87ceeb";
+      // Siang agak oren tapi cerah
+      targetSiang = 0.15;
     } else if (period === 'sore') {
-      targetSore = 0.2;
-      bgColor = "#ffdab9";
+      // Sore oren
+      targetSore = 0.3;
     } else if (period === 'malam') {
-      targetMalam = 0.45;
-      bgColor = "#0a1828";
+      targetMalam = 0.6;
     }
 
-    this.cameras.main.setBackgroundColor(bgColor);
+    // Hentikan tween sebelumnya untuk menghindari tumpang tindih
+    this.tweens.killTweensOf([this.pagiOverlay, this.siangOverlay, this.soreOverlay, this.malamOverlay]);
 
     // Smooth transition
     this.tweens.add({
       targets: this.pagiOverlay,
       alpha: targetPagi,
+      duration: 1000
+    });
+    this.tweens.add({
+      targets: this.siangOverlay,
+      alpha: targetSiang,
       duration: 1000
     });
     this.tweens.add({
