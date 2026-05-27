@@ -20,6 +20,9 @@ export class GameState {
   camera: Camera = { x: 0, y: 0 };
   teleportTargetIndex: number | null = null;
   activeMarkerIndex: number | null = null;
+  justUsedElevator = false;
+  savedPlayerPos: { x: number; y: number; floor: number } | null = null;
+  gameTime = { minute: 0, hour: 8, day: 1, month: 0, year: 2026 };
 
   reset(): void {
     this.screen = 'welcome';
@@ -32,6 +35,9 @@ export class GameState {
     this.camera = { x: 0, y: 0 };
     this.teleportTargetIndex = null;
     this.activeMarkerIndex = null;
+    this.justUsedElevator = false;
+    this.savedPlayerPos = null;
+    this.gameTime = { minute: 0, hour: 8, day: 1, month: 0, year: 2026 };
   }
 
   startPlaying(): void { this.screen = 'playing'; }

@@ -15,13 +15,8 @@ import {
   floor2Url,
   floor3Url,
 } from "../../infrastructure/data/maps";
-import {
-  AreaBounds,
-  FLOOR1_AREA_BOUNDS,
-  FLOOR2_AREA_BOUNDS,
-  FLOOR3_AREA_BOUNDS,
-} from "../../infrastructure/data/floorData";
 import { Player } from "../entities/Player";
+import { TimeManager } from "./TimeManager";
 
 const TILE = 48;
 const TILE_COLORS: Record<number, number> = {
@@ -52,11 +47,14 @@ export class GameScene extends Phaser.Scene {
   wallsGroup!: Phaser.Physics.Arcade.StaticGroup;
   decorationsGroup!: Phaser.GameObjects.Group;
   npcsGroup!: Phaser.GameObjects.Group;
-  private cctvCapturing = false;
   private lastPosEmitTime = 0;
   private activeMarker: Phaser.GameObjects.Text | null = null;
   private activeMarkerTween: Phaser.Tweens.Tween | null = null;
   private defaultZoom = 1.5;
+  private timeManager!: TimeManager;
+  private pagiOverlay!: Phaser.GameObjects.Rectangle;
+  private soreOverlay!: Phaser.GameObjects.Rectangle;
+  private malamOverlay!: Phaser.GameObjects.Rectangle;
 
   constructor() {
     super("GameScene");
@@ -109,9 +107,14 @@ export class GameScene extends Phaser.Scene {
           py = obj.y * TILE + TILE / 2;
         }
         this.gameState.teleportTargetIndex = null;
-      } else if (this.floorManager.currentFloor === 2) {
+      } else if (this.gameState.justUsedElevator) {
         px = ELEVATOR_POS.x * TILE - TILE / 2;
         py = ELEVATOR_POS.y * TILE + TILE / 2;
+        this.gameState.justUsedElevator = false;
+      } else if (this.gameState.savedPlayerPos && this.gameState.savedPlayerPos.floor === this.floorManager.currentFloor) {
+        px = this.gameState.savedPlayerPos.x;
+        py = this.gameState.savedPlayerPos.y;
+        this.gameState.savedPlayerPos = null;
       }
       this.player = new Player(this, px, py);
 
@@ -129,6 +132,11 @@ export class GameScene extends Phaser.Scene {
       this.defaultZoom = this.scale.width < 768 ? 1.1 : 1.5;
       this.cameras.main.setZoom(this.defaultZoom);
 
+      // Overlays untuk Day/Night Cycle (ukurannya selebar map)
+      this.pagiOverlay = this.add.rectangle(0, 0, mapW, mapH, 0xffaa00, 0).setOrigin(0).setScrollFactor(1).setDepth(99997);
+      this.soreOverlay = this.add.rectangle(0, 0, mapW, mapH, 0xff5500, 0).setOrigin(0).setScrollFactor(1).setDepth(99998);
+      this.malamOverlay = this.add.rectangle(0, 0, mapW, mapH, 0x000033, 0).setOrigin(0).setScrollFactor(1).setDepth(99999);
+
       // Controls
       if (this.input.keyboard) {
         this.cursors = this.input.keyboard.createCursorKeys();
@@ -137,19 +145,24 @@ export class GameScene extends Phaser.Scene {
 
       // Events
       EventBus.on("quiz_closed", this.onQuizClosed, this);
-      EventBus.on("request_cctv_capture", this.startCCTVCapture, this);
       EventBus.on("virtual_pad_move", this.onVirtualMove, this);
       EventBus.on("virtual_pad_interact", this.onVirtualInteract, this);
       EventBus.on("pan_to_object", this.panToObject, this);
       EventBus.on("do_change_floor", this.doChangeFloor, this);
+      EventBus.on("game_paused", this.onGamePaused, this);
+      EventBus.on("time_updated", this.onTimeUpdated, this);
+
+      this.timeManager = new TimeManager(this, this.gameState);
 
       this.events.on("shutdown", () => {
         EventBus.off("quiz_closed", this.onQuizClosed, this);
-        EventBus.off("request_cctv_capture", this.startCCTVCapture, this);
         EventBus.off("virtual_pad_move", this.onVirtualMove, this);
         EventBus.off("virtual_pad_interact", this.onVirtualInteract, this);
         EventBus.off("pan_to_object", this.panToObject, this);
         EventBus.off("do_change_floor", this.doChangeFloor, this);
+        EventBus.off("game_paused", this.onGamePaused, this);
+        EventBus.off("time_updated", this.onTimeUpdated, this);
+        this.timeManager.destroy();
       });
 
       this.updateMarker();
@@ -164,9 +177,66 @@ export class GameScene extends Phaser.Scene {
     }
   }
 
+  onTimeUpdated({ period }: { period: string }) {
+    if (!this.cameras || !this.cameras.main) return;
+    
+    let targetPagi = 0;
+    let targetSore = 0;
+    let targetMalam = 0;
+    let bgColor = "#e0e8f0"; // default
+
+    if (period === 'pagi') {
+      targetPagi = 0.1;
+      bgColor = "#e0e8f0";
+    } else if (period === 'siang') {
+      bgColor = "#87ceeb";
+    } else if (period === 'sore') {
+      targetSore = 0.2;
+      bgColor = "#ffdab9";
+    } else if (period === 'malam') {
+      targetMalam = 0.45;
+      bgColor = "#0a1828";
+    }
+
+    this.cameras.main.setBackgroundColor(bgColor);
+
+    // Smooth transition
+    this.tweens.add({
+      targets: this.pagiOverlay,
+      alpha: targetPagi,
+      duration: 1000
+    });
+    this.tweens.add({
+      targets: this.soreOverlay,
+      alpha: targetSore,
+      duration: 1000
+    });
+    this.tweens.add({
+      targets: this.malamOverlay,
+      alpha: targetMalam,
+      duration: 1000
+    });
+  }
+
+  onGamePaused(isPaused: boolean) {
+    if (isPaused) {
+      this.scene.pause();
+    } else {
+      this.scene.resume();
+    }
+  }
+
   onQuizClosed(solved: boolean) {
     if (solved && this.gameState.quizObjectIndex !== null) {
       this.floorManager.allObjects[this.gameState.quizObjectIndex].solve();
+      
+      // Save player position before restart
+      this.gameState.savedPlayerPos = {
+        x: this.player.x,
+        y: this.player.y,
+        floor: this.floorManager.currentFloor
+      };
+
       // Re-render to update object visually (stop blink/red)
       this.scene.restart({
         floorManager: this.floorManager,
@@ -508,7 +578,7 @@ export class GameScene extends Phaser.Scene {
   }
 
   update(time: number, delta: number) {
-    if (this.cctvCapturing || !this.player || !this.player.active) return;
+    if (!this.player || !this.player.active) return;
 
     if (
       this.gameState.screen !== "playing" ||
@@ -643,6 +713,7 @@ export class GameScene extends Phaser.Scene {
   }
 
   doChangeFloor(targetFloor: 1 | 2 | 3) {
+    this.gameState.justUsedElevator = true;
     this.floorManager.loadFloor(targetFloor);
     EventBus.emit("floor_changed", targetFloor);
     this.scene.restart({
@@ -651,169 +722,4 @@ export class GameScene extends Phaser.Scene {
     });
   }
 
-  // ── CCTV Capture ────────────────────────────────────────────
-
-  private clearWorld() {
-    this.tweens.killAll();
-    const children = [...this.children.getAll()];
-    for (const c of children) {
-      c.destroy();
-    }
-    this.wallsGroup = this.physics.add.staticGroup();
-    this.objectsGroup = this.add.group();
-    this.decorationsGroup = this.add.group();
-    this.npcsGroup = this.add.group();
-  }
-
-  private rebuildFloor(floor: 1 | 2 | 3) {
-    this.floorManager.loadFloor(floor);
-    this.renderMap();
-    this.renderDecorations();
-    this.renderElevator();
-    this.renderNPCs();
-    this.renderObjects();
-    const mapW = this.currentTilemap.widthInPixels;
-    const mapH = this.currentTilemap.heightInPixels;
-    this.physics.world.setBounds(0, 0, mapW, mapH);
-    this.cameras.main.setBounds(0, 0, mapW, mapH);
-  }
-
-  startCCTVCapture() {
-    if (this.cctvCapturing) return;
-    this.cctvCapturing = true;
-
-    const savedScrollX = this.cameras.main.scrollX;
-    const savedScrollY = this.cameras.main.scrollY;
-    const savedX = this.player.x;
-    const savedY = this.player.y;
-    const originalFloor = this.floorManager.currentFloor;
-
-    this.cameras.main.stopFollow();
-    this.player.setVisible(false);
-
-    const results: { id: string; src: string }[] = [];
-
-    const captureFloor = (
-      floor: 1 | 2 | 3,
-      cams: any[],
-      onComplete: () => void,
-    ) => {
-      if (this.floorManager.currentFloor !== floor) {
-        this.clearWorld();
-        this.rebuildFloor(floor);
-      }
-      this.captureStep(cams, 0, results, onComplete);
-    };
-
-    // Phase 1: Capture Floor 1
-    captureFloor(1, FLOOR1_AREA_BOUNDS, () => {
-      // Phase 2: Capture Floor 2
-      captureFloor(2, FLOOR2_AREA_BOUNDS, () => {
-        // Phase 3: Capture Floor 3
-        captureFloor(3, FLOOR3_AREA_BOUNDS, () => {
-          // Restore Original State
-          if (this.floorManager.currentFloor !== originalFloor) {
-            this.clearWorld();
-            this.rebuildFloor(originalFloor);
-          }
-
-          // Recreate player
-          this.player = new Player(this, savedX, savedY);
-          this.physics.add.collider(this.player, this.wallsGroup);
-          this.physics.add.collider(this.player, this.groundLayer);
-
-          this.cameras.main.setScroll(savedScrollX, savedScrollY);
-          this.cameras.main.startFollow(this.player);
-          this.cctvCapturing = false;
-          EventBus.emit("cctv_frames", results);
-        });
-      });
-    });
-  }
-
-  private captureStep(
-    positions: AreaBounds[],
-    index: number,
-    results: { id: string; src: string }[],
-    onComplete: () => void,
-  ) {
-    if (index >= positions.length) {
-      this.cameras.main.setZoom(this.defaultZoom);
-      onComplete();
-      return;
-    }
-
-    const pos = positions[index];
-    const startX = pos.startX * TILE;
-    const startY = pos.startY * TILE;
-    const endX = (pos.endX + 1) * TILE;
-    const endY = (pos.endY + 1) * TILE;
-
-    const width = endX - startX;
-    const height = endY - startY;
-    const centerX = startX + width / 2;
-    const centerY = startY + height / 2;
-
-    const cam = this.cameras.main;
-    const zoomX = cam.width / width;
-    const zoomY = cam.height / height;
-
-    // Set zoom to fit the area bounds exactly and center the camera
-    cam.setZoom(Math.min(zoomX, zoomY));
-    cam.centerOn(centerX, centerY);
-
-    // Wait for Phaser to render the new camera view
-    this.time.delayedCall(150, () => {
-      this.doSnapshot((src) => {
-        results.push({ id: pos.id, src });
-        this.captureStep(positions, index + 1, results, onComplete);
-      });
-    });
-  }
-
-  /** Snapshot with multiple fallbacks to guarantee a result */
-  private doSnapshot(cb: (src: string) => void) {
-    let called = false;
-    const safeCb = (src: string) => {
-      if (called) return;
-      called = true;
-      cb(src);
-    };
-
-    // Failsafe timeout: if snapshot doesn't complete in 300ms, force fallback
-    setTimeout(() => {
-      try {
-        const src = this.game.canvas.toDataURL("image/png");
-        if (src && src.length > 100) {
-          safeCb(src);
-          return;
-        }
-      } catch (_) {}
-      safeCb(
-        "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPj/HwADBwIAMCbHYQAAAABJRU5ErkJggg==",
-      );
-    }, 300);
-
-    try {
-      const renderer = this.game.renderer;
-      if (typeof (renderer as any).snapshot === "function") {
-        (renderer as any).snapshot((img: HTMLImageElement) => {
-          safeCb(img.src);
-        });
-        return;
-      }
-    } catch (_) {
-      /* fall through */
-    }
-
-    try {
-      const src = this.game.canvas.toDataURL("image/png");
-      if (src && src.length > 100) {
-        safeCb(src);
-        return;
-      }
-    } catch (_) {
-      /* fall through */
-    }
-  }
 }
