@@ -13,12 +13,12 @@ export default function WelcomeScreen({ onStart }: Props) {
 
   const handleStart = () => { AudioManager.click(); onStart(); };
   return (
-    <div className="w-full h-full relative bg-black/50 backdrop-blur-[2px] overflow-hidden flex items-center justify-center pointer-events-auto">
+    <div className="w-full h-[100dvh] sm:h-full relative bg-black/50 backdrop-blur-[2px] overflow-y-auto overflow-x-hidden flex flex-col items-center justify-center pointer-events-auto py-8 sm:py-0">
       {/* Radial Gradient Overlay to ensure text readability */}
       <div className="absolute inset-0 pointer-events-none z-0 bg-[radial-gradient(circle_at_center,_transparent_0%,_rgba(4,16,32,0.9)_100%)]"></div>
 
       {/* Main Content */}
-      <div className="relative z-10 flex flex-col items-center justify-center gap-6 sm:gap-8 text-center p-8 animate-fade-in w-full max-w-2xl mx-auto">
+      <div className="relative z-10 flex flex-col items-center justify-center gap-6 sm:gap-8 text-center p-8 animate-fade-in w-full max-w-2xl mx-auto my-auto">
         <div className="text-[clamp(3rem,8vw,5rem)] animate-pulse-icon drop-shadow-[0_0_15px_rgba(79,195,247,0.5)]">🏥</div>
         <h1 className="text-[clamp(1.2rem,4vw,2rem)] text-hospital-sky leading-relaxed [text-shadow:0_0_20px_#4fc3f7aa]">
           IT SUPPORT<br />HOSPITAL VIBE

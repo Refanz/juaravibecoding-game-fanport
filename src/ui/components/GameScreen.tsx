@@ -123,7 +123,7 @@ export default function GameScreen({
       : null;
 
   return (
-    <div className="w-screen h-screen flex flex-col bg-surface">
+    <div className="w-full min-h-[100dvh] h-screen sm:h-[100dvh] flex flex-col bg-surface">
       {!isWelcome && (
         <FloatingHUD
           currentFloor={currentFloor}

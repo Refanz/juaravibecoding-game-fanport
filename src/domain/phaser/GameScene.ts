@@ -129,7 +129,7 @@ export class GameScene extends Phaser.Scene {
       this.cameras.main.setBounds(0, 0, mapW, mapH);
       this.cameras.main.startFollow(this.player);
       this.cameras.main.setBackgroundColor("#e0e8f0");
-      this.defaultZoom = this.scale.width < 768 ? 1.1 : 1.5;
+      this.defaultZoom = this.scale.width < 768 ? 1.0 : 1.5;
       this.cameras.main.setZoom(this.defaultZoom);
 
       // Overlays untuk Day/Night Cycle (ukurannya selebar map)
