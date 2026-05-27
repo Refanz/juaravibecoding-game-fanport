@@ -10,6 +10,7 @@ import { GameState } from "../../domain/GameState";
 import { HOSPITAL_QUIZZES } from "../../infrastructure/data/quizzes";
 import { EventBus } from "../../infrastructure/events/EventBus";
 import { PhaserGame } from "../../domain/phaser/PhaserGame";
+import LoadingScreen from "./LoadingScreen";
 
 // Custom Hooks
 import { useGameTime } from "../hooks/useGameTime";
@@ -91,6 +92,7 @@ export default function GameScreen({
   const [showPause, setShowPause] = useState(false);
   const [showDesktop, setShowDesktop] = useState(false);
   const [notification, setNotification] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   const handlePause = useCallback(() => {
     gs.isPaused = true;
@@ -127,7 +129,12 @@ export default function GameScreen({
       : null;
 
   return (
-    <div className="w-full min-h-[100dvh] h-screen sm:h-[100dvh] flex flex-col bg-surface">
+    <div className="w-full min-h-[100dvh] h-screen sm:h-[100dvh] flex flex-col bg-surface relative">
+      {isLoading && (
+        <div className="absolute inset-0 z-[200]">
+          <LoadingScreen onComplete={() => setIsLoading(false)} />
+        </div>
+      )}
       {!isWelcome && (
         <FloatingHUD
           currentFloor={currentFloor}

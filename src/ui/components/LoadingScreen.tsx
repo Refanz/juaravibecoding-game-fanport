@@ -1,5 +1,5 @@
 // ==========================================
-// ui/components/SplashScreen.tsx
+// ui/components/LoadingScreen.tsx
 // ==========================================
 
 import React, { useEffect, useState } from 'react';
@@ -9,7 +9,7 @@ interface Props {
   onComplete: () => void;
 }
 
-export default function SplashScreen({ onComplete }: Props) {
+export default function LoadingScreen({ onComplete }: Props) {
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
