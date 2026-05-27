@@ -38,9 +38,16 @@ export default function GameScreen({
   }, []);
   const gs = useMemo(() => {
     const g = new GameState();
-    g.startPlaying();
     return g;
   }, []);
+
+  useEffect(() => {
+    if (isWelcome) {
+      gs.screen = 'welcome';
+    } else {
+      gs.startPlaying();
+    }
+  }, [isWelcome, gs]);
 
   // UI state (React)
   const [currentFloor, setCurrentFloor] = useState<1 | 2 | 3>(1);
@@ -62,39 +69,37 @@ export default function GameScreen({
   const [notification, setNotification] = useState<string | null>(null);
   const [currentTime, setCurrentTime] = useState("");
   const [currentDate, setCurrentDate] = useState("");
+  const [currentPeriod, setCurrentPeriod] = useState<"pagi"|"siang"|"sore"|"malam">("pagi");
 
   useEffect(() => {
-    const updateTime = () => {
-      const now = new Date();
-      setCurrentTime(
-        now.toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" }),
-      );
-      setCurrentDate(
-        now.toLocaleDateString("id-ID", {
-          weekday: "short",
-          day: "numeric",
-          month: "short",
-          year: "numeric",
-        }),
-      );
+    const onTimeUpdated = ({ time, date, period }: { time: string; date: string; period: "pagi"|"siang"|"sore"|"malam" }) => {
+      setCurrentTime(time);
+      setCurrentDate(date);
+      setCurrentPeriod(period);
     };
-    updateTime();
-    const timer = setInterval(updateTime, 1000);
-    return () => clearInterval(timer);
+
+    EventBus.on("time_updated", onTimeUpdated);
+
+    return () => {
+      EventBus.off("time_updated", onTimeUpdated);
+    };
   }, []);
 
   const handlePause = () => {
     gs.isPaused = true;
     setShowPause(true);
+    EventBus.emit("game_paused", true);
   };
 
   const handleResume = () => {
     gs.isPaused = false;
     setShowPause(false);
+    EventBus.emit("game_paused", false);
   };
 
   const handleReturnToWelcomeFromPause = () => {
     gs.isPaused = false;
+    EventBus.emit("game_paused", false);
     onReturnToWelcome();
   };
 
@@ -154,6 +159,13 @@ export default function GameScreen({
       ? HOSPITAL_QUIZZES[quizKey % HOSPITAL_QUIZZES.length]
       : null;
 
+  const periodIcon = {
+    pagi: "🌅",
+    siang: "☀️",
+    sore: "🌇",
+    malam: "🌙"
+  }[currentPeriod];
+
   return (
     <div className="w-screen h-screen flex flex-col bg-surface">
       {/* Floating HUD - Top Left */}
@@ -189,7 +201,7 @@ export default function GameScreen({
             </span>
             <span className="opacity-30">|</span>
             <span className="flex items-center gap-1.5 font-bold tracking-wider leading-none">
-              <span className="drop-shadow-md">🕒</span> {currentTime}
+              <span className="drop-shadow-md">{periodIcon}</span> {currentTime}
             </span>
           </div>
         </div>

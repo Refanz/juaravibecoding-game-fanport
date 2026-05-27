@@ -80,8 +80,9 @@ function CCTVPanel({
 }) {
   const [clock, setClock] = useState('');
   useEffect(() => {
-    const tick = () => setClock(new Date().toLocaleTimeString('id-ID',{hour12:false}));
-    tick(); const id = setInterval(tick,1000); return ()=>clearInterval(id);
+    const onTimeUpdated = ({ time }: { time: string }) => setClock(time);
+    EventBus.on('time_updated', onTimeUpdated);
+    return () => { EventBus.off('time_updated', onTimeUpdated); };
   }, []);
 
   const bg = feed.floor==='Lt. 2'?'#0d2137':feed.floor==='Luar'?'#0a1828':'#0d1b2a';

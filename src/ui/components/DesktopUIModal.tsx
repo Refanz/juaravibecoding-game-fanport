@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import TicketingApp from "./TicketingApp";
 import { InteractableObject } from "../../domain/entities/InteractableObject";
+import { EventBus } from "../../infrastructure/events/EventBus";
 
 interface Props {
   objects: InteractableObject[];
@@ -15,12 +16,17 @@ export default function DesktopUIModal({
   onGoToLocation,
   onFixTicket,
 }: Props) {
-  const [time, setTime] = useState(new Date());
+  const [time, setTime] = useState("");
   const [activeApp, setActiveApp] = useState<"ticketing" | null>("ticketing");
 
   useEffect(() => {
-    const timer = setInterval(() => setTime(new Date()), 1000);
-    return () => clearInterval(timer);
+    const onTimeUpdated = ({ time }: { time: string }) => {
+      setTime(time);
+    };
+    EventBus.on("time_updated", onTimeUpdated);
+    return () => {
+      EventBus.off("time_updated", onTimeUpdated);
+    };
   }, []);
 
   return (
@@ -114,10 +120,7 @@ export default function DesktopUIModal({
           <div className="flex items-center gap-3 h-full py-1.5 px-3 bg-[#c0c0c0] border-2 border-gray-600 border-b-white border-r-white text-xs text-black font-bold">
             <span>🔋 100%</span>
             <span>
-              {time.toLocaleTimeString([], {
-                hour: "2-digit",
-                minute: "2-digit",
-              })}
+              {time}
             </span>
           </div>
         </div>

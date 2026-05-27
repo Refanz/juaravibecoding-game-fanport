@@ -22,6 +22,7 @@ import {
   FLOOR3_AREA_BOUNDS,
 } from "../../infrastructure/data/floorData";
 import { Player } from "../entities/Player";
+import { TimeManager } from "./TimeManager";
 
 const TILE = 48;
 const TILE_COLORS: Record<number, number> = {
@@ -57,6 +58,10 @@ export class GameScene extends Phaser.Scene {
   private activeMarker: Phaser.GameObjects.Text | null = null;
   private activeMarkerTween: Phaser.Tweens.Tween | null = null;
   private defaultZoom = 1.5;
+  private timeManager!: TimeManager;
+  private pagiOverlay!: Phaser.GameObjects.Rectangle;
+  private soreOverlay!: Phaser.GameObjects.Rectangle;
+  private malamOverlay!: Phaser.GameObjects.Rectangle;
 
   constructor() {
     super("GameScene");
@@ -129,6 +134,11 @@ export class GameScene extends Phaser.Scene {
       this.defaultZoom = this.scale.width < 768 ? 1.1 : 1.5;
       this.cameras.main.setZoom(this.defaultZoom);
 
+      // Overlays untuk Day/Night Cycle (ukurannya selebar map)
+      this.pagiOverlay = this.add.rectangle(0, 0, mapW, mapH, 0xffaa00, 0).setOrigin(0).setScrollFactor(1).setDepth(99997);
+      this.soreOverlay = this.add.rectangle(0, 0, mapW, mapH, 0xff5500, 0).setOrigin(0).setScrollFactor(1).setDepth(99998);
+      this.malamOverlay = this.add.rectangle(0, 0, mapW, mapH, 0x000033, 0).setOrigin(0).setScrollFactor(1).setDepth(99999);
+
       // Controls
       if (this.input.keyboard) {
         this.cursors = this.input.keyboard.createCursorKeys();
@@ -142,6 +152,10 @@ export class GameScene extends Phaser.Scene {
       EventBus.on("virtual_pad_interact", this.onVirtualInteract, this);
       EventBus.on("pan_to_object", this.panToObject, this);
       EventBus.on("do_change_floor", this.doChangeFloor, this);
+      EventBus.on("game_paused", this.onGamePaused, this);
+      EventBus.on("time_updated", this.onTimeUpdated, this);
+
+      this.timeManager = new TimeManager(this);
 
       this.events.on("shutdown", () => {
         EventBus.off("quiz_closed", this.onQuizClosed, this);
@@ -150,6 +164,9 @@ export class GameScene extends Phaser.Scene {
         EventBus.off("virtual_pad_interact", this.onVirtualInteract, this);
         EventBus.off("pan_to_object", this.panToObject, this);
         EventBus.off("do_change_floor", this.doChangeFloor, this);
+        EventBus.off("game_paused", this.onGamePaused, this);
+        EventBus.off("time_updated", this.onTimeUpdated, this);
+        this.timeManager.destroy();
       });
 
       this.updateMarker();
@@ -161,6 +178,55 @@ export class GameScene extends Phaser.Scene {
         })
         .setDepth(1000);
       console.error(e);
+    }
+  }
+
+  onTimeUpdated({ period }: { period: string }) {
+    if (!this.cameras || !this.cameras.main) return;
+    
+    let targetPagi = 0;
+    let targetSore = 0;
+    let targetMalam = 0;
+    let bgColor = "#e0e8f0"; // default
+
+    if (period === 'pagi') {
+      targetPagi = 0.1;
+      bgColor = "#e0e8f0";
+    } else if (period === 'siang') {
+      bgColor = "#87ceeb";
+    } else if (period === 'sore') {
+      targetSore = 0.2;
+      bgColor = "#ffdab9";
+    } else if (period === 'malam') {
+      targetMalam = 0.45;
+      bgColor = "#0a1828";
+    }
+
+    this.cameras.main.setBackgroundColor(bgColor);
+
+    // Smooth transition
+    this.tweens.add({
+      targets: this.pagiOverlay,
+      alpha: targetPagi,
+      duration: 1000
+    });
+    this.tweens.add({
+      targets: this.soreOverlay,
+      alpha: targetSore,
+      duration: 1000
+    });
+    this.tweens.add({
+      targets: this.malamOverlay,
+      alpha: targetMalam,
+      duration: 1000
+    });
+  }
+
+  onGamePaused(isPaused: boolean) {
+    if (isPaused) {
+      this.scene.pause();
+    } else {
+      this.scene.resume();
     }
   }
 
