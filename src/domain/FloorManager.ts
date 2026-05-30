@@ -28,6 +28,7 @@ import {
   createInteractable,
 } from "./entities/InteractableObject";
 import { NPC, createNPC } from "./entities/NPC";
+import { SaveData } from "../infrastructure/storage/SaveManager";
 
 const TILE = 48;
 const INTERACT_RANGE = 56;
@@ -70,6 +71,21 @@ export class FloorManager {
       this.npcs = FLOOR3_NPCS.map(createNPC);
       this.decorations = FLOOR3_DECORATIONS;
       this.floorObjects = this.allObjects.filter((o) => o.floor === 3);
+    }
+  }
+
+  restoreObjectStates(savedObjects: SaveData["objects"]): void {
+    for (const savedObj of savedObjects) {
+      const obj = this.allObjects[savedObj.index];
+      if (obj) {
+        obj.solved = savedObj.solved;
+        obj.active = savedObj.active;
+        obj.impact = savedObj.impact;
+        obj.urgency = savedObj.urgency;
+        obj.spawnTime = savedObj.spawnTime;
+        obj.completionTime = savedObj.completionTime;
+        obj.quizIndex = savedObj.quizIndex;
+      }
     }
   }
 

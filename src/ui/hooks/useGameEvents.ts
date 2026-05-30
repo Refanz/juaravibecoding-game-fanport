@@ -3,8 +3,8 @@ import { EventBus } from "../../infrastructure/events/EventBus";
 import { AudioManager } from "../../infrastructure/assets/AudioManager";
 import { GameState } from "../../domain/GameState";
 
-export function useGameEvents(gs: GameState) {
-  const [currentFloor, setCurrentFloor] = useState<1 | 2 | 3>(1);
+export function useGameEvents(gs: GameState, initialFloor: 1 | 2 | 3 = 1) {
+  const [currentFloor, setCurrentFloor] = useState<1 | 2 | 3>(initialFloor);
   const [nearObject, setNearObject] = useState<number | null>(null);
   const [nearElevator, setNearElevator] = useState(false);
   const [nearCCTV, setNearCCTV] = useState(false);

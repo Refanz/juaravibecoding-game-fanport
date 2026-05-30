@@ -349,7 +349,7 @@ export default function DesktopUIModal({
 }: Props) {
   const [time, setTime] = useState("");
   const [timestamp, setTimestamp] = useState(0);
-  const [activeApp, setActiveApp] = useState<"ticketing" | "cctv" | null>("ticketing");
+  const [activeApp, setActiveApp] = useState<"ticketing" | "cctv" | null>(null);
   const [layout, setLayout] = useState({ width: 1000, height: 700, scale: 1 });
 
   useEffect(() => {

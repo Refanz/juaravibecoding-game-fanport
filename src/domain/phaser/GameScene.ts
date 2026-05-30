@@ -92,6 +92,7 @@ export class GameScene extends Phaser.Scene {
   }
 
   create() {
+    this.currentPeriod = '';
     try {
       // Reset groups
       this.objectsGroup = this.add.group();
@@ -169,7 +170,7 @@ export class GameScene extends Phaser.Scene {
 
       this.timeManager = new TimeManager(this, this.gameState);
 
-      this.events.on("shutdown", () => {
+      const cleanupEvents = () => {
         EventBus.off("quiz_closed", this.onQuizClosed, this);
         EventBus.off("virtual_pad_move", this.onVirtualMove, this);
         EventBus.off("virtual_pad_interact", this.onVirtualInteract, this);
@@ -178,8 +179,13 @@ export class GameScene extends Phaser.Scene {
         EventBus.off("game_paused", this.onGamePaused, this);
         EventBus.off("time_updated", this.onTimeUpdated, this);
         EventBus.off("spawn_at_start", this.spawnAtStart, this);
-        this.timeManager.destroy();
-      });
+        if (this.timeManager) {
+          this.timeManager.destroy();
+        }
+      };
+
+      this.events.on("shutdown", cleanupEvents);
+      this.events.on("destroy", cleanupEvents);
 
       this.updateMarker();
     } catch (e: any) {
@@ -200,6 +206,8 @@ export class GameScene extends Phaser.Scene {
     
     // Hanya lakukan transisi jika periodenya berubah
     if (this.currentPeriod === period) return;
+
+    const isFirstRun = this.currentPeriod === '';
     this.currentPeriod = period;
     
     let targetPagi = 0;
@@ -223,26 +231,28 @@ export class GameScene extends Phaser.Scene {
     // Hentikan tween sebelumnya untuk menghindari tumpang tindih
     this.tweens.killTweensOf([this.pagiOverlay, this.siangOverlay, this.soreOverlay, this.malamOverlay]);
 
+    const duration = isFirstRun ? 0 : 1000;
+
     // Smooth transition
     this.tweens.add({
       targets: this.pagiOverlay,
       alpha: targetPagi,
-      duration: 1000
+      duration: duration
     });
     this.tweens.add({
       targets: this.siangOverlay,
       alpha: targetSiang,
-      duration: 1000
+      duration: duration
     });
     this.tweens.add({
       targets: this.soreOverlay,
       alpha: targetSore,
-      duration: 1000
+      duration: duration
     });
     this.tweens.add({
       targets: this.malamOverlay,
       alpha: targetMalam,
-      duration: 1000
+      duration: duration
     });
   }
 
@@ -256,8 +266,7 @@ export class GameScene extends Phaser.Scene {
 
   onQuizClosed(solved: boolean) {
     if (solved && this.gameState.quizObjectIndex !== null) {
-      const { year, month, day, hour, minute } = this.gameState.gameTime;
-      const ts = new Date(year, month, day, hour, minute).getTime();
+      const ts = this.timeManager.getTimestamp();
       this.floorManager.allObjects[this.gameState.quizObjectIndex].solve(ts);
       
       // Save player position before restart
@@ -307,23 +316,11 @@ export class GameScene extends Phaser.Scene {
 
     if (this.floorManager.currentFloor !== obj.floor) {
       // Show notification if object is on a different floor
-      const text = this.add
-        .text(
-          this.cameras.main.worldView.centerX,
-          this.cameras.main.worldView.centerY - 50,
-          `Lokasi masalah ada di Lantai ${obj.floor}. Silakan gunakan Lift!`,
-          {
-            fontFamily: '"Press Start 2P", monospace',
-            fontSize: "8px",
-            color: "#ffffff",
-            backgroundColor: "#e74c3c",
-            padding: { x: 8, y: 8 },
-          },
-        )
-        .setOrigin(0.5)
-        .setDepth(200);
-
-      this.time.delayedCall(3000, () => text.destroy());
+      EventBus.emit("show_toast_notification", {
+        message: `Lokasi masalah ada di Lantai ${obj.floor}. Silakan gunakan Lift!`,
+        colorTheme: "red",
+        icon: "📍"
+      });
     } else {
       // Pan camera to object on same floor
       this.cameras.main.stopFollow();

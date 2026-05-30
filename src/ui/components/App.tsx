@@ -14,8 +14,12 @@ type AppScreen = 'welcome' | 'game';
 export default function App() {
   const [screen,  setScreen]  = useState<AppScreen>('welcome');
   const [gameKey, setGameKey] = useState(0);
+  const [loadSave, setLoadSave] = useState(false);
 
-  const handleStart = () => { setScreen('game'); };
+  const handleStart = (shouldLoad: boolean = false) => { 
+    setLoadSave(shouldLoad);
+    setScreen('game'); 
+  };
   const handleReturnToWelcome = () => { setGameKey(k => k + 1); setScreen('welcome'); };
 
   return (
@@ -33,6 +37,7 @@ export default function App() {
           key={gameKey} 
           onReturnToWelcome={handleReturnToWelcome} 
           isWelcome={false} 
+          loadSave={loadSave}
         />
       )}
 

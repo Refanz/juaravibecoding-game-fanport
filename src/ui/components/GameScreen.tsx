@@ -11,6 +11,8 @@ import { HOSPITAL_QUIZZES } from "../../infrastructure/data/quizzes";
 import { EventBus } from "../../infrastructure/events/EventBus";
 import { PhaserGame } from "../../domain/phaser/PhaserGame";
 import LoadingScreen from "./LoadingScreen";
+import { SaveManager, SaveData } from "../../infrastructure/storage/SaveManager";
+import { nanoid } from 'nanoid';
 
 // Custom Hooks
 import { useGameTime } from "../hooks/useGameTime";
@@ -34,7 +36,6 @@ import NetworkTopologyModal from "./NetworkTopologyModal";
 import DesktopUIModal from "./DesktopUIModal";
 import ElevatorModal from "./ElevatorModal";
 import { NPCDialogModal } from "./NPCDialogModal";
-import TicketNotificationToast from "./TicketNotificationToast";
 import DailyReportModal from "./DailyReportModal";
 import GeneralLoadingScreen from "./GeneralLoadingScreen";
 import NotificationModal from "./NotificationModal";
@@ -42,22 +43,31 @@ import NotificationModal from "./NotificationModal";
 interface Props {
   onReturnToWelcome: () => void;
   isWelcome?: boolean;
+  loadSave?: boolean;
 }
 
 export default function GameScreen({
   onReturnToWelcome,
   isWelcome = false,
+  loadSave = false,
 }: Props) {
   // Domain singletons (stable refs)
-  const floor = useMemo(() => {
+  const { floor, gs } = useMemo(() => {
     const f = new FloorManager();
     f.init();
-    return f;
-  }, []);
-  
-  const gs = useMemo(() => {
-    return new GameState();
-  }, []);
+    const state = new GameState();
+    
+    if (loadSave) {
+      const data = SaveManager.load();
+      if (data) {
+        state.restoreFromSave(data);
+        f.restoreObjectStates(data.objects);
+        f.loadFloor(data.currentFloor);
+      }
+    }
+    
+    return { floor: f, gs: state };
+  }, [loadSave]);
 
   useEffect(() => {
     if (isWelcome) {
@@ -69,14 +79,25 @@ export default function GameScreen({
 
   const { currentTime, currentDate, currentPeriod } = useGameTime();
   const currentTimeRef = useRef(currentTime);
+  const playerPosRef = useRef({ x: 0, y: 0, floor: gs.savedPlayerPos?.floor || 1 });
+
   useEffect(() => {
     currentTimeRef.current = currentTime;
   }, [currentTime]);
+
+  useEffect(() => {
+    const onPlayerPos = (pos: { x: number, y: number, floor: number }) => {
+      playerPosRef.current = pos;
+    };
+    EventBus.on("player_position", onPlayerPos);
+    return () => { EventBus.off("player_position", onPlayerPos); };
+  }, []);
 
   const { ticketNotification, setTicketNotification } = useTicketManager(floor);
 
   const {
     currentFloor,
+    setCurrentFloor,
     nearObject,
     nearElevator,
     nearCCTV,
@@ -91,7 +112,7 @@ export default function GameScreen({
     setShowCCTV,
     showElevator,
     setShowElevator,
-  } = useGameEvents(gs);
+  } = useGameEvents(gs, floor.currentFloor);
 
   // Additional UI states
   const [solvedCount, setSolvedCount] = useState(0);
@@ -100,7 +121,12 @@ export default function GameScreen({
   const [showTopology, setShowTopology] = useState(false);
   const [showPause, setShowPause] = useState(false);
   const [showDesktop, setShowDesktop] = useState(false);
-  const [notification, setNotification] = useState<string | null>(null);
+  interface ToastNotificationData {
+    message: string;
+    colorTheme?: "orange" | "red" | "blue" | "green";
+    icon?: string;
+  }
+  const [notification, setNotification] = useState<ToastNotificationData | null>(null);
   const [showNotifications, setShowNotifications] = useState(false);
   const [notificationHistory, setNotificationHistory] = useState<{id: string, time: string, message: string}[]>(() => {
     const stored = sessionStorage.getItem("hospital_notifications");
@@ -114,6 +140,55 @@ export default function GameScreen({
   const [unreadNotifCount, setUnreadNotifCount] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [isDayTransitioning, setIsDayTransitioning] = useState(false);
+
+  const collectSaveData = useCallback((): Omit<SaveData, "version" | "savedAt"> => {
+    return {
+      playerX: playerPosRef.current.x,
+      playerY: playerPosRef.current.y,
+      currentFloor: playerPosRef.current.floor as 1 | 2 | 3,
+      gameTime: { ...gs.gameTime },
+      objects: floor.allObjects.map(o => ({
+        index: floor.allObjects.indexOf(o),
+        id: o.id,
+        solved: o.solved,
+        active: o.active,
+        impact: o.impact,
+        urgency: o.urgency,
+        spawnTime: o.spawnTime,
+        completionTime: o.completionTime,
+        quizIndex: o.quizIndex
+      })),
+      reports: sessionStorage.getItem("hospital_reports") || "[]",
+      notifications: sessionStorage.getItem("hospital_notifications") || "[]"
+    };
+  }, [floor, gs]);
+
+  useEffect(() => {
+    const handleManualSave = () => {
+      if (SaveManager.save(collectSaveData())) {
+        setNotification({ message: "Progress berhasil disimpan!", colorTheme: "green", icon: "✅" });
+      }
+    };
+    const handleAutoSave = () => {
+      if (SaveManager.save(collectSaveData())) {
+        setNotification({ message: "Auto-save berhasil", colorTheme: "green", icon: "💾" });
+        setTimeout(() => setNotification(null), 2000);
+      }
+    };
+    const handleShowToast = (data: ToastNotificationData) => {
+      setNotification(data);
+    };
+    
+    EventBus.on("request_manual_save", handleManualSave);
+    EventBus.on("auto_save", handleAutoSave);
+    EventBus.on("show_toast_notification", handleShowToast);
+    
+    return () => {
+      EventBus.off("request_manual_save", handleManualSave);
+      EventBus.off("auto_save", handleAutoSave);
+      EventBus.off("show_toast_notification", handleShowToast);
+    };
+  }, [collectSaveData]);
 
   useEffect(() => {
     const onStartTransition = () => setIsDayTransitioning(true);
@@ -131,7 +206,7 @@ export default function GameScreen({
     if (ticketNotification) {
       const timeStr = currentTimeRef.current;
       setNotificationHistory(prev => [{
-        id: Date.now().toString() + Math.random().toString(),
+        id: nanoid(),
         time: timeStr,
         message: `${ticketNotification.title} - ${ticketNotification.message}`
       }, ...prev]);
@@ -199,11 +274,11 @@ export default function GameScreen({
       {!isWelcome && (
         <FloatingHUD
           currentFloor={currentFloor}
-          solvedCount={solvedCount}
-          totalObjects={floor.totalObjects}
           currentDate={currentDate}
           currentTime={currentTime}
           currentPeriod={currentPeriod}
+          activeTickets={floor.allObjects.filter(o => o.active && !o.solved).length}
+          completedTickets={floor.allObjects.filter(o => o.solved).length}
         />
       )}
 
@@ -313,7 +388,7 @@ export default function GameScreen({
           onGoToLocation={(idx) => {
             if (gs.activeMarkerIndex !== null && gs.activeMarkerIndex !== idx) {
               const msg = "Anda sudah memiliki tiket yang sedang ditelusuri. Selesaikan tiket sebelumnya terlebih dahulu atau berinteraksi dengan sumber masalah untuk membatalkannya.";
-              setNotification(msg);
+              setNotification({ message: msg, colorTheme: "orange", icon: "⚠️" });
               
               const activeObj = floor.allObjects[gs.activeMarkerIndex];
               const targetObj = floor.allObjects[idx];
@@ -322,7 +397,7 @@ export default function GameScreen({
               const timeStr = currentTimeRef.current;
               
               setNotificationHistory(prev => [{
-                id: Date.now().toString() + Math.random().toString(),
+                id: nanoid(),
                 time: timeStr,
                 message: historyMsg
               }, ...prev]);
@@ -350,15 +425,21 @@ export default function GameScreen({
 
       {notification && (
         <NotificationToast
-          notification={notification}
+          message={notification.message}
+          colorTheme={notification.colorTheme}
+          icon={notification.icon}
           onClose={() => setNotification(null)}
         />
       )}
 
       {ticketNotification && (
-        <TicketNotificationToast
+        <NotificationToast
           title={ticketNotification.title}
           message={ticketNotification.message}
+          icon={ticketNotification.icon}
+          colorTheme={ticketNotification.colorTheme}
+          duration={5000}
+          topPosition="top-4"
           onClose={() => setTicketNotification(null)}
         />
       )}
