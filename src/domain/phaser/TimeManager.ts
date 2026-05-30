@@ -28,7 +28,7 @@ export class TimeManager {
     // Skala waktu: 1 jam in-game = 1 menit real-time.
     // Berarti 1 menit in-game = 1 detik real-time.
     this.timerEvent = this.scene.time.addEvent({
-      delay: 1000,
+      delay: 100,
       callback: this.tick,
       callbackScope: this,
       loop: true,
@@ -55,9 +55,12 @@ export class TimeManager {
 
     // Shift kerja hanya 08:00 - 20:00, bila sudah jam 20:00, loncat ke besok jam 08:00
     if (d.getHours() >= 20) {
+      EventBus.emit("end_of_day", { dateStr: this.getFormattedDate() });
       d.setDate(d.getDate() + 1);
       d.setHours(8, 0, 0, 0);
     }
+
+    const prevHour = this.hour;
 
     this.minute = d.getMinutes();
     this.hour = d.getHours();
@@ -73,6 +76,10 @@ export class TimeManager {
       month: this.month,
       year: this.year,
     };
+
+    if (this.hour !== prevHour) {
+      EventBus.emit("hour_changed", this.hour);
+    }
 
     this.emitTime();
   }
@@ -103,10 +110,12 @@ export class TimeManager {
   }
 
   private emitTime() {
+    const d = new Date(this.year, this.month, this.day, this.hour, this.minute);
     EventBus.emit("time_updated", {
       time: this.getFormattedTime(),
       date: this.getFormattedDate(),
       period: this.getPeriod(),
+      timestamp: d.getTime(),
     });
   }
 

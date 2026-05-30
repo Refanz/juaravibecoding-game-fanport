@@ -348,6 +348,7 @@ export default function DesktopUIModal({
   onFixTicket,
 }: Props) {
   const [time, setTime] = useState("");
+  const [timestamp, setTimestamp] = useState(0);
   const [activeApp, setActiveApp] = useState<"ticketing" | "cctv" | null>("ticketing");
   const [layout, setLayout] = useState({ width: 1000, height: 700, scale: 1 });
 
@@ -385,8 +386,9 @@ export default function DesktopUIModal({
   }, []);
 
   useEffect(() => {
-    const onTimeUpdated = ({ time }: { time: string }) => {
+    const onTimeUpdated = ({ time, timestamp: ts }: { time: string, timestamp?: number }) => {
       setTime(time);
+      if (ts) setTimestamp(ts);
     };
     EventBus.on("time_updated", onTimeUpdated);
     return () => {
@@ -485,6 +487,7 @@ export default function DesktopUIModal({
                 objects={objects}
                 onGoToLocation={onGoToLocation}
                 onFixTicket={onFixTicket}
+                currentTimestamp={timestamp}
               />
             </div>
           </div>

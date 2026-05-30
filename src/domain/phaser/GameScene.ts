@@ -165,6 +165,7 @@ export class GameScene extends Phaser.Scene {
       EventBus.on("do_change_floor", this.doChangeFloor, this);
       EventBus.on("game_paused", this.onGamePaused, this);
       EventBus.on("time_updated", this.onTimeUpdated, this);
+      EventBus.on("spawn_at_start", this.spawnAtStart, this);
 
       this.timeManager = new TimeManager(this, this.gameState);
 
@@ -176,6 +177,7 @@ export class GameScene extends Phaser.Scene {
         EventBus.off("do_change_floor", this.doChangeFloor, this);
         EventBus.off("game_paused", this.onGamePaused, this);
         EventBus.off("time_updated", this.onTimeUpdated, this);
+        EventBus.off("spawn_at_start", this.spawnAtStart, this);
         this.timeManager.destroy();
       });
 
@@ -254,7 +256,9 @@ export class GameScene extends Phaser.Scene {
 
   onQuizClosed(solved: boolean) {
     if (solved && this.gameState.quizObjectIndex !== null) {
-      this.floorManager.allObjects[this.gameState.quizObjectIndex].solve();
+      const { year, month, day, hour, minute } = this.gameState.gameTime;
+      const ts = new Date(year, month, day, hour, minute).getTime();
+      this.floorManager.allObjects[this.gameState.quizObjectIndex].solve(ts);
       
       // Save player position before restart
       this.gameState.savedPlayerPos = {
@@ -268,10 +272,6 @@ export class GameScene extends Phaser.Scene {
         floorManager: this.floorManager,
         gameState: this.gameState,
       });
-
-      if (this.floorManager.allSolved) {
-        EventBus.emit("game_won");
-      }
     }
     this.gameState.quizActive = false;
     this.gameState.quizObjectIndex = null;
@@ -573,7 +573,7 @@ export class GameScene extends Phaser.Scene {
       const x = obj.x * TILE + TILE / 2;
       const y = obj.y * TILE + TILE / 2;
 
-      if (!obj.solved) {
+      if (obj.active && !obj.solved) {
         // Glow effect for broken objects
         const glow = this.add.rectangle(
           x,
@@ -808,4 +808,15 @@ export class GameScene extends Phaser.Scene {
     });
   }
 
+  spawnAtStart() {
+    this.gameState.savedPlayerPos = null;
+    this.gameState.justUsedElevator = false;
+    this.gameState.teleportTargetIndex = null;
+    this.floorManager.loadFloor(1);
+    EventBus.emit("floor_changed", 1, true);
+    this.scene.restart({
+      floorManager: this.floorManager,
+      gameState: this.gameState,
+    });
+  }
 }

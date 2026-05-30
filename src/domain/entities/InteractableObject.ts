@@ -3,24 +3,36 @@
 // Entitas objek IT rusak yang bisa diinteraksi
 // Base class + subclasses (OOP polimorfisme)
 // ==========================================
+import { nanoid } from 'nanoid';
 
 const TILE = 48;
 const INTERACT_RANGE = 56;
 
 export abstract class InteractableObject {
+  readonly id: string;
   readonly x: number;
   readonly y: number;
   readonly label: string;
   readonly floor: 1 | 2 | 3;
   quizIndex: number;
   solved = false;
+  active = false;
+  impact: 'Low' | 'Medium' | 'High';
+  urgency: 'Low' | 'Medium' | 'High';
+  spawnTime: number | null = null;
+  completionTime: number | null = null;
 
   constructor(x: number, y: number, label: string, floor: 1 | 2 | 3, quizIndex: number) {
+    this.id = `TKT-${nanoid(6).toUpperCase()}`;
     this.x = x;
     this.y = y;
     this.label = label;
     this.floor = floor;
     this.quizIndex = quizIndex;
+    
+    const levels: Array<'Low' | 'Medium' | 'High'> = ['Low', 'Medium', 'High'];
+    this.impact = levels[Math.floor(Math.random() * levels.length)];
+    this.urgency = levels[Math.floor(Math.random() * levels.length)];
   }
 
   get centerX() { return this.x * TILE + TILE / 2; }
@@ -33,7 +45,10 @@ export abstract class InteractableObject {
   /** Sprite key yang digunakan saat rendering */
   abstract get spriteKey(): string;
 
-  solve(): void { this.solved = true; }
+  solve(timestamp: number): void { 
+    this.solved = true; 
+    this.completionTime = timestamp;
+  }
 }
 
 /** PC / Komputer yang rusak */
