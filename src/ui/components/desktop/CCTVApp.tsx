@@ -1,19 +1,10 @@
 import { useEffect, useState, useCallback } from "react";
-import TicketingApp from "./TicketingApp";
-import { InteractableObject } from "../../domain/entities/InteractableObject";
-import { EventBus } from "../../infrastructure/events/EventBus";
+import { EventBus } from "../../../infrastructure/events/EventBus";
 import {
   initCCTVRenderer,
   captureAllCCTVFrames,
   loadCachedCCTVFrames,
-} from "../../domain/CCTVRenderer";
-
-interface Props {
-  objects: InteractableObject[];
-  onClose: () => void;
-  onGoToLocation: (idx: number) => void;
-  onFixTicket: (idx: number) => void;
-}
+} from "../../../domain/CCTVRenderer";
 
 /* ── CCTV Feed Definitions ── */
 const CCTV_FEEDS = [
@@ -33,8 +24,7 @@ const CCTV_FEEDS = [
   { id: "server_room", label: "Server Room", floor: "Lt.3" },
 ];
 
-/* ── Embedded CCTV App (Windows-style inside laptop) ── */
-function CCTVApp() {
+export default function CCTVApp() {
   const [frames, setFrames] = useState<Record<string, string>>({});
   const [selectedFeed, setSelectedFeed] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -74,9 +64,7 @@ function CCTVApp() {
   return (
     <div className="flex flex-col md:flex-row h-full font-mono text-[11px] min-h-0">
       {/* Sidebar — Camera list */}
-      <div
-        className="hidden md:flex flex-col w-[150px] shrink-0 bg-[#0a1828] border-r border-[#1b4f72] overflow-y-auto"
-      >
+      <div className="hidden md:flex flex-col w-[150px] shrink-0 bg-[#0a1828] border-r border-[#1b4f72] overflow-y-auto">
         <div
           style={{
             padding: "6px 8px",
@@ -239,9 +227,7 @@ function CCTVApp() {
           </div>
         ) : (
           /* Grid view */
-          <div
-            className="flex-1 p-1.5 grid grid-cols-[repeat(auto-fill,minmax(110px,1fr))] gap-1 overflow-y-auto content-start min-h-0 pb-12"
-          >
+          <div className="flex-1 p-1.5 grid grid-cols-[repeat(auto-fill,minmax(110px,1fr))] gap-1 overflow-y-auto content-start min-h-0 pb-12">
             {CCTV_FEEDS.map((feed) => (
               <div
                 key={feed.id}
@@ -336,221 +322,6 @@ function CCTVApp() {
       </div>
 
       <style>{`@keyframes cctvBlink{0%,100%{opacity:1}50%{opacity:.15}}`}</style>
-    </div>
-  );
-}
-
-/* ── Main Desktop UI Modal ── */
-export default function DesktopUIModal({
-  objects,
-  onClose,
-  onGoToLocation,
-  onFixTicket,
-}: Props) {
-  const [time, setTime] = useState("");
-  const [timestamp, setTimestamp] = useState(0);
-  const [activeApp, setActiveApp] = useState<"ticketing" | "cctv" | null>(null);
-  const [layout, setLayout] = useState({ width: 1000, height: 700, scale: 1 });
-
-  useEffect(() => {
-    const handleResize = () => {
-      const W = window.innerWidth;
-      const H = window.innerHeight;
-      
-      // Responsive layout strategy:
-      if (W < 768) {
-        // On mobile, we stretch the virtual resolution to match the screen's exact aspect ratio.
-        // We use a baseline virtual width (e.g. 900) so the content isn't cramped.
-        const virtualWidth = 900;
-        const virtualHeight = virtualWidth * (H / W);
-        setLayout({
-          width: virtualWidth,
-          height: virtualHeight,
-          scale: W / virtualWidth
-        });
-      } else {
-        // On desktop, we preserve the classic 1000x700 windowed look
-        const scaleX = (W - 32) / 1000;
-        const scaleY = (H - 32) / 700;
-        setLayout({
-          width: 1000,
-          height: 700,
-          scale: Math.min(scaleX, scaleY, 1)
-        });
-      }
-    };
-    
-    handleResize();
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
-  useEffect(() => {
-    const onTimeUpdated = ({ time, timestamp: ts }: { time: string, timestamp?: number }) => {
-      setTime(time);
-      if (ts) setTimestamp(ts);
-    };
-    EventBus.on("time_updated", onTimeUpdated);
-    return () => {
-      EventBus.off("time_updated", onTimeUpdated);
-    };
-  }, []);
-
-  return (
-    <div className="fixed inset-0 bg-black/70 z-[200] flex items-center justify-center animate-fade-in pointer-events-auto">
-      <div 
-        className="bg-[#008080] shadow-[0_0_30px_rgba(0,0,0,0.8)] flex flex-col overflow-hidden relative font-sans shrink-0"
-        style={{ 
-          width: layout.width, 
-          height: layout.height, 
-          transform: `scale(${layout.scale})`, 
-          transformOrigin: "center",
-          borderRadius: layout.width === 1000 ? 8 : 0 // round corners only in desktop mode
-        }}
-      >
-        {/* Desktop Icons */}
-        <div className="flex-1 p-4 flex flex-col gap-4 items-start relative z-10">
-          <button
-            className="flex flex-col items-center gap-1 group w-20 cursor-pointer focus:outline-none"
-            onDoubleClick={() => setActiveApp("ticketing")}
-            onClick={() => setActiveApp("ticketing")}
-          >
-            <div
-              className={`text-4xl p-2 rounded ${activeApp === "ticketing" ? "bg-white/20 border border-white/40" : "group-hover:bg-white/10 border border-transparent"}`}
-            >
-              📋
-            </div>
-            <span className="text-white text-[0.6rem] text-center drop-shadow-md">
-              IT Support
-              <br />
-              Ticketing
-            </span>
-          </button>
-
-          <button
-            className="flex flex-col items-center gap-1 group w-20 cursor-pointer focus:outline-none"
-            onDoubleClick={() => setActiveApp("cctv")}
-            onClick={() => setActiveApp("cctv")}
-          >
-            <div
-              className={`text-4xl p-2 rounded ${activeApp === "cctv" ? "bg-white/20 border border-white/40" : "group-hover:bg-white/10 border border-transparent"}`}
-            >
-              📹
-            </div>
-            <span className="text-white text-[0.6rem] text-center drop-shadow-md">
-              CCTV
-              <br />
-              Monitor
-            </span>
-          </button>
-
-          <button className="flex flex-col items-center gap-1 group w-20 cursor-not-allowed opacity-70">
-            <div className="text-4xl p-2 rounded border border-transparent group-hover:bg-white/10">
-              🌐
-            </div>
-            <span className="text-white text-[0.6rem] text-center drop-shadow-md">
-              Browser
-            </span>
-          </button>
-
-          <button className="flex flex-col items-center gap-1 group w-20 cursor-not-allowed opacity-70">
-            <div className="text-4xl p-2 rounded border border-transparent group-hover:bg-white/10">
-              ⚙️
-            </div>
-            <span className="text-white text-[0.6rem] text-center drop-shadow-md">
-              Settings
-            </span>
-          </button>
-        </div>
-
-        {/* Windows / Apps */}
-        {activeApp === "ticketing" && (
-          <div className="absolute inset-10 top-8 bottom-16 bg-white rounded-md shadow-2xl flex flex-col overflow-hidden z-20 border border-slate-300">
-            {/* Window Title Bar */}
-            <div className="bg-[#000080] text-white flex justify-between items-center px-2 py-1 select-none">
-              <div className="flex items-center gap-2">
-                <span className="text-[0.7rem]">📋</span>
-                <span className="font-bold text-[0.7rem]">
-                  Sistem Tiketing IT Support - v1.0
-                </span>
-              </div>
-              <button
-                className="bg-[#c0c0c0] hover:bg-red-500 hover:text-white text-black border-2 border-white border-b-gray-600 border-r-gray-600 px-3 py-0 rounded-sm font-bold text-xs"
-                onClick={() => setActiveApp(null)}
-              >
-                X
-              </button>
-            </div>
-            {/* Window Content */}
-            <div className="flex-1 overflow-hidden p-1 bg-[#c0c0c0]">
-              <TicketingApp
-                objects={objects}
-                onGoToLocation={onGoToLocation}
-                onFixTicket={onFixTicket}
-                currentTimestamp={timestamp}
-              />
-            </div>
-          </div>
-        )}
-
-        {activeApp === "cctv" && (
-          <div className="absolute inset-10 top-8 bottom-16 rounded-md shadow-2xl flex flex-col overflow-hidden z-20 border border-slate-300">
-            {/* Window Title Bar */}
-            <div
-              className="flex justify-between items-center px-2 py-1 select-none"
-              style={{ background: "#0a1828", borderBottom: "1px solid #1b4f72" }}
-            >
-              <div className="flex items-center gap-2">
-                <span className="text-[0.7rem]">📹</span>
-                <span className="font-bold text-[0.7rem]" style={{ color: "#4fc3f7" }}>
-                  CCTV Control Room - Live Monitor
-                </span>
-              </div>
-              <button
-                className="bg-[#c0c0c0] hover:bg-red-500 hover:text-white text-black border-2 border-white border-b-gray-600 border-r-gray-600 px-3 py-0 rounded-sm font-bold text-xs"
-                onClick={() => setActiveApp(null)}
-              >
-                X
-              </button>
-            </div>
-            {/* Window Content */}
-            <div className="flex-1 overflow-hidden" style={{ background: "#050e1a" }}>
-              <CCTVApp />
-            </div>
-          </div>
-        )}
-
-        {/* Taskbar */}
-        <div className="h-10 bg-[#c0c0c0] border-t-2 border-white flex items-center justify-between px-2 z-30 shadow-[inset_0_2px_4px_rgba(255,255,255,0.5)] relative mt-auto">
-          <div className="flex items-center gap-2 h-full py-1">
-            <button
-              className="h-full bg-[#c0c0c0] border-2 border-white border-b-gray-600 border-r-gray-600 px-3 flex items-center gap-2 font-bold text-sm active:border-t-gray-600 active:border-l-gray-600 active:border-b-white active:border-r-white text-black"
-              onClick={onClose}
-            >
-              <span className="text-[#008080]">⊞</span> Tutup OS
-            </button>
-
-            {/* Active App Indicators */}
-            {activeApp === "ticketing" && (
-              <div className="h-full bg-[#dfdfdf] border-2 border-gray-600 border-b-white border-r-white px-3 flex items-center gap-2 text-xs font-bold text-slate-800">
-                📋 IT Support
-              </div>
-            )}
-            {activeApp === "cctv" && (
-              <div className="h-full bg-[#dfdfdf] border-2 border-gray-600 border-b-white border-r-white px-3 flex items-center gap-2 text-xs font-bold text-slate-800">
-                📹 CCTV Monitor
-              </div>
-            )}
-          </div>
-
-          <div className="flex items-center gap-3 h-full py-1.5 px-3 bg-[#c0c0c0] border-2 border-gray-600 border-b-white border-r-white text-xs text-black font-bold">
-            <span>🔋 100%</span>
-            <span>
-              {time}
-            </span>
-          </div>
-        </div>
-      </div>
     </div>
   );
 }

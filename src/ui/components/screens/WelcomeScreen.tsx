@@ -3,9 +3,9 @@
 // ==========================================
 
 import { useState, useEffect } from "react";
-import { AudioManager } from "../../infrastructure/assets/AudioManager";
-import SettingsModal from "./SettingsModal";
-import { SaveManager } from "../../infrastructure/storage/SaveManager";
+import { AudioManager } from "../../../infrastructure/assets/AudioManager";
+import SettingsModal from "../modals/SettingsModal";
+import { SaveManager } from "../../../infrastructure/storage/SaveManager";
 
 interface Props {
   onStart: (loadSave?: boolean) => void;

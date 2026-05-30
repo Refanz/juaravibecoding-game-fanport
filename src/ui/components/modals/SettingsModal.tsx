@@ -3,7 +3,7 @@
 // ==========================================
 
 import React, { useState, useEffect } from 'react';
-import { AudioManager } from '../../infrastructure/assets/AudioManager';
+import { AudioManager } from '../../../infrastructure/assets/AudioManager';
 
 interface Props {
   onClose: () => void;

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { SVG_DEFS } from '../../infrastructure/assets/svg';
-import { npcSpriteKey } from '../../infrastructure/assets/AssetManager';
-import { NPC_DIALOGS } from '../../infrastructure/data/npcDialogs';
+import { SVG_DEFS } from '../../../infrastructure/assets/svg';
+import { npcSpriteKey } from '../../../infrastructure/assets/AssetManager';
+import { NPC_DIALOGS } from '../../../infrastructure/data/npcDialogs';
 
 interface NPCDialogModalProps {
   role: 'doctor' | 'nurse' | 'guest' | 'nurseWheelchair' | 'nurseBed' | 'walkingNurse' | 'security';

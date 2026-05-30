@@ -1,4 +1,4 @@
-import { getAllSpriteUris, SpriteKey } from '../../infrastructure/assets/AssetManager';
+import { getAllSpriteUris, SpriteKey } from '../../../infrastructure/assets/AssetManager';
 
 interface Props {
   onClose: () => void;

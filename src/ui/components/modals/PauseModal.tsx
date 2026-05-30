@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import SettingsModal from './SettingsModal';
 import SaveConfirmModal from './SaveConfirmModal';
-import { EventBus } from '../../infrastructure/events/EventBus';
+import { EventBus } from '../../../infrastructure/events/EventBus';
 
 interface Props {
   onResume: () => void;

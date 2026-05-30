@@ -3,8 +3,8 @@
 // ==========================================
 
 import { useState } from 'react';
-import { Quiz } from '../../infrastructure/data/quizzes';
-import { AudioManager } from '../../infrastructure/assets/AudioManager';
+import { Quiz } from '../../../infrastructure/data/quizzes';
+import { AudioManager } from '../../../infrastructure/assets/AudioManager';
 
 interface Props {
   quiz: Quiz;

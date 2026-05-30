@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { EventBus } from '../../infrastructure/events/EventBus';
+import { EventBus } from '../../../infrastructure/events/EventBus';
 import { 
   FLOOR1_AREA_BOUNDS, 
   FLOOR2_AREA_BOUNDS,
@@ -7,8 +7,8 @@ import {
   ROOM_LABELS_F2,
   FLOOR1_DECORATIONS,
   FLOOR2_DECORATIONS
-} from '../../infrastructure/data/floorData';
-import { ELEVATOR_POS } from '../../infrastructure/data/maps';
+} from '../../../infrastructure/data/floorData';
+import { ELEVATOR_POS } from '../../../infrastructure/data/maps';
 
 interface Props {
   onClose: () => void;
