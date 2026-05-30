@@ -13,7 +13,6 @@ export function useGameEvents(gs: GameState) {
   const [quizKey, setQuizKey] = useState<number | null>(null);
   const [showTransition, setShowTransition] = useState(false);
   const [transFloor, setTransFloor] = useState<1 | 2 | 3>(1);
-  const [won, setWon] = useState(false);
   const [showCCTV, setShowCCTV] = useState(false);
   const [showElevator, setShowElevator] = useState(false);
 
@@ -26,16 +25,13 @@ export function useGameEvents(gs: GameState) {
     const onOpenElevatorUI = () => setShowElevator(true);
     const onNearNPC = (idx: number | null) => setNearNPC(idx);
     const onOpenNPCDialog = (data: { role: string; label: string }) => setDialogData(data);
-    const onFloorChanged = (f: 1 | 2 | 3) => {
+    const onFloorChanged = (f: 1 | 2 | 3, silent: boolean = false) => {
       setCurrentFloor(f);
-      setTransFloor(f);
-      setShowTransition(true);
-      setTimeout(() => setShowTransition(false), 800);
-    };
-    const onGameWon = () => {
-      setWon(true);
-      gs.setWin();
-      AudioManager.complete();
+      if (!silent) {
+        setTransFloor(f);
+        setShowTransition(true);
+        setTimeout(() => setShowTransition(false), 800);
+      }
     };
 
     EventBus.on("near_object", onNearObject);
@@ -47,7 +43,6 @@ export function useGameEvents(gs: GameState) {
     EventBus.on("near_npc", onNearNPC);
     EventBus.on("open_npc_dialog", onOpenNPCDialog);
     EventBus.on("floor_changed", onFloorChanged);
-    EventBus.on("game_won", onGameWon);
 
     return () => {
       EventBus.off("near_object", onNearObject);
@@ -59,7 +54,6 @@ export function useGameEvents(gs: GameState) {
       EventBus.off("near_npc", onNearNPC);
       EventBus.off("open_npc_dialog", onOpenNPCDialog);
       EventBus.off("floor_changed", onFloorChanged);
-      EventBus.off("game_won", onGameWon);
     };
   }, [gs]);
 
@@ -73,7 +67,6 @@ export function useGameEvents(gs: GameState) {
     quizKey, setQuizKey,
     showTransition,
     transFloor,
-    won, setWon,
     showCCTV, setShowCCTV,
     showElevator, setShowElevator,
   };

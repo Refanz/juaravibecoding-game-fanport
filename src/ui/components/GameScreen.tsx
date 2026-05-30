@@ -4,7 +4,7 @@
 // + modal quiz, transisi, win
 // ==========================================
 
-import { useEffect, useState, useCallback, useMemo } from "react";
+import { useEffect, useState, useCallback, useMemo, useRef } from "react";
 import { FloorManager } from "../../domain/FloorManager";
 import { GameState } from "../../domain/GameState";
 import { HOSPITAL_QUIZZES } from "../../infrastructure/data/quizzes";
@@ -15,12 +15,12 @@ import LoadingScreen from "./LoadingScreen";
 // Custom Hooks
 import { useGameTime } from "../hooks/useGameTime";
 import { useGameEvents } from "../hooks/useGameEvents";
+import { useTicketManager } from "../hooks/useTicketManager";
 
 // Subcomponents
 import FloatingHUD from "./FloatingHUD";
 import ActionButtons from "./ActionButtons";
 import InteractionHints from "./InteractionHints";
-import WinModal from "./WinModal";
 import NotificationToast from "./NotificationToast";
 
 // Modals
@@ -34,6 +34,10 @@ import NetworkTopologyModal from "./NetworkTopologyModal";
 import DesktopUIModal from "./DesktopUIModal";
 import ElevatorModal from "./ElevatorModal";
 import { NPCDialogModal } from "./NPCDialogModal";
+import TicketNotificationToast from "./TicketNotificationToast";
+import DailyReportModal from "./DailyReportModal";
+import GeneralLoadingScreen from "./GeneralLoadingScreen";
+import NotificationModal from "./NotificationModal";
 
 interface Props {
   onReturnToWelcome: () => void;
@@ -64,6 +68,12 @@ export default function GameScreen({
   }, [isWelcome, gs]);
 
   const { currentTime, currentDate, currentPeriod } = useGameTime();
+  const currentTimeRef = useRef(currentTime);
+  useEffect(() => {
+    currentTimeRef.current = currentTime;
+  }, [currentTime]);
+
+  const { ticketNotification, setTicketNotification } = useTicketManager(floor);
 
   const {
     currentFloor,
@@ -77,7 +87,6 @@ export default function GameScreen({
     setQuizKey,
     showTransition,
     transFloor,
-    won,
     showCCTV,
     setShowCCTV,
     showElevator,
@@ -92,7 +101,50 @@ export default function GameScreen({
   const [showPause, setShowPause] = useState(false);
   const [showDesktop, setShowDesktop] = useState(false);
   const [notification, setNotification] = useState<string | null>(null);
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [notificationHistory, setNotificationHistory] = useState<{id: string, time: string, message: string}[]>(() => {
+    const stored = sessionStorage.getItem("hospital_notifications");
+    if (stored) {
+      try {
+        return JSON.parse(stored);
+      } catch(e) {}
+    }
+    return [];
+  });
+  const [unreadNotifCount, setUnreadNotifCount] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+  const [isDayTransitioning, setIsDayTransitioning] = useState(false);
+
+  useEffect(() => {
+    const onStartTransition = () => setIsDayTransitioning(true);
+    EventBus.on("start_day_transition", onStartTransition);
+    return () => {
+      EventBus.off("start_day_transition", onStartTransition);
+    };
+  }, []);
+
+  useEffect(() => {
+    sessionStorage.setItem("hospital_notifications", JSON.stringify(notificationHistory));
+  }, [notificationHistory]);
+
+  useEffect(() => {
+    if (ticketNotification) {
+      const timeStr = currentTimeRef.current;
+      setNotificationHistory(prev => [{
+        id: Date.now().toString() + Math.random().toString(),
+        time: timeStr,
+        message: `${ticketNotification.title} - ${ticketNotification.message}`
+      }, ...prev]);
+      setUnreadNotifCount(prev => prev + 1);
+    }
+  }, [ticketNotification]);
+
+  const handleDayTransitionComplete = useCallback(() => {
+    setIsDayTransitioning(false);
+    gs.isPaused = false;
+    EventBus.emit("game_paused", false);
+    EventBus.emit("spawn_at_start");
+  }, [gs]);
 
   const handlePause = useCallback(() => {
     gs.isPaused = true;
@@ -135,6 +187,15 @@ export default function GameScreen({
           <LoadingScreen onComplete={() => setIsLoading(false)} />
         </div>
       )}
+
+      {isDayTransitioning && (
+        <div className="absolute inset-0 z-[400]">
+          <GeneralLoadingScreen 
+            message="MENYIAPKAN HARI BERIKUTNYA..." 
+            onComplete={handleDayTransitionComplete} 
+          />
+        </div>
+      )}
       {!isWelcome && (
         <FloatingHUD
           currentFloor={currentFloor}
@@ -156,6 +217,11 @@ export default function GameScreen({
             onTopology={() => setShowTopology(true)}
             onInfo={() => setShowInfo(true)}
             unsolvedCount={floor.allObjects.filter((o) => !o.solved).length}
+            onNotifications={() => {
+              setShowNotifications(true);
+              setUnreadNotifCount(0);
+            }}
+            notificationCount={unreadNotifCount}
           />
         )}
 
@@ -246,9 +312,22 @@ export default function GameScreen({
           onClose={() => setShowDesktop(false)}
           onGoToLocation={(idx) => {
             if (gs.activeMarkerIndex !== null && gs.activeMarkerIndex !== idx) {
-              setNotification(
-                "Anda sudah memiliki tiket yang sedang ditelusuri. Selesaikan tiket sebelumnya terlebih dahulu atau berinteraksi dengan sumber masalah untuk membatalkannya."
-              );
+              const msg = "Anda sudah memiliki tiket yang sedang ditelusuri. Selesaikan tiket sebelumnya terlebih dahulu atau berinteraksi dengan sumber masalah untuk membatalkannya.";
+              setNotification(msg);
+              
+              const activeObj = floor.allObjects[gs.activeMarkerIndex];
+              const targetObj = floor.allObjects[idx];
+              const historyMsg = `Gagal menelusuri tiket #${targetObj.id}. Anda masih dalam proses penyelesaian tiket #${activeObj.id} (Lantai ${activeObj.floor}).`;
+              
+              const timeStr = currentTimeRef.current;
+              
+              setNotificationHistory(prev => [{
+                id: Date.now().toString() + Math.random().toString(),
+                time: timeStr,
+                message: historyMsg
+              }, ...prev]);
+              setUnreadNotifCount(prev => prev + 1);
+              
               return;
             }
             gs.activeMarkerIndex = idx;
@@ -261,7 +340,13 @@ export default function GameScreen({
         />
       )}
 
-      {won && <WinModal onReturnToWelcome={onReturnToWelcome} />}
+      {showNotifications && (
+        <NotificationModal 
+          notifications={notificationHistory} 
+          onClose={() => setShowNotifications(false)} 
+          onClear={() => setNotificationHistory([])}
+        />
+      )}
 
       {notification && (
         <NotificationToast
@@ -269,6 +354,16 @@ export default function GameScreen({
           onClose={() => setNotification(null)}
         />
       )}
+
+      {ticketNotification && (
+        <TicketNotificationToast
+          title={ticketNotification.title}
+          message={ticketNotification.message}
+          onClose={() => setTicketNotification(null)}
+        />
+      )}
+
+      <DailyReportModal gs={gs} />
     </div>
   );
 }

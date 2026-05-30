@@ -117,7 +117,7 @@ export class FloorManager {
 
   nearestObject(px: number, py: number): InteractableObject | null {
     for (const obj of this.floorObjects) {
-      if (!obj.solved && obj.isNear(px, py)) return obj;
+      if (obj.active && !obj.solved && obj.isNear(px, py)) return obj;
     }
     return null;
   }
