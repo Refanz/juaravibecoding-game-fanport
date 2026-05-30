@@ -1,4 +1,4 @@
-import { AudioManager } from "../../infrastructure/assets/AudioManager";
+import { AudioManager } from "../../../infrastructure/assets/AudioManager";
 
 interface Props {
   onSaveAndQuit: () => void;

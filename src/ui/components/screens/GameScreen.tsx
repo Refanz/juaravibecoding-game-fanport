@@ -5,40 +5,40 @@
 // ==========================================
 
 import { useEffect, useState, useCallback, useMemo, useRef } from "react";
-import { FloorManager } from "../../domain/FloorManager";
-import { GameState } from "../../domain/GameState";
-import { HOSPITAL_QUIZZES } from "../../infrastructure/data/quizzes";
-import { EventBus } from "../../infrastructure/events/EventBus";
-import { PhaserGame } from "../../domain/phaser/PhaserGame";
+import { FloorManager } from "../../../domain/FloorManager";
+import { GameState } from "../../../domain/GameState";
+import { HOSPITAL_QUIZZES } from "../../../infrastructure/data/quizzes";
+import { EventBus } from "../../../infrastructure/events/EventBus";
+import { PhaserGame } from "../../../domain/phaser/PhaserGame";
 import LoadingScreen from "./LoadingScreen";
-import { SaveManager, SaveData } from "../../infrastructure/storage/SaveManager";
+import { SaveManager, SaveData } from "../../../infrastructure/storage/SaveManager";
 import { nanoid } from 'nanoid';
 
 // Custom Hooks
-import { useGameTime } from "../hooks/useGameTime";
-import { useGameEvents } from "../hooks/useGameEvents";
-import { useTicketManager } from "../hooks/useTicketManager";
+import { useGameTime } from "../../hooks/useGameTime";
+import { useGameEvents } from "../../hooks/useGameEvents";
+import { useTicketManager } from "../../hooks/useTicketManager";
 
 // Subcomponents
-import FloatingHUD from "./FloatingHUD";
-import ActionButtons from "./ActionButtons";
-import InteractionHints from "./InteractionHints";
-import NotificationToast from "./NotificationToast";
+import FloatingHUD from "../hud/FloatingHUD";
+import ActionButtons from "../hud/ActionButtons";
+import InteractionHints from "../hud/InteractionHints";
+import NotificationToast from "../hud/NotificationToast";
 
 // Modals
-import QuizModal from "./QuizModal";
-import InfoModal from "./InfoModal";
-import PauseModal from "./PauseModal";
-import CCTVMonitorModal from "./CCTVMonitorModal";
-import VirtualGamepad from "./VirtualGamepad";
-import MapModal from "./MapModal";
-import NetworkTopologyModal from "./NetworkTopologyModal";
-import DesktopUIModal from "./DesktopUIModal";
-import ElevatorModal from "./ElevatorModal";
-import { NPCDialogModal } from "./NPCDialogModal";
-import DailyReportModal from "./DailyReportModal";
+import QuizModal from "../modals/QuizModal";
+import InfoModal from "../modals/InfoModal";
+import PauseModal from "../modals/PauseModal";
+import CCTVMonitorModal from "../modals/CCTVMonitorModal";
+import VirtualGamepad from "../hud/VirtualGamepad";
+import MapModal from "../modals/MapModal";
+import NetworkTopologyModal from "../modals/NetworkTopologyModal";
+import DesktopUIModal from "../desktop/DesktopUIModal";
+import ElevatorModal from "../modals/ElevatorModal";
+import { NPCDialogModal } from "../modals/NPCDialogModal";
+import DailyReportModal from "../modals/DailyReportModal";
 import GeneralLoadingScreen from "./GeneralLoadingScreen";
-import NotificationModal from "./NotificationModal";
+import NotificationModal from "../modals/NotificationModal";
 
 interface Props {
   onReturnToWelcome: () => void;

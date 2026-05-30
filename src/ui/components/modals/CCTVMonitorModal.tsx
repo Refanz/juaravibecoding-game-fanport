@@ -4,12 +4,12 @@
 // ==========================================
 
 import { useEffect, useRef, useState, useCallback } from "react";
-import { EventBus } from "../../infrastructure/events/EventBus";
+import { EventBus } from "../../../infrastructure/events/EventBus";
 import {
   initCCTVRenderer,
   captureAllCCTVFrames,
   loadCachedCCTVFrames,
-} from "../../domain/CCTVRenderer";
+} from "../../../domain/CCTVRenderer";
 
 interface Props {
   onClose: () => void;

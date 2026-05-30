@@ -5,8 +5,8 @@
 // ==========================================
 
 import { useState } from 'react';
-import WelcomeScreen from './WelcomeScreen';
-import GameScreen from './GameScreen';
+import WelcomeScreen from './screens/WelcomeScreen';
+import GameScreen from './screens/GameScreen';
 import { InstallPWAPrompt } from './InstallPWAPrompt';
 
 type AppScreen = 'welcome' | 'game';

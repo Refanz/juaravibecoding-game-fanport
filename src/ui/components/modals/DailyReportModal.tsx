@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import { EventBus } from "../../infrastructure/events/EventBus";
+import { EventBus } from "../../../infrastructure/events/EventBus";
 
-import { GameState } from "../../domain/GameState";
-import ReportTicketList from "./ReportTicketList";
+import { GameState } from "../../../domain/GameState";
+import ReportTicketList from "../desktop/ReportTicketList";
 
 interface ReportData {
   id: string;

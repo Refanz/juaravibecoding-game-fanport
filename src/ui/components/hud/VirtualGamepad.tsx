@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { EventBus } from '../../infrastructure/events/EventBus';
+import { EventBus } from '../../../infrastructure/events/EventBus';
 
 export default function VirtualGamepad() {
   const [isTouchDevice, setIsTouchDevice] = useState(false);

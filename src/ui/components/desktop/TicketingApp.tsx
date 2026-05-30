@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from 'react';
-import { InteractableObject } from '../../domain/entities/InteractableObject';
-import { HOSPITAL_QUIZZES } from '../../infrastructure/data/quizzes';
-import { EventBus } from '../../infrastructure/events/EventBus';
+import { InteractableObject } from '../../../domain/entities/InteractableObject';
+import { HOSPITAL_QUIZZES } from '../../../infrastructure/data/quizzes';
+import { EventBus } from '../../../infrastructure/events/EventBus';
 import ReportTicketList from './ReportTicketList';
 
 interface Props {
@@ -152,23 +152,23 @@ export default function TicketingApp({ objects, onGoToLocation, onFixTicket, cur
       </div>
 
       {/* Right Detail */}
-      <div className={`flex-1 bg-[#fafafa] p-4 flex-col min-h-0 overflow-y-auto custom-scrollbar ${selectedTicket === null ? 'hidden md:flex' : 'flex'}`}>
+      <div className={`flex-1 bg-[#fafafa] p-2 md:p-4 flex-col min-h-0 overflow-y-auto custom-scrollbar ${selectedTicket === null ? 'hidden md:flex' : 'flex'}`}>
         {selectedTicket !== null && activeObj && activeQuiz ? (
           <>
             {/* Mobile Back Button */}
             <div className="md:hidden mb-4">
               <button 
                 onClick={() => setSelectedTicket(null)} 
-                className="text-blue-600 bg-blue-50 px-3 py-1.5 rounded-md font-bold text-[0.65rem] border border-blue-200 flex items-center gap-2"
+                className="text-blue-600 bg-blue-50 px-2 py-1 rounded-md font-bold text-[0.6rem] border border-blue-200 flex items-center gap-2"
               >
                 <span>⬅</span> Kembali ke Daftar Tiket
               </button>
             </div>
 
-            <div className="flex items-center gap-4 border-b-2 border-slate-200 pb-4 mb-4">
-              <div className="text-4xl bg-slate-200 p-3 rounded-lg shadow-inner">{activeQuiz.icon}</div>
+            <div className="flex items-center gap-3 md:gap-4 border-b-2 border-slate-200 pb-3 md:pb-4 mb-3 md:mb-4">
+              <div className="text-3xl md:text-4xl bg-slate-200 p-2 md:p-3 rounded-lg shadow-inner">{activeQuiz.icon}</div>
               <div>
-                <h2 className="text-lg font-bold text-slate-800">
+                <h2 className="text-base md:text-lg font-bold text-slate-800">
                   <span className="text-blue-600 mr-2">#{activeObj.id}</span>
                   {activeQuiz.title}
                 </h2>
@@ -192,10 +192,10 @@ export default function TicketingApp({ objects, onGoToLocation, onFixTicket, cur
                 <p className="text-[0.8rem] text-slate-700 leading-relaxed bg-white p-3 border border-slate-200 rounded shadow-sm">{activeQuiz.question}</p>
               </div>
 
-              <div className="mb-4">
-                <div className="text-[0.65rem] font-bold text-slate-500 uppercase tracking-wider mb-1">Informasi Tiket</div>
-                <div className="flex flex-wrap items-center gap-4">
-                  <div className="flex items-center gap-2 text-[0.8rem] text-slate-700 font-bold bg-white p-2 border border-slate-200 rounded w-fit">
+              <div className="mb-3 md:mb-4">
+                <div className="text-[0.6rem] md:text-[0.65rem] font-bold text-slate-500 uppercase tracking-wider mb-1">Informasi Tiket</div>
+                <div className="flex flex-wrap items-center gap-2 md:gap-4">
+                  <div className="flex items-center gap-2 text-[0.7rem] md:text-[0.8rem] text-slate-700 font-bold bg-white p-1.5 md:p-2 border border-slate-200 rounded w-fit">
                     <span>🏥</span> {activeObj.label} (Lantai {activeObj.floor})
                   </div>
                   
@@ -263,7 +263,7 @@ export default function TicketingApp({ objects, onGoToLocation, onFixTicket, cur
       </div>
     </>
   ) : (
-    <div className="flex-1 bg-white overflow-y-auto p-4 flex flex-col gap-4 custom-scrollbar">
+    <div className="flex-1 bg-white overflow-y-auto p-2 md:p-4 flex flex-col gap-3 md:gap-4 custom-scrollbar">
       {selectedReport === null ? (
         <>
           <h2 className="text-xl font-bold text-slate-800 mb-2">Riwayat Laporan Harian</h2>

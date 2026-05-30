@@ -3,7 +3,7 @@
 // ==========================================
 
 import React, { useEffect, useState } from 'react';
-import { EventBus } from '../../infrastructure/events/EventBus';
+import { EventBus } from '../../../infrastructure/events/EventBus';
 
 interface Props {
   onComplete: () => void;
