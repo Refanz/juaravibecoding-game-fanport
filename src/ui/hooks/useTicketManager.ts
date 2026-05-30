@@ -5,34 +5,59 @@ import { HOSPITAL_QUIZZES } from "../../infrastructure/data/quizzes";
 import { nanoid } from 'nanoid';
 
 export function useTicketManager(floorManager: FloorManager) {
-  const [ticketNotification, setTicketNotification] = useState<{ title: string; message: string } | null>(null);
+  const [ticketNotification, setTicketNotification] = useState<{ 
+    title: string; 
+    message: string;
+    icon?: string;
+    colorTheme?: "orange" | "red" | "blue" | "green";
+  } | null>(null);
   const lastSpawnHour = useRef<number | null>(null);
   const currentTimestamp = useRef<number>(0);
   
   useEffect(() => {
+    let initialSpawnDone = false;
+
     const onTimeUpdated = (data: any) => {
       if (data.timestamp) currentTimestamp.current = data.timestamp;
+      
+      if (!initialSpawnDone && currentTimestamp.current > 0) {
+        initialSpawnDone = true;
+        const activeCount = floorManager.allObjects.filter(o => o.active && !o.solved).length;
+        if (activeCount === 0) {
+          const inactiveObjects = floorManager.allObjects.filter(o => !o.active || o.solved);
+          if (inactiveObjects.length > 0) {
+            const obj = inactiveObjects[Math.floor(Math.random() * inactiveObjects.length)];
+            obj.active = true;
+            obj.solved = false;
+            obj.completionTime = null;
+            obj.id = `TKT-${nanoid(6).toUpperCase()}`;
+            obj.spawnTime = currentTimestamp.current;
+            EventBus.emit("ticket_spawned");
+            const quiz = HOSPITAL_QUIZZES[obj.quizIndex % HOSPITAL_QUIZZES.length];
+            
+            let colorTheme: "orange" | "red" | "blue" | "green" = "blue";
+            let icon = "ℹ️";
+            if (obj.impact === "High") {
+              colorTheme = "red";
+              icon = "🚨";
+            } else if (obj.impact === "Medium") {
+              colorTheme = "orange";
+              icon = "⚠️";
+            }
+            
+            setTimeout(() => {
+              setTicketNotification({
+                title: `Laporan Insiden: ${obj.impact}`,
+                message: `Tiket Baru: [${quiz.title}] di ${obj.label} (Lt. ${obj.floor})`,
+                icon,
+                colorTheme
+              });
+            }, 1000);
+          }
+        }
+      }
     };
     EventBus.on("time_updated", onTimeUpdated);
-
-    // Initial spawn if no active tickets
-    const activeCount = floorManager.allObjects.filter(o => o.active && !o.solved).length;
-    if (activeCount === 0) {
-      const inactiveObjects = floorManager.allObjects.filter(o => !o.active && !o.solved);
-      if (inactiveObjects.length > 0) {
-        const obj = inactiveObjects[Math.floor(Math.random() * inactiveObjects.length)];
-        obj.active = true;
-        obj.spawnTime = currentTimestamp.current > 0 ? currentTimestamp.current : new Date(2026, 0, 1, 8, 0).getTime();
-        EventBus.emit("ticket_spawned");
-        const quiz = HOSPITAL_QUIZZES[obj.quizIndex % HOSPITAL_QUIZZES.length];
-        setTimeout(() => {
-          setTicketNotification({
-            title: `Laporan Insiden: ${obj.impact}`,
-            message: `Tiket Baru: [${quiz.title}] di ${obj.label} (Lt. ${obj.floor})`
-          });
-        }, 1000);
-      }
-    }
 
     const onHourChanged = (hour: number) => {
       // Interval spawn 1-2 hours
@@ -51,17 +76,33 @@ export function useTicketManager(floorManager: FloorManager) {
       
       if (shouldSpawn) {
         // Spawn ticket
-        const inactiveObjects = floorManager.allObjects.filter(o => !o.active && !o.solved);
+        const inactiveObjects = floorManager.allObjects.filter(o => !o.active || o.solved);
         if (inactiveObjects.length > 0) {
           // Pick a random one
           const obj = inactiveObjects[Math.floor(Math.random() * inactiveObjects.length)];
           obj.active = true;
+          obj.solved = false;
+          obj.completionTime = null;
+          obj.id = `TKT-${nanoid(6).toUpperCase()}`;
           obj.spawnTime = currentTimestamp.current;
           
           const quiz = HOSPITAL_QUIZZES[obj.quizIndex % HOSPITAL_QUIZZES.length];
+          
+          let colorTheme: "orange" | "red" | "blue" | "green" = "blue";
+          let icon = "ℹ️";
+          if (obj.impact === "High") {
+            colorTheme = "red";
+            icon = "🚨";
+          } else if (obj.impact === "Medium") {
+            colorTheme = "orange";
+            icon = "⚠️";
+          }
+          
           setTicketNotification({
             title: `Laporan Insiden: ${obj.impact}`,
-            message: `Tiket Baru: [${quiz.title}] di ${obj.label} (Lt. ${obj.floor})`
+            message: `Tiket Baru: [${quiz.title}] di ${obj.label} (Lt. ${obj.floor})`,
+            icon,
+            colorTheme
           });
           
           lastSpawnHour.current = hour;

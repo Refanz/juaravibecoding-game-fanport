@@ -2,20 +2,20 @@ import React from "react";
 
 interface Props {
   currentFloor: number;
-  solvedCount: number;
-  totalObjects: number;
   currentDate: string;
   currentTime: string;
   currentPeriod: "pagi" | "siang" | "sore" | "malam";
+  activeTickets: number;
+  completedTickets: number;
 }
 
 export default function FloatingHUD({
   currentFloor,
-  solvedCount,
-  totalObjects,
   currentDate,
   currentTime,
   currentPeriod,
+  activeTickets,
+  completedTickets,
 }: Props) {
   const periodIcon = {
     pagi: "🌅",
@@ -34,11 +34,14 @@ export default function FloatingHUD({
             Lt. {currentFloor}
           </span>
         </div>
-        {/* Skor Badge */}
-        <div className="flex items-center gap-1.5 bg-black/40 border border-medical-green/30 px-1.5 lg:px-2 py-1 rounded-md shadow-inner backdrop-blur-sm transition-all hover:bg-black/50">
-          <span className="text-[12px] lg:text-[14px] drop-shadow-md">📊</span>
-          <span className="text-[9px] lg:text-[10px] font-bold text-medical-green tracking-widest uppercase">
-            Skor: {solvedCount}/{totalObjects}
+        {/* Tiket Badge */}
+        <div className="flex items-center gap-2 bg-black/40 border border-hospital-sky/30 px-1.5 lg:px-2 py-1 rounded-md shadow-inner backdrop-blur-sm font-[var(--font-pixel)] text-[9px] lg:text-[10px] text-white transition-all hover:bg-black/50">
+          <span className="flex items-center gap-1 text-hospital-alert drop-shadow-md">
+            <span>🎫</span> {activeTickets}
+          </span>
+          <span className="opacity-40">|</span>
+          <span className="flex items-center gap-1 text-green-400 drop-shadow-md">
+            <span>✅</span> {completedTickets}
           </span>
         </div>
       </div>

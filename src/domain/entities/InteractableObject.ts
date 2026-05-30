@@ -9,7 +9,7 @@ const TILE = 48;
 const INTERACT_RANGE = 56;
 
 export abstract class InteractableObject {
-  readonly id: string;
+  id: string;
   readonly x: number;
   readonly y: number;
   readonly label: string;

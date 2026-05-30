@@ -3,6 +3,8 @@
 // State permainan — screen, quiz, camera
 // ==========================================
 
+import { SaveData } from "../infrastructure/storage/SaveManager";
+
 export type Screen = 'welcome' | 'playing' | 'win';
 
 export interface Camera { x: number; y: number; }
@@ -46,6 +48,18 @@ export class GameState {
     this.justUsedElevator = false;
     this.savedPlayerPos = null;
     this.gameTime = { minute: 0, hour: 8, day: 1, month: 0, year: 2026 };
+  }
+
+  restoreFromSave(data: SaveData): void {
+    this.savedPlayerPos = { x: data.playerX, y: data.playerY, floor: data.currentFloor };
+    this.gameTime = data.gameTime;
+    
+    if (data.reports) {
+      sessionStorage.setItem("hospital_reports", data.reports);
+    }
+    if (data.notifications) {
+      sessionStorage.setItem("hospital_notifications", data.notifications);
+    }
   }
 
   startPlaying(): void { this.screen = 'playing'; }

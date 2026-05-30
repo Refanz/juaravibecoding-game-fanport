@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import SettingsModal from './SettingsModal';
+import SaveConfirmModal from './SaveConfirmModal';
+import { EventBus } from '../../infrastructure/events/EventBus';
 
 interface Props {
   onResume: () => void;
@@ -10,6 +12,13 @@ interface Props {
 
 export default function PauseModal({ onResume, onReturnToWelcome, solvedCount, totalObjects }: Props) {
   const [showSettings, setShowSettings] = useState(false);
+  const [showSaveConfirm, setShowSaveConfirm] = useState(false);
+  const [hasJustSaved, setHasJustSaved] = useState(false);
+
+  const handleManualSave = () => {
+    EventBus.emit("request_manual_save");
+    setHasJustSaved(true);
+  };
 
   return (
     <>
@@ -41,7 +50,19 @@ export default function PauseModal({ onResume, onReturnToWelcome, solvedCount, t
               ⚙️ PENGATURAN
             </button>
             <button
-              onClick={onReturnToWelcome}
+              onClick={handleManualSave}
+              className="bg-surface hover:bg-surface-light text-white border-2 border-hospital-blue py-3 px-4 rounded font-[var(--font-pixel)] text-[0.6rem] cursor-pointer transition-all duration-200 hover:scale-105"
+            >
+              💾 SAVE PROGRESS
+            </button>
+            <button
+              onClick={() => {
+                if (hasJustSaved) {
+                  onReturnToWelcome();
+                } else {
+                  setShowSaveConfirm(true);
+                }
+              }}
               className="bg-red-alert/80 hover:bg-red-alert text-white border-2 border-red-500 py-3 px-4 rounded font-[var(--font-pixel)] text-[0.6rem] cursor-pointer transition-all duration-200 hover:scale-105"
             >
               ⏹ KEMBALI KE MENU
@@ -50,6 +71,16 @@ export default function PauseModal({ onResume, onReturnToWelcome, solvedCount, t
         </div>
       </div>
       {showSettings && <SettingsModal onClose={() => setShowSettings(false)} />}
+      {showSaveConfirm && (
+        <SaveConfirmModal
+          onSaveAndQuit={() => {
+            EventBus.emit("request_manual_save");
+            onReturnToWelcome();
+          }}
+          onQuitWithoutSave={onReturnToWelcome}
+          onCancel={() => setShowSaveConfirm(false)}
+        />
+      )}
     </>
   );
 }
