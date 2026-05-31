@@ -13,7 +13,6 @@ export default function SettingsModal({ onClose }: Props) {
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [gamepadLayout, setGamepadLayout] = useState<'right' | 'left'>('right');
   const [gamepadType, setGamepadType] = useState<'dpad' | 'joystick'>('dpad');
-  const [orientation, setOrientation] = useState<'landscape' | 'portrait'>('landscape');
 
   useEffect(() => {
     setSoundEnabled(!AudioManager.isMuted());
@@ -21,8 +20,6 @@ export default function SettingsModal({ onClose }: Props) {
     if (savedLayout) setGamepadLayout(savedLayout);
     const savedType = localStorage.getItem('jvc_gamepad_type') as 'dpad' | 'joystick' | null;
     if (savedType) setGamepadType(savedType);
-    const savedOrient = localStorage.getItem('jvc_orientation') as 'landscape' | 'portrait' | null;
-    if (savedOrient) setOrientation(savedOrient);
   }, []);
 
   const handleSoundChange = (enabled: boolean) => {
@@ -41,22 +38,6 @@ export default function SettingsModal({ onClose }: Props) {
     setGamepadType(type);
     localStorage.setItem('jvc_gamepad_type', type);
     AudioManager.click();
-  };
-
-  const handleOrientationChange = async (type: 'landscape' | 'portrait') => {
-    setOrientation(type);
-    localStorage.setItem('jvc_orientation', type);
-    AudioManager.click();
-    
-    try {
-      if (document.fullscreenElement || (document as any).webkitFullscreenElement) {
-        if (screen.orientation && (screen.orientation as any).lock) {
-          await (screen.orientation as any).lock(type);
-        }
-      }
-    } catch (err) {
-      console.warn("Orientation lock failed", err);
-    }
   };
 
   return (
@@ -122,25 +103,6 @@ export default function SettingsModal({ onClose }: Props) {
                 onClick={() => handleTypeChange('joystick')}
               >
                 Joystick<br/>(Analog)
-              </button>
-            </div>
-          </div>
-
-          {/* Orientation Settings */}
-          <div className="flex flex-col justify-center gap-2 bg-dark/50 p-3 rounded border border-hospital-blue/30 h-full">
-            <span className="text-hospital-sky font-bold text-xs sm:text-sm tracking-wide">📱 ORIENTASI (MOBILE)</span>
-            <div className="flex gap-2 text-[0.65rem] sm:text-xs mt-auto">
-              <button
-                className={`flex-1 py-1.5 sm:py-2 rounded transition-colors border ${orientation === 'landscape' ? 'bg-hospital-blue/80 border-hospital-sky text-white shadow-[0_0_10px_rgba(79,195,247,0.4)]' : 'bg-dark border-gray-600 text-gray-400'}`}
-                onClick={() => handleOrientationChange('landscape')}
-              >
-                Landscape
-              </button>
-              <button
-                className={`flex-1 py-1.5 sm:py-2 rounded transition-colors border ${orientation === 'portrait' ? 'bg-hospital-blue/80 border-hospital-sky text-white shadow-[0_0_10px_rgba(79,195,247,0.4)]' : 'bg-dark border-gray-600 text-gray-400'}`}
-                onClick={() => handleOrientationChange('portrait')}
-              >
-                Portrait
               </button>
             </div>
           </div>

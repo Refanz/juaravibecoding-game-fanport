@@ -6,6 +6,7 @@
 ![Phaser](https://img.shields.io/badge/Phaser-990033?style=for-the-badge&logo=phaser&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
 ![TailwindCSS](https://img.shields.io/badge/TailwindCSS-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)
+![Express](https://img.shields.io/badge/Express.js-404D59?style=for-the-badge)
 ![PWA](https://img.shields.io/badge/PWA-5A0FC8?style=for-the-badge&logo=pwa&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
 ![Cloud Run](https://img.shields.io/badge/Cloud%20Run-4285F4?style=for-the-badge&logo=google-cloud&logoColor=white)
@@ -49,12 +50,18 @@ Seluruh visual game — termasuk sprite karakter pemain, NPC medis, lift, komput
 - SVG ini dirasterisasi sekali menjadi Data URI (Base64 PNG) selama fase `preload` Phaser untuk mencegah memory leak.
 - Membuat game ini **100% mandiri** tanpa ketergantungan pada hosting gambar eksternal, menjamin game tetap dapat dimuat dengan cepat dan andal secara offline.
 
-### 6. PWA & Optimalisasi Mobile
-- **Installable PWA**: Mendukung instalasi di perangkat seluler dan desktop sebagai aplikasi standalone layar penuh melalui konfigurasi manifest web terintegrasi.
-- **Virtual Gamepad**: Joystick virtual D-pad dan tombol aksi sentuh yang halus untuk mempermudah pergerakan di layar mobile, dioptimalkan dengan penanganan event sentuh non-pasif untuk mencegah scroll lagging.
-- **Responsive Layout & Orientation System**: Tampilan UI otomatis menyesuaikan ukuran layar, serta memiliki pengaturan rotasi orientasi (Landscape / Portrait) di menu Settings.
+### 6. Sistem Simpan Progres (Game Save/Load System)
+Jangan khawatir kehilangan progres! Game ini memiliki sistem penyimpanan otomatis (auto-save) setiap 5 jam waktu in-game, serta tombol simpan manual yang terintegrasi dengan browser `localStorage`. Posisi pemain, waktu permainan, dan status tiket selalu terjaga aman secara lokal.
 
-### 7. Percakapan Interaktif dengan NPC
+### 7. Sistem Pengadaan Cerdas (Vibe Procurement System)
+Untuk perbaikan perangkat keras berat yang membutuhkan komponen fisik (seperti pergantian motherboard server atau switch baru), game ini menyediakan modul **Procurement App** di Laptop OS. Sistem ini didukung oleh backend Node.js (Express) mandiri dan alur persetujuan berbasis AI (**AI-Driven Approval Workflow**) secara real-time.
+
+### 8. PWA & Optimalisasi Mobile yang Disempurnakan
+- **Installable PWA**: Mendukung instalasi di perangkat seluler dan desktop sebagai aplikasi standalone layar penuh melalui konfigurasi manifest web terintegrasi.
+- **Virtual Gamepad**: Joystick virtual D-pad dan tombol aksi sentuh yang halus untuk mempermudah pergerakan di layar mobile, dioptimalkan dengan penanganan event sentuh non-pasif.
+- **Responsive UI Scaling**: Desain HUD dan Desktop Modal telah di-refactor menggunakan kombinasi CSS `calc` dan `transform` guna memberikan pengalaman bermain penuh (*edge-to-edge*) tanpa jeda (*stutter*) pada orientasi landscape seluler.
+
+### 9. Percakapan Interaktif dengan NPC
 Berinteraksilah dengan staf medis (Dokter, Perawat, Petugas Keamanan) dan pengunjung di rumah sakit. Dapatkan dialog dan saran unik yang disesuaikan dengan peran (role) masing-masing NPC untuk memandu pemecahan masalah Anda.
 
 ---
@@ -104,6 +111,7 @@ Terdapat 12 jenis kuis pemecahan masalah IT yang sangat relevan dengan operasion
 Proyek ini dibangun menggunakan pustaka modern berkinerja tinggi:
 - **Core UI**: React v18.2 (Stateful UI rendering) & TypeScript v5.2 (Tipe statis yang aman).
 - **Core Engine**: Phaser.js v4.1 (Web Audio API, Canvas rendering, dynamic texture capture, physics).
+- **Backend API**: Node.js & Express.js (AI-driven approval workflow untuk sistem pengadaan).
 - **Bundler & Tooling**: Vite v5.0 (Prapemrosesan super cepat) & Vite PWA Plugin (Penyediaan service worker & manifest).
 - **Styling**: Vanilla CSS3 + TailwindCSS v4.3 (Konfigurasi tema dinamis dan styling responsif modal desktop).
 - **Container Server**: Nginx Alpine (Ringan, aman, menyajikan berkas static bundle di port 8080).
@@ -152,10 +160,12 @@ JVC_Refanzzzz/
 │       │   ├── QuizModal.tsx        # Penampil pertanyaan troubleshooting
 │       │   ├── MapModal.tsx         # Tampilan peta interaktif
 │       │   ├── NetworkTopologyModal.tsx # Diagram topologi kesehatan jaringan rumah sakit
-│       │   └── SettingsModal.tsx    # Panel opsi audio, bahasa, dan orientasi layar
+│       │   └── SettingsModal.tsx    # Panel opsi game, manual save, dan audio
 │       └── hooks/                   # Custom React Hooks
 │           ├── useGameTime.ts       # Hook sinkronisasi jam simulasi
 │           └── useGameEvents.ts     # Hook penanganan EventBus game
+├── server/                          # Backend Express API untuk layanan AI
+│   └── index.js                     # Main server entry point
 ├── index.html                       # HTML5 template (Meta tag PWA, Google Fonts)
 ├── Dockerfile                       # Multi-stage image build (Node Alpine & Nginx Alpine)
 ├── nginx.conf                       # Konfigurasi reverse-routing Nginx port 8080
@@ -174,13 +184,27 @@ Pastikan Anda telah memasang **Node.js (v18+)** di sistem Anda.
 # Masuk ke direktori workspace game
 cd JVC_Refanzzzz
 
-# Pasang semua paket dependensi yang dibutuhkan
+# Pasang semua paket dependensi yang dibutuhkan (Frontend)
 npm install
+
+# Pasang dependensi untuk backend Server
+cd server
+npm install
+cd ..
 ```
 
-### 2. Jalankan Server Dev (Vite)
+### 2. Jalankan Game (Frontend + Backend)
+Karena saat ini terdapat sistem pengadaan AI di backend server, jalankan dua terminal yang berbeda:
+
+**Terminal 1 (Backend Server):**
 ```bash
+cd server
 npm run dev
+```
+
+**Terminal 2 (Frontend React + Phaser):**
+```bash
+npm run dev -- --host
 ```
 Buka peramban (browser) Anda di alamat yang tertera di terminal, biasanya `http://localhost:5173`.
 
