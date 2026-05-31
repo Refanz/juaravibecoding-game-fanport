@@ -4,11 +4,13 @@ import CCTVApp from "./CCTVApp";
 import DesktopTaskbar from "./DesktopTaskbar";
 import DesktopIcon from "./DesktopIcon";
 import DesktopWindow from "./DesktopWindow";
+import VibeProcurementApp from "./VibeProcurementApp";
 import { InteractableObject } from "../../../domain/entities/InteractableObject";
 import { EventBus } from "../../../infrastructure/events/EventBus";
 
 interface Props {
   objects: InteractableObject[];
+  initialApp?: "ticketing" | "cctv" | "procurement" | null;
   onClose: () => void;
   onGoToLocation: (idx: number) => void;
   onFixTicket: (idx: number) => void;
@@ -16,13 +18,14 @@ interface Props {
 
 export default function DesktopUIModal({
   objects,
+  initialApp,
   onClose,
   onGoToLocation,
   onFixTicket,
 }: Props) {
   const [time, setTime] = useState("");
   const [timestamp, setTimestamp] = useState(0);
-  const [activeApp, setActiveApp] = useState<"ticketing" | "cctv" | null>(null);
+  const [activeApp, setActiveApp] = useState<"ticketing" | "cctv" | "procurement" | null>(initialApp || null);
   const [layout, setLayout] = useState({
     width: 1000,
     height: 700,
@@ -136,6 +139,18 @@ export default function DesktopUIModal({
             onDoubleClick={() => setActiveApp("cctv")}
           />
           <DesktopIcon icon="🌐" label="Browser" isDisabled={true} />
+          <DesktopIcon 
+            icon="🛒" 
+            label={
+              <>
+                Vibe<br />
+                Procurement
+              </>
+            } 
+            isActive={activeApp === "procurement"}
+            onClick={() => setActiveApp("procurement")}
+            onDoubleClick={() => setActiveApp("procurement")}
+          />
           <DesktopIcon icon="⚙️" label="Settings" isDisabled={true} />
         </div>
 
@@ -166,6 +181,19 @@ export default function DesktopUIModal({
             isDesktop={layout.isDesktop}
           >
             <CCTVApp />
+          </DesktopWindow>
+        )}
+
+        {activeApp === "procurement" && (
+          <DesktopWindow
+            title="Vibe Procurement System"
+            icon="🛒"
+            theme="light"
+            onClose={() => setActiveApp(null)}
+            isDesktop={layout.isDesktop}
+            contentClassName="bg-[#f0f0f0]"
+          >
+            <VibeProcurementApp currentTimestamp={timestamp} />
           </DesktopWindow>
         )}
 

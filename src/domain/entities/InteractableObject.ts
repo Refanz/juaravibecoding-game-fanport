@@ -4,6 +4,7 @@
 // Base class + subclasses (OOP polimorfisme)
 // ==========================================
 import { nanoid } from 'nanoid';
+import { HOSPITAL_QUIZZES } from '../../infrastructure/data/quizzes';
 
 const TILE = 48;
 const INTERACT_RANGE = 56;
@@ -21,6 +22,8 @@ export abstract class InteractableObject {
   urgency: 'Low' | 'Medium' | 'High';
   spawnTime: number | null = null;
   completionTime: number | null = null;
+  resolutionType: 'quiz' | 'hardware' = 'quiz';
+  requiredItem?: string;
 
   constructor(x: number, y: number, label: string, floor: 1 | 2 | 3, quizIndex: number) {
     this.id = `TKT-${nanoid(6).toUpperCase()}`;
@@ -33,6 +36,12 @@ export abstract class InteractableObject {
     const levels: Array<'Low' | 'Medium' | 'High'> = ['Low', 'Medium', 'High'];
     this.impact = levels[Math.floor(Math.random() * levels.length)];
     this.urgency = levels[Math.floor(Math.random() * levels.length)];
+
+    const quiz = HOSPITAL_QUIZZES[quizIndex % HOSPITAL_QUIZZES.length];
+    if (quiz.resolutionType === 'hardware') {
+      this.resolutionType = 'hardware';
+      this.requiredItem = quiz.requiredItem;
+    }
   }
 
   get centerX() { return this.x * TILE + TILE / 2; }

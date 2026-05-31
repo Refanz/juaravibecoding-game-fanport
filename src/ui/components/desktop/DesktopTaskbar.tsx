@@ -1,6 +1,6 @@
 interface Props {
   time: string;
-  activeApp: "ticketing" | "cctv" | null;
+  activeApp: "ticketing" | "cctv" | "procurement" | null;
   onCloseOS: () => void;
 }
 
@@ -24,6 +24,11 @@ export default function DesktopTaskbar({ time, activeApp, onCloseOS }: Props) {
         {activeApp === "cctv" && (
           <div className="h-full bg-[#dfdfdf] border-2 border-gray-600 border-b-white border-r-white px-3 flex items-center gap-2 text-xs font-bold text-slate-800">
             📹 CCTV Monitor
+          </div>
+        )}
+        {activeApp === "procurement" && (
+          <div className="h-full bg-[#dfdfdf] border-2 border-gray-600 border-b-white border-r-white px-3 flex items-center gap-2 text-xs font-bold text-slate-800">
+            🛒 Vibe Procurement
           </div>
         )}
       </div>

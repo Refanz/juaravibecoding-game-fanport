@@ -39,6 +39,11 @@ import { NPCDialogModal } from "../modals/NPCDialogModal";
 import DailyReportModal from "../modals/DailyReportModal";
 import GeneralLoadingScreen from "./GeneralLoadingScreen";
 import NotificationModal from "../modals/NotificationModal";
+import WarehouseModal from "../modals/WarehouseModal";
+import HardwareTicketModal from "../modals/HardwareTicketModal";
+import { BudgetManager } from "../../../infrastructure/storage/BudgetManager";
+import { WarehouseManager } from "../../../infrastructure/storage/WarehouseManager";
+import { ProcurementManager } from "../../../infrastructure/storage/ProcurementManager";
 
 interface Props {
   onReturnToWelcome: () => void;
@@ -65,6 +70,10 @@ export default function GameScreen({
         f.loadFloor(data.currentFloor);
       }
     }
+    
+    BudgetManager.initialize();
+    WarehouseManager.initialize();
+    ProcurementManager.initialize();
     
     return { floor: f, gs: state };
   }, [loadSave]);
@@ -121,6 +130,7 @@ export default function GameScreen({
   const [showTopology, setShowTopology] = useState(false);
   const [showPause, setShowPause] = useState(false);
   const [showDesktop, setShowDesktop] = useState(false);
+  const [desktopInitialApp, setDesktopInitialApp] = useState<"ticketing" | "cctv" | "procurement" | null>(null);
   interface ToastNotificationData {
     message: string;
     colorTheme?: "orange" | "red" | "blue" | "green";
@@ -140,6 +150,16 @@ export default function GameScreen({
   const [unreadNotifCount, setUnreadNotifCount] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [isDayTransitioning, setIsDayTransitioning] = useState(false);
+  
+  const [showWarehouse, setShowWarehouse] = useState(false);
+  const [hardwareTicket, setHardwareTicket] = useState<{ objIndex: number; requiredItem: string } | null>(null);
+  const [currentBudget, setCurrentBudget] = useState(BudgetManager.getBudget());
+
+  useEffect(() => {
+    const handleBudgetUpdate = (data: { budget: number }) => setCurrentBudget(data.budget);
+    EventBus.on("budget_updated", handleBudgetUpdate);
+    return () => { EventBus.off("budget_updated", handleBudgetUpdate); };
+  }, []);
 
   const collectSaveData = useCallback((): Omit<SaveData, "version" | "savedAt"> => {
     return {
@@ -159,7 +179,14 @@ export default function GameScreen({
         quizIndex: o.quizIndex
       })),
       reports: sessionStorage.getItem("hospital_reports") || "[]",
-      notifications: sessionStorage.getItem("hospital_notifications") || "[]"
+      notifications: sessionStorage.getItem("hospital_notifications") || "[]",
+      itBudget: BudgetManager.getBudget(),
+      warehouseStock: JSON.stringify(WarehouseManager.getStock()),
+      procurementData: JSON.stringify({
+        prs: ProcurementManager.getPRs(),
+        pos: ProcurementManager.getPOs(),
+        dos: ProcurementManager.getDOs()
+      })
     };
   }, [floor, gs]);
 
@@ -178,15 +205,20 @@ export default function GameScreen({
     const handleShowToast = (data: ToastNotificationData) => {
       setNotification(data);
     };
+    const handleHardwareTicketInteract = (data: { objIndex: number; requiredItem: string }) => {
+      setHardwareTicket(data);
+    };
     
     EventBus.on("request_manual_save", handleManualSave);
     EventBus.on("auto_save", handleAutoSave);
     EventBus.on("show_toast_notification", handleShowToast);
+    EventBus.on("hardware_ticket_interact", handleHardwareTicketInteract);
     
     return () => {
       EventBus.off("request_manual_save", handleManualSave);
       EventBus.off("auto_save", handleAutoSave);
       EventBus.off("show_toast_notification", handleShowToast);
+      EventBus.off("hardware_ticket_interact", handleHardwareTicketInteract);
     };
   }, [collectSaveData]);
 
@@ -279,6 +311,7 @@ export default function GameScreen({
           currentPeriod={currentPeriod}
           activeTickets={floor.allObjects.filter(o => o.active && !o.solved).length}
           completedTickets={floor.allObjects.filter(o => o.solved).length}
+          currentBudget={currentBudget}
         />
       )}
 
@@ -290,6 +323,7 @@ export default function GameScreen({
             onDesktop={() => setShowDesktop(true)}
             onMap={() => setShowMap(true)}
             onTopology={() => setShowTopology(true)}
+            onWarehouse={() => setShowWarehouse(true)}
             onInfo={() => setShowInfo(true)}
             unsolvedCount={floor.allObjects.filter((o) => !o.solved).length}
             onNotifications={() => {
@@ -333,6 +367,27 @@ export default function GameScreen({
           onWrong={handleWrong}
         />
       )}
+      
+      {hardwareTicket && (
+        <HardwareTicketModal
+          quizKey={floor.allObjects[hardwareTicket.objIndex].quizIndex}
+          requiredItem={hardwareTicket.requiredItem}
+          onSuccess={() => {
+            handleCorrect();
+            setHardwareTicket(null);
+          }}
+          onCancel={() => {
+            handleWrong();
+            setHardwareTicket(null);
+          }}
+          onOpenProcurement={() => {
+            handleWrong();
+            setHardwareTicket(null);
+            setDesktopInitialApp("procurement");
+            setShowDesktop(true);
+          }}
+        />
+      )}
 
       {dialogData && (
         <NPCDialogModal
@@ -369,6 +424,10 @@ export default function GameScreen({
       {showTopology && (
         <NetworkTopologyModal onClose={() => setShowTopology(false)} />
       )}
+      
+      {showWarehouse && (
+        <WarehouseModal onClose={() => setShowWarehouse(false)} />
+      )}
 
       {showElevator && (
         <ElevatorModal
@@ -384,7 +443,11 @@ export default function GameScreen({
       {showDesktop && (
         <DesktopUIModal
           objects={floor.allObjects}
-          onClose={() => setShowDesktop(false)}
+          initialApp={desktopInitialApp}
+          onClose={() => {
+            setShowDesktop(false);
+            setDesktopInitialApp(null);
+          }}
           onGoToLocation={(idx) => {
             if (gs.activeMarkerIndex !== null && gs.activeMarkerIndex !== idx) {
               const msg = "Anda sudah memiliki tiket yang sedang ditelusuri. Selesaikan tiket sebelumnya terlebih dahulu atau berinteraksi dengan sumber masalah untuk membatalkannya.";

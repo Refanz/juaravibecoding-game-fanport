@@ -17,6 +17,7 @@ export class TimeManager {
   private currentDate: Date;
   
   private elapsedHoursSinceSave: number = 0;
+  private nextBudgetEventHours: number = 0;
 
   constructor(scene: Phaser.Scene, gameState: GameState) {
     this.scene = scene;
@@ -30,6 +31,7 @@ export class TimeManager {
     this.year = this.gameState.gameTime.year;
 
     this.currentDate = new Date(this.year, this.month, this.day, this.hour, this.minute);
+    this.nextBudgetEventHours = Phaser.Math.Between(3, 5);
 
     // Skala waktu: 1 jam in-game = 1 menit real-time.
     // Berarti 1 menit in-game = 1 detik real-time.
@@ -86,6 +88,19 @@ export class TimeManager {
       if (this.elapsedHoursSinceSave >= 5) {
         EventBus.emit("auto_save");
         this.elapsedHoursSinceSave = 0;
+      }
+
+      this.nextBudgetEventHours--;
+      if (this.nextBudgetEventHours <= 0) {
+        const delta = Phaser.Math.Between(-30, 50) * 100000;
+        const isPositive = delta > 0;
+        const reason = isPositive 
+          ? ["Refund vendor", "Bonus operasional", "Klaim garansi cair"][Phaser.Math.Between(0, 2)]
+          : ["Biaya operasional tak terduga", "Denda keterlambatan bayar vendor", "Maintenance rutin"][Phaser.Math.Between(0, 2)];
+        if (delta !== 0) {
+          EventBus.emit("budget_event", { delta, reason });
+        }
+        this.nextBudgetEventHours = Phaser.Math.Between(3, 5);
       }
     }
 

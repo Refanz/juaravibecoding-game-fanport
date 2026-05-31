@@ -29,6 +29,8 @@ steps:
       - "--port"
       - "8080"
       - "--allow-unauthenticated"
+      - "--set-env-vars"
+      - "GEMINI_API_KEY=$_GEMINI_API_KEY"
 
 # Menyimpan image di GCR
 images:
