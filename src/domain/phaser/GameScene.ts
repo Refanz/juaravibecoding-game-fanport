@@ -779,7 +779,12 @@ export class GameScene extends Phaser.Scene {
 
       this.gameState.quizActive = true;
       this.gameState.quizObjectIndex = nearIdx;
-      EventBus.emit("open_quiz", nearIdx);
+      
+      if (nearObj.resolutionType === 'hardware') {
+        EventBus.emit("hardware_ticket_interact", { objIndex: nearIdx, requiredItem: nearObj.requiredItem });
+      } else {
+        EventBus.emit("open_quiz", nearIdx);
+      }
     } else if (nearNPC) {
       AudioManager.interact();
       this.gameState.dialogActive = true;

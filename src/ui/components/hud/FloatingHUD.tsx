@@ -7,6 +7,7 @@ interface Props {
   currentPeriod: "pagi" | "siang" | "sore" | "malam";
   activeTickets: number;
   completedTickets: number;
+  currentBudget: number;
 }
 
 export default function FloatingHUD({
@@ -16,6 +17,7 @@ export default function FloatingHUD({
   currentPeriod,
   activeTickets,
   completedTickets,
+  currentBudget,
 }: Props) {
   const periodIcon = {
     pagi: "🌅",
@@ -53,6 +55,13 @@ export default function FloatingHUD({
         <span className="opacity-30">|</span>
         <span className="flex items-center gap-1.5 font-bold tracking-wider leading-none">
           <span className="drop-shadow-md text-[10px] lg:text-[12px]">{periodIcon}</span> {currentTime}
+        </span>
+      </div>
+      {/* Budget Badge */}
+      <div className="flex items-center gap-1.5 bg-black/40 border border-green-500/30 px-1.5 lg:px-2 py-1 rounded-md shadow-inner backdrop-blur-sm font-[var(--font-pixel)] text-[9px] lg:text-[10px] text-green-400 transition-all hover:bg-black/50 w-fit">
+        <span className="drop-shadow-md text-[10px] lg:text-[12px]">💰</span>
+        <span className="font-bold tracking-widest">
+          Rp {currentBudget.toLocaleString("id-ID")}
         </span>
       </div>
     </div>

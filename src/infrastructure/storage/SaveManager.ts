@@ -28,6 +28,10 @@ export interface SaveData {
   }>;
   reports: string;
   notifications: string;
+  itBudget?: number;
+  warehouseStock?: string;
+  procurementData?: string;
+  discrepancyReports?: string;
 }
 
 const SAVE_KEY = "hospital_vibe_save_data";

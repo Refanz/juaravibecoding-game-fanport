@@ -5,6 +5,7 @@ interface Props {
   onDesktop: () => void;
   onMap: () => void;
   onTopology: () => void;
+  onWarehouse: () => void;
   onInfo: () => void;
   unsolvedCount: number;
   onNotifications: () => void;
@@ -16,6 +17,7 @@ export default function ActionButtons({
   onDesktop,
   onMap,
   onTopology,
+  onWarehouse,
   onInfo,
   unsolvedCount,
   onNotifications,
@@ -97,6 +99,18 @@ export default function ActionButtons({
         </span>
         <span className="text-[7px] lg:text-[10px] font-bold tracking-wider opacity-80 group-hover:opacity-100">
           TOPOLOGI
+        </span>
+      </button>
+      <button
+        onClick={onWarehouse}
+        className="text-hospital-sky hover:text-white bg-dark/50 hover:bg-dark border border-hospital-blue/40 hover:border-hospital-blue w-[38px] h-[38px] lg:w-[60px] lg:h-[60px] rounded-xl cursor-pointer transition-all duration-300 opacity-80 hover:opacity-100 shadow-[0_0_10px_rgba(0,0,0,0.5)] backdrop-blur-sm flex flex-col items-center justify-center gap-0.5 lg:gap-1 group relative"
+        title="Gudang IT"
+      >
+        <span className="text-[16px] lg:text-[28px] leading-none group-hover:scale-110 transition-transform">
+          📦
+        </span>
+        <span className="text-[7px] lg:text-[10px] font-bold tracking-wider opacity-80 group-hover:opacity-100">
+          GUDANG
         </span>
       </button>
       <button
