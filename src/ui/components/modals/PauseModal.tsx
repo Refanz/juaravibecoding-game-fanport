@@ -6,11 +6,9 @@ import { EventBus } from '../../../infrastructure/events/EventBus';
 interface Props {
   onResume: () => void;
   onReturnToWelcome: () => void;
-  solvedCount: number;
-  totalObjects: number;
 }
 
-export default function PauseModal({ onResume, onReturnToWelcome, solvedCount, totalObjects }: Props) {
+export default function PauseModal({ onResume, onReturnToWelcome }: Props) {
   const [showSettings, setShowSettings] = useState(false);
   const [showSaveConfirm, setShowSaveConfirm] = useState(false);
   const [hasJustSaved, setHasJustSaved] = useState(false);
@@ -26,16 +24,6 @@ export default function PauseModal({ onResume, onReturnToWelcome, solvedCount, t
         <div className="bg-dark border-2 border-hospital-blue rounded-lg p-4 sm:p-6 max-w-sm w-full text-center relative shadow-[0_0_15px_#1565c0] max-h-[95vh] overflow-y-auto custom-scrollbar">
           <h2 className="text-hospital-sky text-2xl mb-2 font-[var(--font-pixel)]">PAUSED</h2>
           
-          <div className="my-6 p-4 bg-surface rounded border border-hospital-blue/30 text-left">
-            <p className="text-text-dim text-[0.6rem] mb-3 font-[var(--font-pixel)]">Progress Task:</p>
-            <div className="flex items-center gap-3">
-              <span className="text-medical-green text-2xl animate-pulse-icon">📊</span>
-              <span className="text-white text-lg font-[var(--font-pixel)]">
-                {solvedCount} / {totalObjects} <span className="text-[0.6rem] text-medical-light">Selesai</span>
-              </span>
-            </div>
-          </div>
-
           <div className="flex flex-col gap-3">
             <button
               onClick={onResume}

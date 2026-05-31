@@ -124,7 +124,7 @@ export default function GameScreen({
   } = useGameEvents(gs, floor.currentFloor);
 
   // Additional UI states
-  const [solvedCount, setSolvedCount] = useState(0);
+
   const [showInfo, setShowInfo] = useState(false);
   const [showMap, setShowMap] = useState(false);
   const [showTopology, setShowTopology] = useState(false);
@@ -272,7 +272,7 @@ export default function GameScreen({
   }, [gs, onReturnToWelcome]);
 
   const handleCorrect = useCallback(() => {
-    setSolvedCount(floor.solvedCount + 1); // optimism update
+
     EventBus.emit("quiz_closed", true);
     setQuizKey(null);
   }, [floor]);
@@ -407,8 +407,6 @@ export default function GameScreen({
         <PauseModal
           onResume={handleResume}
           onReturnToWelcome={handleReturnToWelcomeFromPause}
-          solvedCount={solvedCount}
-          totalObjects={floor.totalObjects}
         />
       )}
 
